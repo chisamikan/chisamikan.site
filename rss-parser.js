@@ -1,0 +1,21 @@
+let Parser = require('rss-parser');
+const fs = require('fs');
+let parser = new Parser();
+
+(async () => {
+  let feed = await parser.parseURL(
+    'https://pixivfanboxrss.herokuapp.com/fanbox/chisamikan',
+  );
+
+  feed.items.length = 5; //一度に表示する件数
+  feed.siteName = 'chisamikan.site',
+  feed.siteRootUrl = 'https://chisamikan.site/',
+  feed.ogImageUrl = 'https://chisamikan.site/images/og-image.jpg',
+  feed.fbAppId = '',
+  feed.twitterSite = '@chisamikan',
+  feed.googleAnalyticsId = 'UA-35769734-2',
+
+  fs.writeFile('site.json', JSON.stringify(feed, null, '    '), (err) => {
+    if (err) console.log(`error!::${err}`);
+  });
+})();

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title><% if (pageId != 'index') { %><%= pageTitle %> - <% } %><%= siteName %></title>
+    <meta name="description" content="<%= pageDescription %>">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <%# OGP %>
+    <meta property="og:title" content="<%= pageTitle %> - <%= siteName %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= siteRootUrl %><%= pageUrl %>" />
+    <meta property="og:image" content="<%= ogImageUrl %>" />
+    <meta property="og:site_name" content="<%= siteName %>" />
+    <meta property="fb:app_id" content="<%= fbAppId %>" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="<%= twitterSite %>">
+
+    <%# CDN CSS %>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
+        integrity="sha256-dARYuC3pd0wa/7R4Hkt/sR2zfLHCgbnVAQ2sPwhNe0A=" crossorigin="anonymous" />
+    <link href="//fonts.googleapis.com/css?family=M+PLUS+1p:400,700|Share+Tech+Mono&display=swap&subset=japanese"
+        rel="stylesheet">
+
+    <%# Custom CSS %>
+    <link rel="stylesheet" href="style.css" />
+
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="images/android-chrome-192x192.png">
+    <link rel="canonical" href="<%= siteRootUrl %><%= pageUrl %>" />
+</head>
+
+<body>

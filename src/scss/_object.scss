@@ -1,0 +1,301 @@
+.side {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: $side-menu-width-md;
+  height: 100vh;
+  padding: 0 1rem 5rem;
+  text-align: center;
+  backdrop-filter: blur(3px);
+  background-color: rgba(255, 255, 255, 0.05);
+  ul {
+    padding-inline-start: 0;
+    margin-block-end: 0;
+    list-style: none;
+  }
+  &-menu {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    &-active {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    li {
+      margin-top: 1rem;
+    }
+  }
+  &-sns {
+    ul {
+      @media only screen and (max-width: $small) {
+        display: flex;
+        justify-content: center;
+      }
+    }
+    li {
+      font-size: 1.5rem;
+      &:not(:first-child) {
+        @media only screen and (min-width: $small) {
+          margin-top: 0.5rem;
+        }
+        @media only screen and (max-width: $small) {
+          margin-left: 2rem;
+        }
+      }
+    }
+  }
+
+  a {
+    color: rgba(236, 239, 241, 0.7);
+    transition: color ease 0.3s, font-size ease 0.1s;
+    text-decoration: none;
+    &:hover {
+      color: map-get($colors, 'light');
+    }
+  }
+
+  @media only screen and (max-width: $small) {
+    top: -100vh;
+    width: 100%;
+    transition: all 0.5s;
+    z-index: 10;
+  }
+}
+
+.scroll {
+  @media only screen and (min-width: $small) {
+    margin-left: $side-menu-width-md;
+  }
+
+  a {
+    &:not(.btn) {
+      color: rgba(158, 228, 255, 1);
+      transition: color ease 0.3s;
+      &:hover,
+      &:focus,
+      &:active {
+        text-decoration: none;
+        color: rgba(158, 228, 255, 0.5);
+      }
+    }
+    &[target='_blank']:after {
+      font-family: 'icomoon';
+      content: '\f045';
+      font-size: 0.9em;
+      margin: 0px 3px;
+      font-weight: 900;
+      vertical-align: -0.05em;
+    }
+  }
+
+  h2 {
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 0.5em;
+    margin-bottom: 0;
+    border-left: 0.5em solid map-get($colors, 'light');
+    border-bottom: solid 1px map-get($colors, 'light');
+  }
+  /* purgecss start ignore */
+  &-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    &:first-child {
+      height: 100vh;
+    }
+    &:not(:first-child) {
+      padding-top: 1rem;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 800ms;
+      @media only screen and (min-width: $small) {
+        margin-bottom: 4rem;
+      }
+      @media only screen and (max-width: $small) {
+        margin-bottom: 3rem;
+      }
+      &.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    &-box {
+      width: 100%;
+      max-width: 80%;
+      &-txt {
+        margin: 2rem 1.5rem;
+        @media only screen and (max-width: $small) {
+          margin: 2rem 0;
+        }
+      }
+    }
+  }
+}
+/* purgecss end ignore */
+.form {
+  &-group {
+    position: relative;
+    z-index: 1;
+    input {
+      &[type='text'] {
+        padding-left: 4em;
+      }
+      &[type='email'] {
+        padding-left: 8.5em;
+      }
+      &[type='text'],
+      &[type='email'] {
+        font-size: 15px;
+        line-height: 24px;
+        letter-spacing: 1px;
+      }
+    }
+    input[type='text'],
+    input[type='email'],
+    textarea {
+      width: 100%;
+      transition: 0.4s;
+      &:focus {
+        outline: none;
+      }
+    }
+    input[type='text']:focus,
+    input[type='email']:focus,
+    textarea:focus {
+      padding: 0;
+    }
+    textarea {
+      padding-top: 1.5rem;
+    }
+    &,
+    & ~ .btn {
+      &:not(:first-child) {
+        margin-top: 40px;
+      }
+    }
+  }
+
+  &-control {
+    padding: 4px 0;
+    background-color: transparent;
+    border: 0;
+    border-bottom: 1px solid map-get($colors, 'lightS');
+    color: map-get($colors, 'light');
+
+    ~ .focus-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: map-get($colors, 'light');
+      transition: 0.4s;
+      &.textarea {
+        bottom: 5px;
+      }
+    }
+    ~ label {
+      position: absolute;
+      top: 4px;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      letter-spacing: 0.5px;
+      transition: 0.3s;
+    }
+  }
+
+  &-control:focus ~ .focus-line,
+  &-group.form-control ~ .focus-line {
+    width: 100%;
+    transition: 0.4s;
+  }
+
+  &-control:focus ~ label,
+  &-group.form-control ~ label {
+    top: -16px;
+    font-size: 12px;
+    transition: 0.3s;
+  }
+}
+/* purgecss start ignore */
+.fadein {
+  top: 0 !important;
+}
+
+#target {
+  @media only screen and (max-width: $small) {
+    width: 40px;
+    height: 30px;
+    position: fixed;
+    top: 0;
+    right: 1rem;
+    cursor: pointer;
+    display: block;
+    transition: 1.5s;
+    z-index: 100;
+  }
+  @media only screen and (min-width: $small) {
+    display: none;
+  }
+}
+
+.target_inner {
+  width: 40px;
+  height: 30px;
+  position: relative;
+  &_line {
+    display: block;
+    width: 40px;
+    height: 5px;
+    background: map-get($colors, 'lightS');
+    transition: 1.5s;
+    border-radius: 50px;
+    position: absolute;
+  }
+  &_1 {
+    top: 0;
+  }
+
+  &_2 {
+    top: 13px;
+  }
+
+  &_3 {
+    top: 26px;
+  }
+}
+
+.linea {
+  transform: rotate(225deg);
+  top: 13px;
+}
+
+.lineb {
+  opacity: 0;
+}
+
+.linec {
+  transform: rotate(-225deg);
+  top: 13px;
+}
+
+.rss {
+  padding-left: 0;
+  list-style-type: none;
+  &-list {
+    margin: 0;
+    padding: 10px 0;
+    &:not(:last-child) {
+      border-bottom: 1px dashed #cccccc;
+    }
+  }
+  &-date {
+    font-size: 80%;
+  }
+}
+/* purgecss end ignore */
