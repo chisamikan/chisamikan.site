@@ -6,11 +6,10 @@
   "scripts": {
     "build": "run-p build:*",
     "build:css": "sass src/scss/style.scss src/style.css && postcss src/style.css --dir dist --config postcss.config.js && rimraf src/style.css",
-    "build:ejs": "ejs-cli --base-dir src/ejs/pages **/**.ejs --out dist/ --options site.json",
+    "build:ejs": "node rss-parser.js && ejs-cli --base-dir src/ejs/pages **/**.ejs --out dist/ --options site.json",
     "build:js": "./node_modules/.bin/babel src/js --out-dir src/js/babel && uglifyjs src/js/babel/*.js -o dist/bundle.js && rimraf src/js/babel",
     "build:imagemin": "rimraf dist/images && mkdirp dist/images && node .imagemin.mjs && cpx \"src/images/favicon.ico\" dist/images",
     "build:font": "cpx \"src/scss/fonts/**\" dist/fonts",
-    "build:json": "node rss-parser.js",
     "test": "browser-sync start --config bs-config.js",
     "watch": "run-p build:* && run-p test watch:*",
     "watch:css": "chokidar \"src/scss/**.scss\" -c \"npm run build:css\"",
