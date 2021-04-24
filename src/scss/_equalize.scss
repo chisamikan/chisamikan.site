@@ -1,4 +1,4 @@
-@import 'vars';
+@use 'vars';
 
 .wrapper,
 .container,
@@ -6,14 +6,14 @@
   margin-right: auto;
   margin-left: auto;
   max-width: 100%;
-  padding-left: $col-step / 2;
-  padding-right: $col-step / 2;
+  padding-left: vars.$col-step / 2;
+  padding-right: vars.$col-step / 2;
 }
 
 .container-fluid {
   width: 100%;
-  padding-right: $col-step / 2;
-  padding-left: $col-step / 2;
+  padding-right: vars.$col-step / 2;
+  padding-left: vars.$col-step / 2;
 }
 
 .row {
@@ -21,8 +21,8 @@
   display: flex;
   flex: 0 1 auto;
   flex-flow: row wrap;
-  margin-right: - $col-step / 2;
-  margin-left: - $col-step / 2;
+  margin-right: - vars.$col-step / 2;
+  margin-left: - vars.$col-step / 2;
 }
 
 .row-reverse {
@@ -39,20 +39,20 @@
 
 .col,
 .col-xs {
-  margin-left: $column;
+  margin-left: vars.$column;
   box-sizing: border-box;
   flex: 0 0 auto;
-  padding-right: $col-step / 2;
-  padding-left: $col-step / 2;
+  padding-right: vars.$col-step / 2;
+  padding-left: vars.$col-step / 2;
 }
 
 @for $i from 1 through 11 {
   .col-xs-#{$i} {
-    margin-left: $column * $i;
+    margin-left: vars.$column * $i;
     box-sizing: border-box;
     flex: 0 0 auto;
-    padding-right: $col-step / 2;
-    padding-left: $col-step / 2;
+    padding-right: vars.$col-step / 2;
+    padding-left: vars.$col-step / 2;
   }
 }
 
@@ -65,8 +65,8 @@
 
 @for $i from 1 through 12 {
   .col-xs-#{$i} {
-    flex-basis: $column * $i;
-    max-width: $column * $i;
+    flex-basis: vars.$column * $i;
+    max-width: vars.$column * $i;
   }
 }
 
@@ -76,7 +76,7 @@
 
 @for $i from 1 through 11 {
   .col-xs-offset-#{$i} {
-    margin-left: $column * $i;
+    margin-left: vars.$column * $i;
   }
 }
 
@@ -144,9 +144,9 @@
   align-self: flex-end !important;
 }
 
-@media only screen and (min-width: $tiny) {
+@media only screen and (min-width: vars.$tiny) {
   .wrapper {
-    width: calc(#{$tiny} - 6.25%);
+    width: calc(#{vars.$tiny} - 6.25%);
   }
 
   .container {
@@ -154,9 +154,9 @@
   }
 }
 
-@media only screen and (min-width: $small) {
+@media only screen and (min-width: vars.$small) {
   .wrapper {
-    width: calc(#{$small} - 6.25%);
+    width: calc(#{vars.$small} - 6.25%);
   }
 
   .container {
@@ -166,16 +166,16 @@
   .col-sm {
     box-sizing: border-box;
     flex: 0 0 auto;
-    padding-right: $col-step / 2;
-    padding-left: $col-step / 2;
+    padding-right: vars.$col-step / 2;
+    padding-left: vars.$col-step / 2;
   }
 
   @for $i from 1 through 11 {
     .col-sm-#{$i} {
       box-sizing: border-box;
       flex: 0 0 auto;
-      padding-right: $col-step / 2;
-      padding-left: $col-step / 2;
+      padding-right: vars.$col-step / 2;
+      padding-left: vars.$col-step / 2;
     }
   }
 
@@ -187,8 +187,8 @@
 
   @for $i from 1 through 12 {
     .col-sm-#{$i} {
-      flex-basis: $column * $i;
-      max-width: $column * $i;
+      flex-basis: vars.$column * $i;
+      max-width: vars.$column * $i;
     }
   }
 
@@ -198,7 +198,7 @@
 
   @for $i from 1 through 11 {
     .col-sm-offset-#{$i} {
-      margin-left: $column * $i;
+      margin-left: vars.$column * $i;
     }
   }
 
@@ -255,9 +255,9 @@
   }
 }
 
-@media only screen and (min-width: $medium) {
+@media only screen and (min-width: vars.$medium) {
   .wrapper {
-    width: calc(#{$medium} - 6.25%);
+    width: calc(#{vars.$medium} - 6.25%);
   }
 
   .container {
@@ -267,16 +267,16 @@
   .col-md {
     box-sizing: border-box;
     flex: 0 0 auto;
-    padding-right: $col-step / 2;
-    padding-left: $col-step / 2;
+    padding-right: vars.$col-step / 2;
+    padding-left: vars.$col-step / 2;
   }
 
   @for $i from 1 through 11 {
     .col-md-#{$i} {
       box-sizing: border-box;
       flex: 0 0 auto;
-      padding-right: $col-step / 2;
-      padding-left: $col-step / 2;
+      padding-right: vars.$col-step / 2;
+      padding-left: vars.$col-step / 2;
     }
   }
 
@@ -288,8 +288,8 @@
 
   @for $i from 1 through 12 {
     .col-md-#{$i} {
-      flex-basis: $column * $i;
-      max-width: $column * $i;
+      flex-basis: vars.$column * $i;
+      max-width: vars.$column * $i;
     }
   }
 
@@ -299,7 +299,7 @@
 
   @for $i from 1 through 11 {
     .col-md-offset-#{$i} {
-      margin-left: $column * $i;
+      margin-left: vars.$column * $i;
     }
   }
 
@@ -356,9 +356,9 @@
   }
 }
 
-@media only screen and (min-width: $large) {
+@media only screen and (min-width: vars.$large) {
   .wrapper {
-    width: calc(#{$large} - 6.25%);
+    width: calc(#{vars.$large} - 6.25%);
   }
 
   .container {
@@ -368,16 +368,16 @@
   .col-lg {
     box-sizing: border-box;
     flex: 0 0 auto;
-    padding-right: $col-step / 2;
-    padding-left: $col-step / 2;
+    padding-right: vars.$col-step / 2;
+    padding-left: vars.$col-step / 2;
   }
 
   @for $i from 1 through 11 {
     .col-lg-#{$i} {
       box-sizing: border-box;
       flex: 0 0 auto;
-      padding-right: $col-step / 2;
-      padding-left: $col-step / 2;
+      padding-right: vars.$col-step / 2;
+      padding-left: vars.$col-step / 2;
     }
   }
 
@@ -389,8 +389,8 @@
 
   @for $i from 1 through 12 {
     .col-lg-#{$i} {
-      flex-basis: $column * $i;
-      max-width: $column * $i;
+      flex-basis: vars.$column * $i;
+      max-width: vars.$column * $i;
     }
   }
 
@@ -400,7 +400,7 @@
 
   @for $i from 1 through 11 {
     .col-lg-offset-#{$i} {
-      margin-left: $column * $i;
+      margin-left: vars.$column * $i;
     }
   }
 

@@ -1,5 +1,4 @@
-@import 'variables';
-@import 'equalize';
-@import 'foundation';
-@import 'object';
-@import 'utility';
+@use 'equalize';
+@use 'foundation';
+@use 'object';
+@use 'utility';

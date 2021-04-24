@@ -1,3 +1,5 @@
+@use 'vars';
+
 @font-face {
   font-family: 'icomoon';
   src: url('fonts/icomoon.eot?mi7qx5');
@@ -48,7 +50,7 @@
 
 body {
   font-family: 'M PLUS 1p', sans-serif;
-  color: map-get($colors, 'light');
+  color: map-get(vars.$colors, 'light');
   background-color: #000;
 }
 
@@ -73,14 +75,14 @@ h6,
 
 h1 {
   font-size: 5vw;
-  @media only screen and (max-width: $small) {
+  @media only screen and (max-width: vars.$small) {
     font-size: 10vw;
   }
 }
 
 h2 small {
   font-size: 60%;
-  @media only screen and (max-width: $small) {
+  @media only screen and (max-width: vars.$small) {
     font-size: 50%;
   }
 }

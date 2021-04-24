@@ -1,9 +1,11 @@
+@use 'vars';
+
 .side {
   position: fixed;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: $side-menu-width-md;
+  width: vars.$side-menu-width-md;
   height: 100vh;
   padding: 0 1rem 5rem;
   text-align: center;
@@ -29,7 +31,7 @@
   }
   &-sns {
     ul {
-      @media only screen and (max-width: $small) {
+      @media only screen and (max-width: vars.$small) {
         display: flex;
         justify-content: center;
       }
@@ -37,10 +39,10 @@
     li {
       font-size: 1.5rem;
       &:not(:first-child) {
-        @media only screen and (min-width: $small) {
+        @media only screen and (min-width: vars.$small) {
           margin-top: 0.5rem;
         }
-        @media only screen and (max-width: $small) {
+        @media only screen and (max-width: vars.$small) {
           margin-left: 2rem;
         }
       }
@@ -52,11 +54,11 @@
     transition: color ease 0.3s, font-size ease 0.1s;
     text-decoration: none;
     &:hover {
-      color: map-get($colors, 'light');
+      color: map-get(vars.$colors, 'light');
     }
   }
 
-  @media only screen and (max-width: $small) {
+  @media only screen and (max-width: vars.$small) {
     top: -100vh;
     width: 100%;
     transition: all 0.5s;
@@ -65,8 +67,8 @@
 }
 
 .scroll {
-  @media only screen and (min-width: $small) {
-    margin-left: $side-menu-width-md;
+  @media only screen and (min-width: vars.$small) {
+    margin-left: vars.$side-menu-width-md;
   }
 
   a {
@@ -95,8 +97,8 @@
     padding-bottom: 0.25em;
     padding-left: 0.5em;
     margin-bottom: 0;
-    border-left: 0.5em solid map-get($colors, 'light');
-    border-bottom: solid 1px map-get($colors, 'light');
+    border-left: 0.5em solid map-get(vars.$colors, 'light');
+    border-bottom: solid 1px map-get(vars.$colors, 'light');
   }
   /* purgecss start ignore */
   &-section {
@@ -112,10 +114,10 @@
       opacity: 0;
       transform: translateY(50px);
       transition: all 800ms;
-      @media only screen and (min-width: $small) {
+      @media only screen and (min-width: vars.$small) {
         margin-bottom: 4rem;
       }
-      @media only screen and (max-width: $small) {
+      @media only screen and (max-width: vars.$small) {
         margin-bottom: 3rem;
       }
       &.show {
@@ -128,7 +130,7 @@
       max-width: 80%;
       &-txt {
         margin: 2rem 1.5rem;
-        @media only screen and (max-width: $small) {
+        @media only screen and (max-width: vars.$small) {
           margin: 2rem 0;
         }
       }
@@ -183,8 +185,8 @@
     padding: 4px 0;
     background-color: transparent;
     border: 0;
-    border-bottom: 1px solid map-get($colors, 'lightS');
-    color: map-get($colors, 'light');
+    border-bottom: 1px solid map-get(vars.$colors, 'lightS');
+    color: map-get(vars.$colors, 'light');
 
     ~ .focus-line {
       position: absolute;
@@ -192,7 +194,7 @@
       left: 0;
       width: 0;
       height: 2px;
-      background-color: map-get($colors, 'light');
+      background-color: map-get(vars.$colors, 'light');
       transition: 0.4s;
       &.textarea {
         bottom: 5px;
@@ -228,7 +230,7 @@
 }
 
 #target {
-  @media only screen and (max-width: $small) {
+  @media only screen and (max-width: vars.$small) {
     width: 40px;
     height: 30px;
     position: fixed;
@@ -239,7 +241,7 @@
     transition: 1.5s;
     z-index: 100;
   }
-  @media only screen and (min-width: $small) {
+  @media only screen and (min-width: vars.$small) {
     display: none;
   }
 }
@@ -252,7 +254,7 @@
     display: block;
     width: 40px;
     height: 5px;
-    background: map-get($colors, 'lightS');
+    background: map-get(vars.$colors, 'lightS');
     transition: 1.5s;
     border-radius: 50px;
     position: absolute;
