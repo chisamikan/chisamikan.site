@@ -1,6 +1,7 @@
 node_modules
 dist/
 .env
+site.json
 
 # Local Netlify folder
 .netlify
