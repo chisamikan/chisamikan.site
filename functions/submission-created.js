@@ -7,13 +7,7 @@ exports.handler = function (event, context, callback) {
 
   console.log(user);
 
-  let transporter = nodemailer.createTransport('SMTP', {
-    service: 'hotmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  let transporter = nodemailer.createTransport(`"smtp://"${process.env.EMAIL_USER}:"${process.env.EMAIL_PASS}"@smtp-mail.outlook.com"`);
 
   console.log(event.body);
 
