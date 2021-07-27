@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const easeFunctions = {
-    easeInQuad: function(t, b, c, d) {
+    easeInQuad: function (t, b, c, d) {
       t /= d;
       return c * t * t + b;
     },
-    easeOutQuad: function(t, b, c, d) {
+    easeOutQuad: function (t, b, c, d) {
       t /= d;
       return -c * t * (t - 2) + b;
     },

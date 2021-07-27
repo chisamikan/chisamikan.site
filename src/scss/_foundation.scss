@@ -22,7 +22,7 @@
   font-variant: normal;
   text-transform: none;
   line-height: 1;
-  vertical-align: -.05em;
+  vertical-align: -0.05em;
 
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
@@ -100,7 +100,12 @@ main {
 }
 
 //iOS Safariでフォームに角丸が付く問題の対処６
-input[type="button"],input[type="text"],input[type="email"],input[type="submit"],input[type="image"],textarea{
+input[type='button'],
+input[type='text'],
+input[type='email'],
+input[type='submit'],
+input[type='image'],
+textarea {
   -webkit-appearance: none;
   border-radius: 0;
 }
