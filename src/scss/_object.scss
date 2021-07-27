@@ -89,6 +89,11 @@
       margin: 0px 3px;
       font-weight: 900;
       vertical-align: -0.05em;
+      &:not(.btn):hover,
+      &:not(.btn):focus,
+      &:not(.btn):active {
+        color: rgba(158, 228, 255, 0.5);
+      }
     }
   }
 
