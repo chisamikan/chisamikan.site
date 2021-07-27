@@ -5,3 +5,4 @@ site.json
 
 # Local Netlify folder
 .netlify
+src/style.css.map
