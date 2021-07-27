@@ -1,7 +1,7 @@
 {
   "name": "chisamikan.site",
   "version": "1.0.0",
-  "description": "",
+  "description": "千紗みかんウェブサイト",
   "main": "index.js",
   "scripts": {
     "build": "run-p build:*",
