@@ -31,15 +31,21 @@
     <link rel="stylesheet" href="/icons/style.css" />
     <link rel="stylesheet" href="/style.css" />
 
+    <%# icons %>
     <link rel="shortcut icon" href="/images/favicon.ico">
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png">
+
+    <%# Others %>
     <link rel="canonical" href="<%= siteRootUrl %><%= pageUrl %>" />
 </head>
 
 <body>
+    <%# ローディング %>
  <div id="js-loader" class="loader"></div>
+    <%# 背景 %>
     <canvas class="canvas-background" width="640" height="480"></canvas>
+    <%# メイン %>
     <main>
         <%# ハンバーガーボタン %>
         <div id="target">
