@@ -54,6 +54,10 @@ body {
   background-color: #000;
 }
 
+input:-webkit-autofill {
+  transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+}
+
 .canvas-background {
   position: fixed;
   top: 0;
