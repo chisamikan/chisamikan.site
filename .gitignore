@@ -2,7 +2,7 @@ node_modules
 dist/
 .env
 site.json
+src/style.css.map
 
 # Local Netlify folder
 .netlify
-src/style.css.map
