@@ -1,209 +1,166 @@
 <% const pageTitle="chisamikan.site" ; pageId="index" ; pageUrl="" ; pageDescription="千紗みかんウェブサイト" ; %>
-    <% include ../_common/_header %>
-        <div id="js-loader" class="loader"></div>
-        <canvas class="canvas-background" width="640" height="480"></canvas>
-        <main>
-            <div id="target">
-                <div class="target_inner">
-                    <span class="target_inner_line target_inner_1" id="line1"></span>
-                    <span class="target_inner_line target_inner_2" id="line2"></span>
-                    <span class="target_inner_line target_inner_3" id="line3"></span>
-                </div>
+<% include ../_common/_header %>
+    <section class="scroll-section" id="top">
+        <div class="scroll-section-box text-center">
+            <h1 class="">
+                <%= siteName %>
+            </h1>
+            <p class="st-mono">Web & Graphic Designer,Illustrator,Novelist</p>
+        </div>
+    </section>
+    <section class="scroll-section" id="information">
+        <div class="scroll-section-box">
+            <h2>Information<small class="ml-1">お知らせ</small></h2>
+            <div class="scroll-section-box-txt">
+                <p>最新情報は<a href="https://chisamikan.fanbox.cc/posts"
+                        target="_blank">pixivFANBOX</a>よりお届けしております。<br><small>※<span class="icon-lock"
+                            style="margin-left: .25em;margin-right: .25em;"></span>付きの記事はFANBOX会員限定記事です。</small>
+                </p>
+                <ul id="rss" class="rss">
+                    <% items.forEach(function (item) {
+                        const date = new Date(item.pubDate);
+                        const year = date.getFullYear();
+                        const month = date.getMonth() + 1;
+                        const day = date.getDate();
+
+                        //会員限定記事の判定
+                        let premium = 'd-none';
+                        if (item.content.includes('Fee Required') == true) {
+                        premium = '';
+                        }
+
+                        %>
+                        <li class="rss-list"><a href="<%= item.link %>" target="_blank"><span class="icon-lock <%= premium %>" style="margin-right:.25em;"></span><%= item.title %></a>
+                        <br><span class="rss-date"><%= year %>年<%= month %>月<%= day %>日</span>
+                        </li>
+                        <% }); %>
+                </ul>
+                <div class="text-center mt-2"><a href="https://chisamikan.fanbox.cc/posts" target="_blank"
+                        class="btn">もっと見る</a></div>
             </div>
-            <aside class="side st-mono" id="nav_f">
-                <nav class="side-menu">
-                    <section class="side-menu-box">
-                        <h2>Menu</h2>
-                        <ul>
-                            <li><a href="#top" class="side-menu-active js-trigger" data-mt-duration="300">Top</a></li>
-                            <li><a href="#information" class="js-trigger" data-mt-duration="300">Information</a></li>
-                            <li><a href="#about" class="js-trigger" data-mt-duration="300">About</a></li>
-                            <li><a href="#works" class="js-trigger" data-mt-duration="300">Works</a></li>
-                            <li><a href="#shop" class="js-trigger" data-mt-duration="300">Shop</a></li>
-                            <li><a href="#contact" class="js-trigger" data-mt-duration="300">Contact</a></li>
-                        </ul>
-                    </section>
-                </nav>
-                <nav class="side-sns">
+        </div>
+    </section>
+    <section class="scroll-section" id="about">
+        <div class="scroll-section-box">
+            <h2>About<small class="ml-1">サイトについて</small></h2>
+            <div class="scroll-section-box-txt">
+                <p>こちらは千紗みかんのWebサイトです。<br>
+                    サイトコンテンツに二次創作物を含みますので、苦手な方はご注意下さい。</p>
+                <aside class="mt-3">
+                    <h3>千紗みかん <small>Chisa Mikan</small></h3>
+                    <p>インターネット絵とデザインと文マン。要するに器用貧乏。本職はウェブ界隈中心のよろずデザイナーです。<br>同人サークル『Pt.Spoon』・<a
+                            href="https://twitter.com/i/moments/902120763217428480"
+                            target="_blank">『Satellite
+                            Galaxy』</a>主催。詳しいプロフィールは<a
+                            href="https://profcard.info/u/2tAWek4TZeNyCprff9W5lryJTo73"
+                            target="_blank">こちら</a>。<br>不定期で<a
+                            href="http://com.nicovideo.jp/community/co437179"
+                            target="_blank">ニコニコ生放送</a>してます。だいたい深夜0時前後からスタートします。</p>
+                </aside>
+            </div>
+        </div>
+    </section>
+    <section class="scroll-section" id="works">
+        <div class="scroll-section-box">
+            <h2>Works<small class="ml-1">お仕事履歴</small></h2>
+            <div class="scroll-section-box-txt">
+                <section>
+                    <h3>Graphic Design</h3>
                     <ul>
-                        <li><a href="https://twitter.com/chisamikan" target="_blank"><span
-                                    class="icon-twitter"></span></a></li>
-                        <li><a href="https://www.pixiv.net/users/263417" target="_blank"><span
-                                    class="icon-pixiv"></span></a></li>
-                        <li><a href="https://www.nicovideo.jp/user/1225267" target="_blank"><span
-                                    class="icon-niconico"></span></a></li>
-                        <li><a href="https://github.com/chisamikan" target="_blank"><span
-                                    class="icon-github"></span></a></li>
+                        <li>2021.01 <a href="https://www.ai-fla.com/" target="_blank">航空グッズ専門店あいふら様</a>:<a
+                                href="https://www.ai-fla.com/items/38162892"
+                                target="_blank">あいふら福袋・オリジナルタオル制作</a></li>
+                        <li>2021.01 <a href="https://www.ai-fla.com/" target="_blank">航空グッズ専門店あいふら様</a>:<a
+                                href="https://www.ai-fla.com/blog/2021/01/20/164535"
+                                target="_blank">新規ブランドロゴ制作</a></li>
+                        <li>2020.12 <a href="https://www.ai-fla.com/"
+                                target="_blank">航空グッズ専門店あいふら様</a>:あいふら冬ののりものまつりロゴ作成</li>
+                        <li>2020.03 <a href="https://twitter.com/DDH0141" target="_blank">はるな様</a>:<a
+                                href="https://twitter.com/DDH0141/status/1238442386918760448"
+                                target="_blank">痛車デザイン</a></li>
+                        <li>2017.11 <a href="https://twitter.com/boneofjellyfish"
+                                target="_blank">奇くらげ様</a>:艦これ二次創作小説『黒と蒼のエチュード』表紙デザイン</li>
+                        <li>2016.10 <a href="https://twitter.com/DDH0141" target="_blank">はるな様</a>:<a
+                                href="https://twitter.com/DDH0141/status/791112115385880576"
+                                target="_blank">痛車デザイン</a></li>
                     </ul>
-                </nav>
-            </aside>
-            <article class="scroll">
-                <section class="scroll-section" id="top">
-                    <div class="scroll-section-box text-center">
-                        <h1 class="">
-                            <%= siteName %>
-                        </h1>
-                        <p class="st-mono">Web & Graphic Designer,Illustrator,Novelist</p>
-                    </div>
                 </section>
-                <section class="scroll-section" id="information">
-                    <div class="scroll-section-box">
-                        <h2>Information<small class="ml-1">お知らせ</small></h2>
-                        <div class="scroll-section-box-txt">
-                            <p>最新情報は<a href="https://chisamikan.fanbox.cc/posts"
-                                    target="_blank">pixivFANBOX</a>よりお届けしております。<br><small>※<span class="icon-lock"
-                                        style="margin-left: .25em;margin-right: .25em;"></span>付きの記事はFANBOX会員限定記事です。</small>
-                            </p>
-                            <ul id="rss" class="rss">
-                                <% items.forEach(function (item) {
-                                    const date = new Date(item.pubDate);
-                                    const year = date.getFullYear();
-                                    const month = date.getMonth() + 1;
-                                    const day = date.getDate();
-
-                                    //会員限定記事の判定
-                                    let premium = 'd-none';
-                                    if (item.content.includes('Fee Required') == true) {
-                                    premium = '';
-                                    }
-
-                                    %>
-                                    <li class="rss-list"><a href="<%= item.link %>" target="_blank"><span class="icon-lock <%= premium %>" style="margin-right:.25em;"></span><%= item.title %></a>
-                                    <br><span class="rss-date"><%= year %>年<%= month %>月<%= day %>日</span>
-                                    </li>
-                                    <% }); %>
-                            </ul>
-                            <div class="text-center mt-2"><a href="https://chisamikan.fanbox.cc/posts" target="_blank"
-                                    class="btn">もっと見る</a></div>
-                        </div>
-                    </div>
+                <section>
+                    <h3>Illustration</h3>
+                    <ul>
+                        <li>2020.07 <a href="https://twitter.com/hunezukuri" target="_blank">船造咲斗様</a>:<a
+                                href="https://twitter.com/hunezukuri/status/1282969242325839873"
+                                target="_blank">配信サイト用イラスト制作</a></li>
+                        <li>2017.11 <a href="https://twitter.com/boneofjellyfish"
+                                target="_blank">奇くらげ様</a>:艦これ二次創作小説『黒と蒼のエチュード』表紙イラスト</li>
+                        <li>2015.05 <a href="http://www.chocolop.net/"
+                                target="_blank">株式会社Chocolop様</a>：PBW<a href="http://cl2.chocolop.net/"
+                                target="_blank">『新-アラタナル-』</a>用キャラクター<a
+                                href="http://cl2.chocolop.net/character_status.php?chara_code=CL2000635"
+                                target="_blank">『鵜森 ほのか』</a>イラスト提供</li>
+                        <li>2015.03 <a href="http://www.nicovideo.jp/user/1563664"
+                                target="_blank">Ke☆Ke様</a>:ボカロオリジナル曲<a
+                                href="http://www.nicovideo.jp/watch/sm25772524"
+                                target="_blank">『BABEL』</a>イラスト製作</li>
+                        <li>2015.02 <a href="http://www.nicovideo.jp/mylist/19214375"
+                                target="_blank">SMT-T様</a>:ボカロCDアルバム『Please take to song』ジャケット絵製作</li>
+                    </ul>
                 </section>
-                <section class="scroll-section" id="about">
-                    <div class="scroll-section-box">
-                        <h2>About<small class="ml-1">サイトについて</small></h2>
-                        <div class="scroll-section-box-txt">
-                            <p>こちらは千紗みかんのWebサイトです。<br>
-                                サイトコンテンツに二次創作物を含みますので、苦手な方はご注意下さい。</p>
-                            <aside class="mt-3">
-                                <h3>千紗みかん <small>Chisa Mikan</small></h3>
-                                <p>インターネット絵とデザインと文マン。要するに器用貧乏。本職はウェブ界隈中心のよろずデザイナーです。<br>同人サークル『Pt.Spoon』・<a
-                                        href="https://twitter.com/i/moments/902120763217428480"
-                                        target="_blank">『Satellite
-                                        Galaxy』</a>主催。詳しいプロフィールは<a
-                                        href="https://profcard.info/u/2tAWek4TZeNyCprff9W5lryJTo73"
-                                        target="_blank">こちら</a>。<br>不定期で<a
-                                        href="http://com.nicovideo.jp/community/co437179"
-                                        target="_blank">ニコニコ生放送</a>してます。だいたい深夜0時前後からスタートします。</p>
-                            </aside>
-                        </div>
-                    </div>
+                <section>
+                    <h3>Web Design</h3>
+                    <ul>
+                        <li>2021.01 <a href="https://www.ai-fla.com/"
+                                target="_blank">航空グッズ専門店あいふら様</a>:ウェブサイトリニューアル</li>
+                        <li>2018.10 <a href="http://sound.jp/soundescape/"
+                                target="_blank">rana様</a>:コンピレーションアルバム<a
+                                href="http://sound.jp/soundescape/mochitarou/" title="餅太郎で歯が欠けたろう"
+                                target="_blank">『餅太郎で歯が欠けたろう』</a>特設サイトデザイン</li>
+                        <li>2014.06 佐藤様:<a href="http://neo0310japan.web.fc2.com/"
+                                target="_blank">0310職人工房</a> アイコン素材作成</li>
+                    </ul>
                 </section>
-                <section class="scroll-section" id="works">
-                    <div class="scroll-section-box">
-                        <h2>Works<small class="ml-1">お仕事履歴</small></h2>
-                        <div class="scroll-section-box-txt">
-                            <section>
-                                <h3>Graphic Design</h3>
-                                <ul>
-                                    <li>2021.01 <a href="https://www.ai-fla.com/" target="_blank">航空グッズ専門店あいふら様</a>:<a
-                                            href="https://www.ai-fla.com/items/38162892"
-                                            target="_blank">あいふら福袋・オリジナルタオル制作</a></li>
-                                    <li>2021.01 <a href="https://www.ai-fla.com/" target="_blank">航空グッズ専門店あいふら様</a>:<a
-                                            href="https://www.ai-fla.com/blog/2021/01/20/164535"
-                                            target="_blank">新規ブランドロゴ制作</a></li>
-                                    <li>2020.12 <a href="https://www.ai-fla.com/"
-                                            target="_blank">航空グッズ専門店あいふら様</a>:あいふら冬ののりものまつりロゴ作成</li>
-                                    <li>2020.03 <a href="https://twitter.com/DDH0141" target="_blank">はるな様</a>:<a
-                                            href="https://twitter.com/DDH0141/status/1238442386918760448"
-                                            target="_blank">痛車デザイン</a></li>
-                                    <li>2017.11 <a href="https://twitter.com/boneofjellyfish"
-                                            target="_blank">奇くらげ様</a>:艦これ二次創作小説『黒と蒼のエチュード』表紙デザイン</li>
-                                    <li>2016.10 <a href="https://twitter.com/DDH0141" target="_blank">はるな様</a>:<a
-                                            href="https://twitter.com/DDH0141/status/791112115385880576"
-                                            target="_blank">痛車デザイン</a></li>
-                                </ul>
-                            </section>
-                            <section>
-                                <h3>Illustration</h3>
-                                <ul>
-                                    <li>2020.07 <a href="https://twitter.com/hunezukuri" target="_blank">船造咲斗様</a>:<a
-                                            href="https://twitter.com/hunezukuri/status/1282969242325839873"
-                                            target="_blank">配信サイト用イラスト制作</a></li>
-                                    <li>2017.11 <a href="https://twitter.com/boneofjellyfish"
-                                            target="_blank">奇くらげ様</a>:艦これ二次創作小説『黒と蒼のエチュード』表紙イラスト</li>
-                                    <li>2015.05 <a href="http://www.chocolop.net/"
-                                            target="_blank">株式会社Chocolop様</a>：PBW<a href="http://cl2.chocolop.net/"
-                                            target="_blank">『新-アラタナル-』</a>用キャラクター<a
-                                            href="http://cl2.chocolop.net/character_status.php?chara_code=CL2000635"
-                                            target="_blank">『鵜森 ほのか』</a>イラスト提供</li>
-                                    <li>2015.03 <a href="http://www.nicovideo.jp/user/1563664"
-                                            target="_blank">Ke☆Ke様</a>:ボカロオリジナル曲<a
-                                            href="http://www.nicovideo.jp/watch/sm25772524"
-                                            target="_blank">『BABEL』</a>イラスト製作</li>
-                                    <li>2015.02 <a href="http://www.nicovideo.jp/mylist/19214375"
-                                            target="_blank">SMT-T様</a>:ボカロCDアルバム『Please take to song』ジャケット絵製作</li>
-                                </ul>
-                            </section>
-                            <section>
-                                <h3>Web Design</h3>
-                                <ul>
-                                    <li>2021.01 <a href="https://www.ai-fla.com/"
-                                            target="_blank">航空グッズ専門店あいふら様</a>:ウェブサイトリニューアル</li>
-                                    <li>2018.10 <a href="http://sound.jp/soundescape/"
-                                            target="_blank">rana様</a>:コンピレーションアルバム<a
-                                            href="http://sound.jp/soundescape/mochitarou/" title="餅太郎で歯が欠けたろう"
-                                            target="_blank">『餅太郎で歯が欠けたろう』</a>特設サイトデザイン</li>
-                                    <li>2014.06 佐藤様:<a href="http://neo0310japan.web.fc2.com/"
-                                            target="_blank">0310職人工房</a> アイコン素材作成</li>
-                                </ul>
-                            </section>
-                        </div>
-                    </div>
+            </div>
+        </div>
+    </section>
+    <section class="scroll-section" id="shop">
+        <div class="scroll-section-box">
+            <h2>Shop<small class="ml-1">通信販売</small></h2>
+            <div class="scroll-section-box-txt">
+                <p>現在以下のショップで通販を行っています。</p>
+                <section>
+                    <h3><a href="https://www.ai-fla.com/categories/3044373" target="_blank">航空グッズ専門店あいふら</a>
+                    </h3>
+                    <p>紙の同人誌、グッズはこちら</p>
                 </section>
-                <section class="scroll-section" id="shop">
-                    <div class="scroll-section-box">
-                        <h2>Shop<small class="ml-1">通信販売</small></h2>
-                        <div class="scroll-section-box-txt">
-                            <p>現在以下のショップで通販を行っています。</p>
-                            <section>
-                                <h3><a href="https://www.ai-fla.com/categories/3044373" target="_blank">航空グッズ専門店あいふら</a>
-                                </h3>
-                                <p>紙の同人誌、グッズはこちら</p>
-                            </section>
-                            <section>
-                                <h3><a href="https://ptspoon.booth.pm/" target="_blank">BOOTH</a></h3>
-                                <p>電子書籍、音声作品、受注生産グッズはこちら</p>
-                            </section>
-                        </div>
-                    </div>
+                <section>
+                    <h3><a href="https://ptspoon.booth.pm/" target="_blank">BOOTH</a></h3>
+                    <p>電子書籍、音声作品、受注生産グッズはこちら</p>
                 </section>
-                <section class="scroll-section" id="contact">
-                    <div class="scroll-section-box">
-                        <h2>Contact<small class="ml-1">お問い合わせ</small></h2>
-                        <form class="scroll-section-box-txt" name="contact" method="POST" netlify>
-                            <div class="form-group">
-                                <input class="form-control" type="text" name="name" placeholder="例：山田　太郎" required>
-                                <label>お名前</label>
-                                <span class="focus-line"></span>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" type="email" name="email" placeholder="例：xxx@xxx.jp"
-                                    required>
-                                <label>メールアドレス</label>
-                                <span class="focus-line"></span>
-                            </div>
-                            <div class="form-group">
-                                <textarea class="form-control" rows="5" name="message" required></textarea>
-                                <label>お問い合わせ内容</label>
-                                <span class="focus-line textarea"></span>
-                            </div>
-                            <div class="text-center mt-3"><button type="submit" class="btn">送信</button></div>
-                        </form>
-                    </div>
-                </section>
-                <footer class="text-center py-3">
-                    <p>© 2021 Chisamikan</p>
-                </footer>
-            </article>
-        </main>
-        <% include ../_common/_footer %>
+            </div>
+        </div>
+    </section>
+    <section class="scroll-section" id="contact">
+        <div class="scroll-section-box">
+            <h2>Contact<small class="ml-1">お問い合わせ</small></h2>
+            <form class="scroll-section-box-txt" name="contact" method="POST" netlify>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="name" placeholder="例：山田　太郎" required>
+                    <label>お名前</label>
+                    <span class="focus-line"></span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="email" name="email" placeholder="例：xxx@xxx.jp"
+                        required>
+                    <label>メールアドレス</label>
+                    <span class="focus-line"></span>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="5" name="message" required></textarea>
+                    <label>お問い合わせ内容</label>
+                    <span class="focus-line textarea"></span>
+                </div>
+                <div class="text-center mt-3"><button type="submit" class="btn">送信</button></div>
+            </form>
+        </div>
+    </section> 
+<% include ../_common/_footer %>
