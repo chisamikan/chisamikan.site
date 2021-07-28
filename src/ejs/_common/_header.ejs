@@ -42,7 +42,7 @@
 
 <body>
     <%# ローディング %>
- <div id="js-loader" class="loader"></div>
+    <div id="js-loader" class="loader"></div>
     <%# 背景 %>
     <canvas class="canvas-background" width="640" height="480"></canvas>
     <%# メイン %>
@@ -61,7 +61,7 @@
                 <section class="side-menu-box">
                     <h2>Menu</h2>
                     <ul>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#top" class="side-menu-active js-trigger" data-mt-duration="300">Top</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } else { %>#top<% } %>" class="side-menu-active js-trigger" data-mt-duration="300">Top</a></li>
                         <li><a href="<% if (pageId != 'index') { %>/<% } %>#information" class="js-trigger" data-mt-duration="300">Information</a></li>
                         <li><a href="<% if (pageId != 'index') { %>/<% } %>#about" class="js-trigger" data-mt-duration="300">About</a></li>
                         <li><a href="<% if (pageId != 'index') { %>/<% } %>#works" class="js-trigger" data-mt-duration="300">Works</a></li>
@@ -83,4 +83,4 @@
                 </ul>
             </nav>
         </aside>
-        <article class="scroll">
+        <article class="scroll"<% if (pageId = '404') { %> style="height: 100vh;display: flex;flex-direction: column;justify-content: center;"<% } %>>

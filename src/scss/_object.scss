@@ -111,7 +111,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    &:first-child {
+    &.hero {
       height: 100vh;
     }
     &:not(:first-child) {
