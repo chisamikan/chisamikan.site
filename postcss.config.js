@@ -4,7 +4,9 @@ const cssnano = require('cssnano');
 module.exports = (ctx) => ({
   map: ctx.options.map,
   plugins: [
-    //require('postcss-import'),
+    require('postcss-import')({
+      plugins: [require('stylelint')],
+    }),
     //require('tailwindcss'),
     require('postcss-simple-vars'),
     require('postcss-nested'),
