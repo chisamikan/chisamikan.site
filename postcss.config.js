@@ -1,19 +1,18 @@
-const postcssFlexBugsFixes = require('postcss-flexbugs-fixes');
-const cssMqgroup = require('css-mqgroup');
-const autoprefixer = require('autoprefixer');
-const purgecss = require('@fullhuman/postcss-purgecss');
+//const purgecss = require('@fullhuman/postcss-purgecss');
 const cssnano = require('cssnano');
 
-module.exports = {
+module.exports = (ctx) => ({
+  map: ctx.options.map,
   plugins: [
-    postcssFlexBugsFixes({}),
-    cssMqgroup({ sort: true }),
-    autoprefixer({
-      grid: true,
-    }),
-    purgecss({
-      content: ['./dist/**/*.html', './dist/**/*.js'],
+    //require('postcss-import'),
+    //require('tailwindcss'),
+    require('postcss-simple-vars'),
+    require('postcss-nested'),
+    require('postcss-nested-ancestors'),
+    require('autoprefixer'),
+    require('postcss-sort-media-queries')({
+      sort: function (a, b) {},
     }),
     cssnano({ preset: 'default' }),
   ],
-};
+});

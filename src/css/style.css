@@ -1,11 +1,88 @@
-@use 'vars';
+/* @import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities'; */
 
+/* Vars */
+/* colors */
+$colors-dark: #212121;
+$colors-light: #eceff1;
+$colors-lightS: rgba(236, 239, 241, 0.5);
+
+/* Media queries breakpoints */
+$small: 768px;
+
+$side-menu-width-md: 20vw;
+
+/* foundation */
+body {
+  font-family: 'M PLUS 1p', sans-serif;
+  color: $colors-light;
+  background-color: #000;
+}
+
+input:-webkit-autofill {
+  transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+}
+
+.canvas-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.st-mono {
+  font-family: 'Share Tech Mono', 'M PLUS 1p', monospace;
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 5vw;
+  @media only screen and (max-width: $small) {
+    font-size: 10vw;
+  }
+}
+
+h2 small {
+  font-size: 60%;
+  @media only screen and (max-width: $small) {
+    font-size: 50%;
+  }
+}
+
+main {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* iOS Safariでフォームに角丸が付く問題の対処 */
+input[type='button'],
+input[type='text'],
+input[type='email'],
+input[type='submit'],
+input[type='image'],
+textarea {
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+/* Object */
 .side {
   position: fixed;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: vars.$side-menu-width-md;
+  width: $side-menu-width-md;
   height: 100vh;
   padding: 0 1rem 5rem;
   text-align: center;
@@ -31,7 +108,7 @@
   }
   &-sns {
     ul {
-      @media only screen and (max-width: vars.$small) {
+      @media only screen and (max-width: $small) {
         display: flex;
         justify-content: center;
       }
@@ -39,10 +116,10 @@
     li {
       font-size: 1.5rem;
       &:not(:first-child) {
-        @media only screen and (min-width: vars.$small) {
+        @media only screen and (min-width: $small) {
           margin-top: 0.5rem;
         }
-        @media only screen and (max-width: vars.$small) {
+        @media only screen and (max-width: $small) {
           margin-left: 2rem;
         }
       }
@@ -54,11 +131,11 @@
     transition: color ease 0.3s, font-size ease 0.1s;
     text-decoration: none;
     &:hover {
-      color: map-get(vars.$colors, 'light');
+      color: $colors-light;
     }
   }
 
-  @media only screen and (max-width: vars.$small) {
+  @media only screen and (max-width: $small) {
     top: -100vh;
     width: 100%;
     transition: all 0.5s;
@@ -67,8 +144,8 @@
 }
 
 .scroll {
-  @media only screen and (min-width: vars.$small) {
-    margin-left: vars.$side-menu-width-md;
+  @media only screen and (min-width: $small) {
+    margin-left: $side-menu-width-md;
   }
 
   a {
@@ -102,8 +179,8 @@
     padding-bottom: 0.25em;
     padding-left: 0.5em;
     margin-bottom: 0;
-    border-left: 0.5em solid map-get(vars.$colors, 'light');
-    border-bottom: solid 1px map-get(vars.$colors, 'light');
+    border-left: 0.5em solid $colors-light;
+    border-bottom: solid 1px $colors-light;
   }
   /* purgecss start ignore */
   &-section {
@@ -119,10 +196,10 @@
       opacity: 0;
       transform: translateY(50px);
       transition: all 800ms;
-      @media only screen and (min-width: vars.$small) {
+      @media only screen and (min-width: $small) {
         margin-bottom: 4rem;
       }
-      @media only screen and (max-width: vars.$small) {
+      @media only screen and (max-width: $small) {
         margin-bottom: 3rem;
       }
       &.show {
@@ -135,7 +212,7 @@
       max-width: 80%;
       &-txt {
         margin: 2rem 1.5rem;
-        @media only screen and (max-width: vars.$small) {
+        @media only screen and (max-width: $small) {
           margin: 2rem 0;
         }
       }
@@ -179,7 +256,7 @@
       padding-top: 1.5rem;
     }
     &,
-    & ~ .btn {
+    ~ .btn {
       &:not(:first-child) {
         margin-top: 40px;
       }
@@ -190,8 +267,8 @@
     padding: 4px 0;
     background-color: transparent;
     border: 0;
-    border-bottom: 1px solid map-get(vars.$colors, 'lightS');
-    color: map-get(vars.$colors, 'light');
+    border-bottom: 1px solid $colors-lightS;
+    color: $colors-light;
 
     ~ .focus-line {
       position: absolute;
@@ -199,7 +276,7 @@
       left: 0;
       width: 0;
       height: 2px;
-      background-color: map-get(vars.$colors, 'light');
+      background-color: $colors-light;
       transition: 0.4s;
       &.textarea {
         bottom: 5px;
@@ -235,7 +312,7 @@
 }
 
 #target {
-  @media only screen and (max-width: vars.$small) {
+  @media only screen and (max-width: $small) {
     width: 40px;
     height: 30px;
     position: fixed;
@@ -246,7 +323,7 @@
     transition: 1.5s;
     z-index: 100;
   }
-  @media only screen and (min-width: vars.$small) {
+  @media only screen and (min-width: $small) {
     display: none;
   }
 }
@@ -259,7 +336,7 @@
     display: block;
     width: 40px;
     height: 5px;
-    background: map-get(vars.$colors, 'lightS');
+    background: $colors-lightS;
     transition: 1.5s;
     border-radius: 50px;
     position: absolute;
@@ -306,3 +383,112 @@
   }
 }
 /* purgecss end ignore */
+
+/* Utility */
+.btn {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  width: 200px;
+  font-weight: bold;
+  line-height: 45px;
+  color: $colors-light;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: uppercase;
+  background-color: transparent;
+  border: 1px solid transparent;
+  outline: 1px solid;
+  outline-color: $colors-lightS;
+  outline-offset: 0px;
+  transition: all 1.2s cubic-bezier(0.2, 1, 0.2, 1);
+
+  &:hover {
+    color: inherit;
+    text-shadow: 2px 2px 3px #000;
+    border-color: $colors-light;
+    outline-color: transparent;
+    outline-offset: 12px;
+    box-shadow: inset 0 0 20px $colors-lightS, 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none;
+  }
+}
+
+.mx-auto {
+  margin-right: auto;
+  margin-left: auto;
+}
+.mt-1 {
+  margin-top: 1rem;
+}
+.mt-2 {
+  margin-top: 2rem;
+}
+.mt-3 {
+  margin-top: 3rem;
+}
+.ml-1 {
+  margin-left: 1rem;
+}
+
+.pt-3 {
+  padding-top: 3rem;
+}
+.py-3 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.d-none {
+  display: none;
+}
+
+.scroll-section-box-txt section:not(:last-child) {
+  margin-bottom: 2rem;
+}
+
+.loader {
+  align-items: center;
+  background: #000;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  &::after {
+    animation: loader 0.5s linear infinite;
+    border: 1px solid $colors-light;
+    border-radius: 50%;
+    border-right: 1px solid rgba(236, 239, 241, 0.2);
+    border-top: 1px solid rgba(236, 239, 241, 0.2);
+    content: '';
+    height: 70px;
+    width: 70px;
+  }
+}
+
+@keyframes loader {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
