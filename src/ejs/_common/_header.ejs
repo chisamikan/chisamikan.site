@@ -61,12 +61,12 @@
                 <section class="side-menu-box">
                     <h2>Menu</h2>
                     <ul>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } else { %>#top<% } %>" class="side-menu-active js-trigger" data-mt-duration="300">Top</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#information" class="js-trigger" data-mt-duration="300">Information</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#about" class="js-trigger" data-mt-duration="300">About</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#works" class="js-trigger" data-mt-duration="300">Works</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#shop" class="js-trigger" data-mt-duration="300">Shop</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#contact" class="js-trigger" data-mt-duration="300">Contact</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } else { %>#top<% } %>" class="side-menu-active<% if (pageId === 'index') { %> js-trigger<% } %>" data-mt-duration="300">Top</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#information" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Information</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#about" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">About</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#works" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Works</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#shop" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Shop</a></li>
+                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#contact" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Contact</a></li>
                     </ul>
                 </section>
             </nav>
