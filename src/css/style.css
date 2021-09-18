@@ -163,7 +163,7 @@ textarea {
     }
     &[target='_blank']::after {
       margin: 0 3px;
-      font-family: 'icomoon';
+      font-family: icons, sans-serif;
       font-size: 0.9em;
       font-weight: 900;
       vertical-align: -0.05em;
@@ -409,7 +409,11 @@ textarea {
   outline-color: $colors-lightS;
   outline-offset: 0;
   transition: all 1.2s cubic-bezier(0.2, 1, 0.2, 1);
-
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none;
+  }
   &:hover {
     color: inherit;
     text-shadow: 2px 2px 3px #000;
@@ -417,11 +421,6 @@ textarea {
     outline-color: transparent;
     outline-offset: 12px;
     box-shadow: inset 0 0 20px $colors-lightS, 0 0 20px rgba(255, 255, 255, 0.2);
-  }
-  &:hover,
-  &:focus,
-  &:active {
-    text-decoration: none;
   }
 }
 

@@ -2,83 +2,78 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>
+  <meta charset="utf-8">
+  <title>
     <% if (pageId != 'index') { %><%= pageTitle %> - <%= siteName %>
     <% } else { %><%= pageTitle %> - <%= pageDescription %><% } %>
-    </title>
-    <meta name="description" content="<%= pageDescription %>">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  </title>
+  <meta name="description" content="<%= pageDescription %>">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <%# OGP %>
-    <meta property="og:title" content="<% if (pageId != 'index') { %><%= pageTitle %> - <%= siteName %><% } else { %><%= pageTitle %><% } %>" />
-    <meta property="og:description" content="<%= pageDescription %>" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="<%= siteRootUrl %><%= pageUrl %>" />
-    <meta property="og:image" content="<%= ogImageUrl %>" />
-    <meta property="og:site_name" content="<%= siteName %>" />
-    <meta property="fb:app_id" content="<%= fbAppId %>" />
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="<%= twitterSite %>">
+  <%# OGP %>
+  <meta property="og:title" content="<% if (pageId != 'index') { %><%= pageTitle %> - <%= siteName %><% } else { %><%= pageTitle %><% } %>" />
+  <meta property="og:description" content="<%= pageDescription %>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="<%= siteRootUrl %><%= pageUrl %>" />
+  <meta property="og:image" content="<%= ogImageUrl %>" />
+  <meta property="og:site_name" content="<%= siteName %>" />
+  <meta property="fb:app_id" content="<%= fbAppId %>" />
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="<%= twitterSite %>">
 
-    <%# CDN CSS %>
-    <link href="//fonts.googleapis.com/css?family=M+PLUS+1p:400,700|Share+Tech+Mono&display=swap&subset=japanese"
-        rel="stylesheet">
+  <%# CDN CSS %>
+  <link href="//fonts.googleapis.com/css?family=M+PLUS+1p:400,700|Share+Tech+Mono&display=swap&subset=japanese" rel="stylesheet">
 
-    <%# Custom CSS %>
-    <link rel="stylesheet" href="/icons/style.css" />
-    <link rel="stylesheet" href="/style.css" />
+  <%# Custom CSS %>
+  <link rel="stylesheet" href="/icons/icons.css" />
+  <link rel="stylesheet" href="/style.css" />
 
-    <%# icons %>
-    <link rel="shortcut icon" href="/images/favicon.ico">
-    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png">
+  <%# icons %>
+  <link rel="shortcut icon" href="/images/favicon.ico">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png">
 
-    <%# Others %>
-    <link rel="canonical" href="<%= siteRootUrl %><%= pageUrl %>" />
+  <%# Others %>
+  <link rel="canonical" href="<%= siteRootUrl %><%= pageUrl %>" />
 </head>
 
 <body>
-    <%# ローディング %>
-    <div id="js-loader" class="loader"></div>
-    <%# 背景 %>
-    <canvas class="canvas-background" width="640" height="480"></canvas>
-    <%# メイン %>
-    <main>
-        <%# ハンバーガーボタン %>
-        <div id="target">
-            <div class="target_inner">
-                <span class="target_inner_line target_inner_1" id="line1"></span>
-                <span class="target_inner_line target_inner_2" id="line2"></span>
-                <span class="target_inner_line target_inner_3" id="line3"></span>
-            </div>
-        </div>
-        <%# ナビゲーション %>
-        <aside class="side st-mono" id="nav_f">
-            <nav class="side-menu">
-                <section class="side-menu-box">
-                    <h2>Menu</h2>
-                    <ul>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } else { %>#top<% } %>" class="side-menu-active<% if (pageId === 'index') { %> js-trigger<% } %>" data-mt-duration="300">Top</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#information" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Information</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#about" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">About</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#works" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Works</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#shop" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Shop</a></li>
-                        <li><a href="<% if (pageId != 'index') { %>/<% } %>#contact" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Contact</a></li>
-                    </ul>
-                </section>
-            </nav>
-            <nav class="side-sns">
-                <ul>
-                    <li><a href="https://twitter.com/chisamikan" target="_blank"><span
-                                class="icon-twitter"></span></a></li>
-                    <li><a href="https://www.pixiv.net/users/263417" target="_blank"><span
-                                class="icon-pixiv"></span></a></li>
-                    <li><a href="https://www.nicovideo.jp/user/1225267" target="_blank"><span
-                                class="icon-niconico"></span></a></li>
-                    <li><a href="https://github.com/chisamikan" target="_blank"><span
-                                class="icon-github"></span></a></li>
-                </ul>
-            </nav>
-        </aside>
-        <article class="scroll"<% if (pageId === '404') { %> style="height: 100vh;display: flex;flex-direction: column;justify-content: center;"<% } %>>
+  <%# ローディング %>
+  <div id="js-loader" class="loader"></div>
+  <%# 背景 %>
+  <canvas class="canvas-background" width="640" height="480"></canvas>
+  <%# メイン %>
+  <main>
+    <%# ハンバーガーボタン %>
+    <div id="target">
+      <div class="target_inner">
+        <span class="target_inner_line target_inner_1" id="line1"></span>
+        <span class="target_inner_line target_inner_2" id="line2"></span>
+        <span class="target_inner_line target_inner_3" id="line3"></span>
+      </div>
+    </div>
+    <%# ナビゲーション %>
+    <aside class="side st-mono" id="nav_f">
+      <nav class="side-menu">
+        <section class="side-menu-box">
+          <h2>Menu</h2>
+          <ul>
+            <li><a href="<% if (pageId != 'index') { %>/<% } else { %>#top<% } %>" class="side-menu-active<% if (pageId === 'index') { %> js-trigger<% } %>" data-mt-duration="300">Top</a></li>
+            <li><a href="<% if (pageId != 'index') { %>/<% } %>#information" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Information</a></li>
+            <li><a href="<% if (pageId != 'index') { %>/<% } %>#about" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">About</a></li>
+            <li><a href="<% if (pageId != 'index') { %>/<% } %>#works" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Works</a></li>
+            <li><a href="<% if (pageId != 'index') { %>/<% } %>#shop" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Shop</a></li>
+            <li><a href="<% if (pageId != 'index') { %>/<% } %>#contact" <% if (pageId === 'index') { %>class="js-trigger" <% } %>data-mt-duration="300">Contact</a></li>
+          </ul>
+        </section>
+      </nav>
+      <nav class="side-sns">
+        <ul>
+          <li><a href="https://twitter.com/chisamikan" target="_blank"><i class="icon icon-twitter"></i></a></li>
+          <li><a href="https://www.pixiv.net/users/263417" target="_blank"><i class="icon icon-pixiv"></i></a></li>
+          <li><a href="https://www.nicovideo.jp/user/1225267" target="_blank"><i class="icon icon-niconico"></i></a></li>
+          <li><a href="https://github.com/chisamikan" target="_blank"><i class="icon icon-github"></i></a></li>
+        </ul>
+      </nav>
+    </aside>
+    <article class="scroll" <% if (pageId === '404') { %> style="height: 100vh;display: flex;flex-direction: column;justify-content: center;" <% } %>>
