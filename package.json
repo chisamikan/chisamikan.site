@@ -37,7 +37,6 @@
     "ejs-cli": "^2.2.1",
     "fantasticon": "^1.2.2",
     "html-minifier": "^4.0.0",
-    "icomoon-generator": "^1.6.0",
     "imagemin": "^8.0.0",
     "imagemin-gifsicle": "^7.0.0",
     "imagemin-mozjpeg": "^9.0.0",
