@@ -15,8 +15,7 @@
     "start:ejs": "chokidar \"src/ejs/**/*.ejs\" \"-c yarn build:ejs\"",
     "start:js": "chokidar \"src/js/*.js\" \"-c yarn build:js\"",
     "start:imagemin": "chokidar \"src/images\" \"-c yarn build:imagemin\"",
-    "start": "run-s build:* && run-p test start:*",
-    "upgrade-interactive": "npm-check --update"
+    "start": "run-s build:* && run-p test start:*"
   },
   "author": "Chisamikan",
   "license": "UNLICENSED",
@@ -37,7 +36,7 @@
     "ejs-cli": "^2.2.1",
     "fantasticon": "^1.2.2",
     "html-minifier": "^4.0.0",
-    "imagemin": "^8.0.0",
+    "imagemin": "^8.0.1",
     "imagemin-gifsicle": "^7.0.0",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.2",
@@ -64,7 +63,6 @@
     "stylelint-declaration-block-no-ignored-properties": "^2.4.0",
     "stylelint-no-unsupported-browser-features": "^5.0.1",
     "stylelint-prettier": "^1.2.0",
-    "svgo": "^2.3.1",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
