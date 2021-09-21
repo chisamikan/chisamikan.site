@@ -1,7 +1,26 @@
-/* @import 'tailwindcss/base';
+@import 'tailwindcss/base';
 @import 'tailwindcss/components';
-@import 'tailwindcss/utilities'; */
-@import 'bootstrap-reboot/reboot.css';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    @apply mb-2;
+  }
+  h1 {
+    font-size: 10vw;
+    @screen md {
+      font-size: 5vw;
+    }
+  }
+  h3 {
+    font-size: 1.17rem;
+  }
+  p {
+    @apply mb-4;
+  }
+}
 
 /* Vars */
 
@@ -11,15 +30,13 @@ $colors-light: #eceff1;
 $colors-lightS: rgba(236, 239, 241, 0.5);
 
 /* Media queries breakpoints */
-$small: 768px;
-
 $side-menu-width-md: 20vw;
 
 /* foundation */
 body {
   font-family: 'M PLUS 1p', sans-serif;
   color: $colors-light;
-  background-color: #000;
+  @apply bg-black;
 }
 
 input:-webkit-autofill {
@@ -27,11 +44,7 @@ input:-webkit-autofill {
 }
 
 .canvas-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  @apply w-full h-full top-0 left-0 fixed;
 }
 
 h1,
@@ -42,29 +55,20 @@ h5,
 h6,
 .st-mono {
   font-family: 'Share Tech Mono', 'M PLUS 1p', monospace;
-  font-weight: normal;
 }
 
-h1 {
-  font-size: 5vw;
-  @media only screen and (max-width: $small) {
-    font-size: 10vw;
-  }
-}
-
-h2 small {
-  font-size: 60%;
-  @media only screen and (max-width: $small) {
+h2 {
+  @apply text-2xl;
+  & small {
     font-size: 50%;
+    @screen md {
+      font-size: 60%;
+    }
   }
 }
 
 main {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  @apply top-0 right-0 bottom-0 left-0 absolute;
 }
 
 /* iOS Safariでフォームに角丸が付く問題の対処 */
@@ -74,79 +78,52 @@ input[type='email'],
 input[type='submit'],
 input[type='image'],
 textarea {
-  -webkit-appearance: none;
-  border-radius: 0;
+  @apply rounded-none appearance-none;
 }
 
 /* Object */
 .side {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  width: $side-menu-width-md;
-  height: 100vh;
   padding: 0 1rem 5rem;
-  text-align: center;
   backdrop-filter: blur(3px);
   background-color: rgba(255, 255, 255, 0.05);
-  ul {
-    padding-inline-start: 0;
-    margin-block-end: 0;
-    list-style: none;
+  top: -100vh;
+  transition: all 0.5s;
+  @apply fixed flex flex-col content-around h-screen text-center z-10 md:z-auto w-full md:top-auto;
+  @screen md {
+    width: $side-menu-width-md;
   }
   &-menu {
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-    justify-content: center;
+    @apply flex flex-grow items-center justify-center;
     &-active {
-      font-size: 1.5rem;
-      font-weight: bold;
+      @apply font-bold text-2xl;
     }
     li {
-      margin-top: 1rem;
+      @apply mt-4;
     }
   }
   &-sns {
     ul {
-      @media only screen and (max-width: $small) {
-        display: flex;
-        justify-content: center;
-      }
+      @apply flex md:list-item justify-center;
     }
     li {
       font-size: 1.5rem;
       &:not(:first-child) {
-        @media only screen and (min-width: $small) {
-          margin-top: 0.5rem;
-        }
-        @media only screen and (max-width: $small) {
-          margin-left: 2rem;
-        }
+        @apply ml-8 md:ml-0 md:mt-2;
       }
     }
   }
-
   a {
     color: rgba(236, 239, 241, 0.7);
-    text-decoration: none;
     transition: color ease 0.3s, font-size ease 0.1s;
+    @apply no-underline;
     &:hover {
       color: $colors-light;
     }
   }
-
-  @media only screen and (max-width: $small) {
-    top: -100vh;
-    z-index: 10;
-    width: 100%;
-    transition: all 0.5s;
-  }
 }
 
 .scroll {
-  @media only screen and (min-width: $small) {
+  @screen md {
     margin-left: $side-menu-width-md;
   }
 
@@ -158,16 +135,16 @@ textarea {
       &:focus,
       &:active {
         color: rgba(158, 228, 255, 0.5);
-        text-decoration: none;
+        @apply no-underline;
       }
     }
     &[target='_blank']::after {
       margin: 0 3px;
       font-family: icons, sans-serif;
       font-size: 0.9em;
-      font-weight: 900;
       vertical-align: -0.05em;
-      content: '\e900';
+      content: '\f101';
+      @apply font-black;
       &:not(.btn):hover,
       &:not(.btn):focus,
       &:not(.btn):active {
@@ -187,37 +164,24 @@ textarea {
 
   /* purgecss start ignore */
   &-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    @apply flex flex-col items-center justify-center;
     &.hero {
-      height: 100vh;
+      @apply h-screen;
     }
     &:not(:first-child) {
-      padding-top: 1rem;
-      opacity: 0;
       transition: all 800ms;
       transform: translateY(50px);
-      @media only screen and (min-width: $small) {
-        margin-bottom: 4rem;
-      }
-      @media only screen and (max-width: $small) {
-        margin-bottom: 3rem;
-      }
+      @apply opacity-0 pt-4 mb-12 md:mb-16;
       &.show {
-        opacity: 1;
         transform: translateY(0);
+        @apply opacity-100;
       }
     }
     &-box {
-      width: 100%;
       max-width: 80%;
+      @apply w-full;
       &-txt {
-        margin: 2rem 1.5rem;
-        @media only screen and (max-width: $small) {
-          margin: 2rem 0;
-        }
+        @apply my-8 mx-0 md:mx-6;
       }
     }
   }
@@ -226,8 +190,8 @@ textarea {
 /* purgecss end ignore */
 .form {
   &-group {
-    position: relative;
     z-index: 1;
+    @apply relative;
     input {
       &[type='text'] {
         padding-left: 4em;
@@ -238,15 +202,15 @@ textarea {
       &[type='text'],
       &[type='email'] {
         font-size: 15px;
-        line-height: 24px;
         letter-spacing: 1px;
+        @apply leading-6;
       }
     }
     input[type='text'],
     input[type='email'],
     textarea {
-      width: 100%;
       transition: 0.4s;
+      @apply w-full;
       &:focus {
         outline: none;
       }
@@ -254,60 +218,52 @@ textarea {
     input[type='text']:focus,
     input[type='email']:focus,
     textarea:focus {
-      padding: 0;
+      @apply p-0;
     }
     textarea {
-      padding-top: 1.5rem;
+      @apply pt-6;
     }
     &,
     ~ .btn {
       &:not(:first-child) {
-        margin-top: 40px;
+        @apply mt-10;
       }
     }
   }
 
   &-control {
-    padding: 4px 0;
     color: $colors-light;
     background-color: transparent;
-    border: 0;
     border-bottom: 1px solid $colors-lightS;
-
+    @apply py-1 px-0;
     ~ .focus-line {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
       background-color: $colors-light;
       transition: 0.4s;
+      @apply absolute bottom-0 left-0 w-0 h-0.5;
       &.textarea {
         bottom: 5px;
       }
     }
     ~ label {
-      position: absolute;
       top: 4px;
-      left: 0;
       z-index: -1;
-      width: 100%;
       letter-spacing: 0.5px;
       transition: 0.3s;
+      @apply w-full left-0 absolute;
     }
   }
 
   &-control:focus ~ .focus-line,
   &-group.form-control ~ .focus-line {
-    width: 100%;
     transition: 0.4s;
+    @apply w-full;
   }
 
   &-control:focus ~ label,
   &-group.form-control ~ label {
     top: -16px;
-    font-size: 12px;
     transition: 0.3s;
+    @apply text-xs;
   }
 }
 
@@ -317,20 +273,11 @@ textarea {
 }
 
 #target {
-  @media only screen and (max-width: $small) {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 100;
-    display: block;
-    width: 40px;
-    height: 30px;
-    cursor: pointer;
-    transition: 1.5s;
-  }
-  @media only screen and (min-width: $small) {
-    display: none;
-  }
+  z-index: 100;
+  width: 40px;
+  height: 30px;
+  transition: 1.5s;
+  @apply top-4 right-4 fixed block cursor-pointer md:hidden;
 }
 
 .target_inner {
@@ -338,16 +285,15 @@ textarea {
   width: 40px;
   height: 30px;
   &_line {
-    position: absolute;
-    display: block;
     width: 40px;
     height: 5px;
     background: $colors-lightS;
     border-radius: 50px;
     transition: 1.5s;
+    @apply block absolute;
   }
   &_1 {
-    top: 0;
+    @apply top-0;
   }
 
   &_2 {
@@ -365,7 +311,7 @@ textarea {
 }
 
 .lineb {
-  opacity: 0;
+  @apply opacity-0;
 }
 
 .linec {
@@ -374,11 +320,8 @@ textarea {
 }
 
 .rss {
-  padding-left: 0;
-  list-style-type: none;
   &-list {
-    padding: 10px 0;
-    margin: 0;
+    @apply m-0 py-2.5 px-0;
     &:not(:last-child) {
       border-bottom: 1px dashed #ccc;
     }
@@ -392,27 +335,19 @@ textarea {
 
 /* Utility */
 .btn {
-  position: relative;
-  display: inline-block;
   width: 200px;
-  font-weight: bold;
   line-height: 45px;
   color: $colors-light;
-  text-align: center;
-  text-decoration: none;
-  text-shadow: none;
-  text-transform: uppercase;
-  cursor: pointer;
-  background-color: transparent;
   border: 1px solid transparent;
   outline: 1px solid;
   outline-color: $colors-lightS;
   outline-offset: 0;
   transition: all 1.2s cubic-bezier(0.2, 1, 0.2, 1);
+  @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent;
   &:hover,
   &:focus,
   &:active {
-    text-decoration: none;
+    @apply no-underline;
   }
   &:hover {
     color: inherit;
@@ -424,58 +359,13 @@ textarea {
   }
 }
 
-.mx-auto {
-  margin-right: auto;
-  margin-left: auto;
-}
-.mt-1 {
-  margin-top: 1rem;
-}
-.mt-2 {
-  margin-top: 2rem;
-}
-.mt-3 {
-  margin-top: 3rem;
-}
-.ml-1 {
-  margin-left: 1rem;
-}
-
-.pt-3 {
-  padding-top: 3rem;
-}
-.py-3 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.h-100 {
-  height: 100%;
-}
-
-.d-none {
-  display: none;
-}
-
 .scroll-section-box-txt section:not(:last-child) {
-  margin-bottom: 2rem;
+  @apply mb-8;
 }
 
 .loader {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
   z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
+  @apply bg-black justify-center items-center flex top-0 right-0 bottom-0 left-0 fixed;
   &::after {
     width: 70px;
     height: 70px;
@@ -490,10 +380,15 @@ textarea {
 
 @keyframes loader {
   0% {
-    transform: rotate(0);
+    @apply transform rotate-0;
   }
 
   100% {
     transform: rotate(360deg);
   }
+}
+
+.list-default {
+  padding-inline-start: 40px;
+  @apply list-disc mb-4;
 }

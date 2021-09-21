@@ -1,13 +1,11 @@
-//const purgecss = require('@fullhuman/postcss-purgecss');
 const cssnano = require('cssnano');
 
-module.exports = (ctx) => ({
-  map: ctx.options.map,
+module.exports = {
   plugins: [
     require('postcss-import')({
       plugins: [require('stylelint')],
     }),
-    //require('tailwindcss'),
+    require('tailwindcss'),
     require('postcss-simple-vars'),
     require('postcss-nested'),
     require('postcss-nested-ancestors'),
@@ -17,4 +15,4 @@ module.exports = (ctx) => ({
     }),
     cssnano({ preset: 'default' }),
   ],
-});
+};

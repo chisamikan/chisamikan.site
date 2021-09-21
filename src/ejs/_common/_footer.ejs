@@ -1,29 +1,34 @@
                 <%# フッター %>
-                <footer class="text-center <% if (pageId === '404') { %>pt-3<% } else { %>py-3<% } %>">
-                    <p>© 2021 Chisamikan</p>
+                <footer class="text-center <% if (pageId === '404') { %>pt-12<% } else { %>py-12<% } %>">
+                  <p>© 2021 Chisamikan</p>
                 </footer>
-            </article>
-        </main>
-    <%# Google Analytics %>
-    <script>
-        (function (i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-        ga('create', '<%= googleAnalyticsId %>', 'auto');
-        ga('require', 'displayfeatures');
-        ga('send', 'pageview');
-    </script>
+                </article>
+                </main>
+                <%# Google Analytics %>
+                <script>
+                  (function(i, s, o, g, r, a, m) {
+                    i['GoogleAnalyticsObject'] = r;
+                    i[r] = i[r] || function() {
+                      (i[r].q = i[r].q || []).push(arguments)
+                    }, i[r].l = 1 * new Date();
+                    a = s.createElement(o),
+                      m = s.getElementsByTagName(o)[0];
+                    a.async = 1;
+                    a.src = g;
+                    m.parentNode.insertBefore(a, m)
+                  })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+                  ga('create', '<%= googleAnalyticsId %>', 'auto');
+                  ga('require', 'displayfeatures');
+                  ga('send', 'pageview');
+                </script>
 
-    <%# CDN JS %>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js" integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moveTo/1.8.2/moveTo.min.js" integrity="sha512-K8tGrJxPw5dbYRLSOdH+dZ9SVZwrtMffca3bBOe+IWAgl4SDi55bIR2IUnF+p+PzReEDeKgoIBHpuq7R9043GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <%# CDN JS %>
+                <script src="//cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js" integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <script src="//cdnjs.cloudflare.com/ajax/libs/moveTo/1.8.2/moveTo.min.js" integrity="sha512-K8tGrJxPw5dbYRLSOdH+dZ9SVZwrtMffca3bBOe+IWAgl4SDi55bIR2IUnF+p+PzReEDeKgoIBHpuq7R9043GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <%# Custom JS %>
-    <script src="bundle.js"></script>
+                <%# Custom JS %>
+                <script src="bundle.js"></script>
 
-    </body>
+                </body>
 
-</html>
+                </html>
