@@ -6,7 +6,7 @@
   "scripts": {
     "build:ejs": "node rss-parser.js && ejs-cli --base-dir src/ejs/pages **/**.ejs --out src --options site.json && html-minifier --input-dir src --output-dir dist -c html-minifier.json --file-ext html && rimraf src/*.html",
     "build:js": "./node_modules/.bin/babel src/js --out-dir src/js/babel && uglifyjs src/js/babel/*.js -o dist/bundle.js && rimraf src/js/babel",
-    "build:imagemin": "rimraf dist/images && mkdirp dist/images && node .imagemin.mjs && cpx \"src/images/favicon.ico\" dist/images",
+    "build:imagemin": "node .imagemin.mjs && cpx \"src/images/favicon.ico\" dist/images",
     "build:icons": "mkdirp dist/icons && fantasticon src/icons -o dist/icons --normalize && rimraf dist/icons/icons.html dist/icons/icons.ts dist/icons/icons.json && postcss -r dist/icons/icons.css",
     "build:css": "postcss src/css/*.css -d dist",
     "build": "rimraf dist && run-s build:*",
