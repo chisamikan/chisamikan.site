@@ -31,6 +31,7 @@
     "autoprefixer": "^10.3.4",
     "browser-sync": "^2.27.5",
     "chokidar-cli": "^2.1.0",
+    "core-js": "3",
     "cpx2": "^4.0.0",
     "cssnano": "^5.0.7",
     "ejs-cli": "^2.2.1",
