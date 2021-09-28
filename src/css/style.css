@@ -6,24 +6,21 @@
   html {
     height: -webkit-fill-available;
   }
-  h1,
-  h3 {
-    @apply mb-2;
-  }
   h1 {
     font-size: 10vw;
+    @apply mb-2;
     @screen md {
       font-size: 5vw;
     }
   }
   h2 {
-    @apply text-2xl;
+    @apply text-2xl md:text-3xl;
   }
   h3 {
-    @apply text-xl;
+    @apply text-lg md:text-xl mb-2;
   }
   h4 {
-    @apply text-lg;
+    @apply text-base md:text-lg font-bold;
   }
 }
 
@@ -141,7 +138,7 @@ textarea {
   }
   h2 {
     background-image: url('/images/star.svg');
-    @apply relative bg-contain bg-no-repeat py-4 pl-6 leading-normal;
+    @apply relative bg-contain bg-no-repeat py-3 md:py-4 pl-4 md:pl-6 leading-normal -ml-4 md:ml-0;
   }
   a {
     &:not(.btn) {
