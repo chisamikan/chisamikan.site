@@ -404,6 +404,9 @@ textarea {
       @apply text-xs absolute;
     }
   }
+  & .list-default {
+    @apply mb-1 mt-0;
+  }
 }
 
 .neon {
