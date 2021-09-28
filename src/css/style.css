@@ -23,9 +23,6 @@
   h4 {
     @apply text-lg;
   }
-  p {
-    @apply mb-4;
-  }
 }
 
 /* Vars */
@@ -91,10 +88,10 @@ textarea {
 
 /* Object */
 .side {
+  top: -100vh;
   padding: 0 1rem 5rem;
   backdrop-filter: blur(3px);
   background-color: rgba(255, 255, 255, 0.05);
-  top: -100vh;
   transition: all 0.5s;
   @apply fixed flex flex-col content-around h-screen text-center z-10 md:z-auto w-full md:top-auto;
   @screen md {
@@ -190,6 +187,9 @@ textarea {
       @apply w-full;
       &-txt {
         @apply my-8 mx-0 md:mx-6;
+        & section:not(:last-child) {
+          @apply mb-8;
+        }
       }
     }
   }
@@ -214,6 +214,9 @@ textarea {
         @apply leading-6;
       }
     }
+    textarea {
+      @apply pt-6;
+    }
     input[type='text'],
     input[type='email'],
     textarea {
@@ -221,15 +224,8 @@ textarea {
       @apply w-full;
       &:focus {
         outline: none;
+        @apply p-0;
       }
-    }
-    input[type='text']:focus,
-    input[type='email']:focus,
-    textarea:focus {
-      @apply p-0;
-    }
-    textarea {
-      @apply pt-6;
     }
     &,
     ~ .btn {
@@ -365,10 +361,6 @@ textarea {
     outline-offset: 12px;
     box-shadow: inset 0 0 20px $colors-lightS, 0 0 20px rgba(255, 255, 255, 0.2);
   }
-}
-
-.scroll-section-box-txt section:not(:last-child) {
-  @apply mb-8;
 }
 
 .loader {
