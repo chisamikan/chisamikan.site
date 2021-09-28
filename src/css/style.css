@@ -392,8 +392,18 @@ textarea {
 }
 
 .list-default {
-  padding-inline-start: 40px;
-  @apply list-disc mb-4;
+  padding-inline-start: 2em;
+  @apply mb-4 mt-2;
+  & li {
+    @apply relative;
+    &::before {
+      top: 0.27rem;
+      left: -1.75em;
+      font-family: icons, sans-serif;
+      content: '\f106';
+      @apply text-xs absolute;
+    }
+  }
 }
 
 .neon {
