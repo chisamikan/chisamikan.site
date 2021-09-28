@@ -40,7 +40,7 @@
 /* foundation */
 body {
   font-family: 'M PLUS 1p', sans-serif;
-  color: $colors-light;
+  color: var(--colors-light);
   @apply bg-black;
 }
 
