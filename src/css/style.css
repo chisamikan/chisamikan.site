@@ -416,7 +416,7 @@ textarea {
       top: 0.27rem;
       left: -1.75em;
       font-family: icons, sans-serif;
-      content: '\f106';
+      content: '\f107';
       @apply text-xs absolute;
     }
   }
