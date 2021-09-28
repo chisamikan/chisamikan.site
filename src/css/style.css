@@ -67,6 +67,7 @@ h2,
 h3,
 h4 {
   & small {
+    margin-left: 0.5em;
     font-size: 50%;
     @screen md {
       font-size: 60%;
