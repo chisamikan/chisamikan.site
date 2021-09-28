@@ -94,6 +94,22 @@ textarea {
 }
 
 /* Object */
+#forIE {
+  z-index: 9999;
+  @apply fixed top-0 bottom-0 left-0 right-0 p-10 bg-black text-center flex-col justify-center;
+  & .btn {
+    @apply w-auto px-4 no-underline;
+  }
+  & a {
+    @apply underline;
+  }
+}
+#forIE,
+#lowerWin10,
+#forWin10 {
+  @apply hidden;
+}
+
 .side {
   top: -100vh;
   min-height: -webkit-fill-available;
