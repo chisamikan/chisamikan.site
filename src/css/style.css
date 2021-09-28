@@ -26,14 +26,16 @@
 }
 
 /* Vars */
-
+:root {
 /* colors */
-$colors-dark: #212121;
-$colors-light: #eceff1;
-$colors-lightS: rgba(236, 239, 241, 0.5);
+  --colors-dark: #212121;
+  --colors-light: #eceff1;
+  --colors-lightS: rgba(236, 239, 241, 0.5);
+
 
 /* Media queries breakpoints */
-$side-menu-width-md: 20vw;
+  --side-menu-width-md: 20vw;
+}
 
 /* foundation */
 body {
@@ -95,7 +97,7 @@ textarea {
   transition: all 0.5s;
   @apply fixed flex flex-col content-around h-screen text-center z-10 md:z-auto w-full md:top-auto;
   @screen md {
-    width: $side-menu-width-md;
+    width: var(--side-menu-width-md);
   }
   &-menu {
     @apply flex flex-grow items-center justify-center;
@@ -122,14 +124,14 @@ textarea {
     transition: color ease 0.3s, font-size ease 0.1s;
     @apply no-underline;
     &:hover {
-      color: $colors-light;
+      color: var(--colors-light);
     }
   }
 }
 
 .scroll {
   @screen md {
-    margin-left: $side-menu-width-md;
+    margin-left: var(--side-menu-width-md);
   }
 
   a {
@@ -163,8 +165,8 @@ textarea {
     padding-bottom: 0.25em;
     padding-left: 0.5em;
     margin-bottom: 0;
-    border-bottom: solid 1px $colors-light;
-    border-left: 0.5em solid $colors-light;
+    border-bottom: solid 1px var(--colors-light);
+    border-left: 0.5em solid var(--colors-light);
   }
 
   /* purgecss start ignore */
@@ -194,7 +196,6 @@ textarea {
     }
   }
 }
-
 /* purgecss end ignore */
 .form {
   &-group {
@@ -236,12 +237,12 @@ textarea {
   }
 
   &-control {
-    color: $colors-light;
+    color: var(--colors-light);
     background-color: transparent;
-    border-bottom: 1px solid $colors-lightS;
+    border-bottom: 1px solid var(--colors-lightS);
     @apply py-1 px-0;
     ~ .focus-line {
-      background-color: $colors-light;
+      background-color: var(--colors-light);
       transition: 0.4s;
       @apply absolute bottom-0 left-0 w-0 h-0.5;
       &.textarea {
@@ -291,7 +292,7 @@ textarea {
   &_line {
     width: 40px;
     height: 5px;
-    background: $colors-lightS;
+    background: var(--colors-lightS);
     border-radius: 50px;
     transition: 1.5s;
     @apply block absolute;
@@ -341,10 +342,10 @@ textarea {
 .btn {
   width: 200px;
   line-height: 45px;
-  color: $colors-light;
+  color: var(--colors-light);
   border: 1px solid transparent;
   outline: 1px solid;
-  outline-color: $colors-lightS;
+  outline-color: var(--colors-lightS);
   outline-offset: 0;
   transition: all 1.2s cubic-bezier(0.2, 1, 0.2, 1);
   @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent;
@@ -356,10 +357,11 @@ textarea {
   &:hover {
     color: inherit;
     text-shadow: 2px 2px 3px #000;
-    border-color: $colors-light;
+    border-color: var(--colors-light);
     outline-color: transparent;
     outline-offset: 12px;
-    box-shadow: inset 0 0 20px $colors-lightS, 0 0 20px rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 0 20px var(--colors-lightS),
+      0 0 20px rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -370,7 +372,7 @@ textarea {
     width: 70px;
     height: 70px;
     content: '';
-    border: 1px solid $colors-light;
+    border: 1px solid var(--colors-light);
     border-top: 1px solid rgba(236, 239, 241, 0.2);
     border-right: 1px solid rgba(236, 239, 241, 0.2);
     border-radius: 50%;
