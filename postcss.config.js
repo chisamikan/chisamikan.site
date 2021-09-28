@@ -6,7 +6,6 @@ module.exports = {
       plugins: [require('stylelint')],
     }),
     require('tailwindcss'),
-    require('postcss-simple-vars'),
     require('postcss-nested'),
     require('postcss-nested-ancestors'),
     require('autoprefixer'),
