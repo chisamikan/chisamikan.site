@@ -399,7 +399,7 @@ textarea {
 
 @keyframes loader {
   0% {
-    @apply transform rotate-0;
+    transform: rotate(0);
   }
 
   100% {
