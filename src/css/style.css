@@ -7,7 +7,6 @@
     height: -webkit-fill-available;
   }
   h1,
-  h2,
   h3 {
     @apply mb-2;
   }
@@ -140,7 +139,10 @@ textarea {
   @screen md {
     margin-left: var(--side-menu-width-md);
   }
-
+  h2 {
+    background-image: url('/images/star.svg');
+    @apply relative bg-contain bg-no-repeat py-4 pl-6 leading-normal;
+  }
   a {
     &:not(.btn) {
       color: rgba(158, 228, 255, 1);
@@ -186,7 +188,7 @@ textarea {
       max-width: 80%;
       @apply w-full;
       &-txt {
-        @apply my-8 mx-0 md:mx-6;
+        @apply my-6 mx-0 md:mx-6;
         & section:not(:last-child) {
           @apply mb-8;
         }
