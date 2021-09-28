@@ -26,10 +26,6 @@
   h4 {
     @apply text-lg;
   }
-  .full-screen {
-    min-height: -webkit-fill-available;
-    @apply min-h-screen;
-  }
 }
 
 /* Vars */
@@ -101,11 +97,12 @@ textarea {
 /* Object */
 .side {
   top: -100vh;
+  min-height: -webkit-fill-available;
   padding: 0 1rem 5rem;
   backdrop-filter: blur(3px);
   background-color: rgba(255, 255, 255, 0.05);
   transition: all 0.5s;
-  @apply fixed flex flex-col content-around full-screen text-center z-10 md:z-auto w-full md:top-auto;
+  @apply fixed flex flex-col content-around min-h-screen text-center z-10 md:z-auto w-full md:top-auto;
   @screen md {
     width: var(--side-menu-width-md);
   }
@@ -174,7 +171,7 @@ textarea {
   &-section {
     @apply flex flex-col items-center justify-center;
     &.hero {
-      @apply full-screen;
+      @apply min-h-screen;
     }
     &:not(:first-child) {
       transition: all 800ms;
