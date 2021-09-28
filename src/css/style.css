@@ -14,8 +14,14 @@
       font-size: 5vw;
     }
   }
+  h2 {
+    @apply text-2xl;
+  }
   h3 {
-    font-size: 1.17rem;
+    @apply text-xl;
+  }
+  h4 {
+    @apply text-lg;
   }
   p {
     @apply mb-4;
@@ -57,8 +63,9 @@ h6,
   font-family: 'Share Tech Mono', 'M PLUS 1p', monospace;
 }
 
-h2 {
-  @apply text-2xl;
+h2,
+h3,
+h4 {
   & small {
     font-size: 50%;
     @screen md {
