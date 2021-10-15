@@ -135,9 +135,12 @@ textarea {
       @apply flex md:list-item justify-center;
     }
     li {
-      font-size: 1.5rem;
+      @apply text-2xl;
       &:not(:first-child) {
         @apply ml-8 md:ml-0 md:mt-2;
+      }
+      & .icon-discord {
+        @apply text-xl;
       }
     }
   }
@@ -174,7 +177,7 @@ textarea {
       margin: 0 3px;
       font-family: icons, sans-serif;
       font-size: 0.9em;
-      content: '\f101';
+      content: '\f102';
       @apply font-black align-middle;
       &:not(.btn):hover,
       &:not(.btn):focus,
