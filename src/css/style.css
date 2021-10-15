@@ -412,18 +412,29 @@ textarea {
 .list-default {
   padding-inline-start: 2em;
   @apply mb-4 mt-2;
-  & li {
+  & .list-default {
+    @apply mb-1 mt-0;
+  }
+  ul& li {
     @apply relative;
     &::before {
       top: 0.27rem;
       left: -1.75em;
       font-family: icons, sans-serif;
-      content: '\f107';
+      content: '\f108';
       @apply text-xs absolute;
     }
   }
-  & .list-default {
-    @apply mb-1 mt-0;
+  ol& {
+    @apply list-decimal;
+    & li {
+      &:not(:first-child) {
+        @apply mt-2;
+      }
+      & .list-default {
+        @apply mt-2;
+      }
+    }
   }
 }
 
