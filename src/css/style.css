@@ -207,8 +207,8 @@ textarea {
       @apply w-full;
       &-txt {
         @apply my-6 mx-0 md:mx-6;
-        & section:not(:last-child) {
-          @apply mb-8;
+        & section {
+          @apply mt-8;
         }
       }
     }
