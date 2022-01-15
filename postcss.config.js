@@ -1,8 +1,9 @@
 module.exports = {
   plugins: [
-    require('tailwindcss'),
-    require('postcss-nested'),
+    require('postcss-import'),
+    require('tailwindcss/nesting'),
     require('postcss-nested-ancestors'),
+    require('tailwindcss'),
     require('postcss-sort-media-queries')({
       sort: 'mobile-first',
     }),
