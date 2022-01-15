@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:ejs": "node rss-parser.js && ejs-cli --base-dir src/ejs/pages **/**.ejs --out src --options site.json && html-minifier --input-dir src --output-dir dist -c html-minifier.json --file-ext html && rimraf src/*.html",
-    "build:js": "./node_modules/.bin/babel src/js --out-dir src/js/babel && uglifyjs src/js/babel/*.js -o dist/bundle.js && rimraf src/js/babel",
+    "build:js": "babel src/js --out-dir src/js/babel && mkdirp dist/js && uglifyjs src/js/babel/*.js -o dist/bundle.js && rimraf src/js/babel",
     "build:imagemin": "node .imagemin.mjs && cpx \"src/images/favicon.ico\" dist/images",
     "build:icons": "mkdirp dist/icons && fantasticon src/icons -o dist/icons --normalize && rimraf dist/icons/icons.html dist/icons/icons.ts dist/icons/icons.json && postcss -r dist/icons/icons.css",
     "build:css": "postcss src/css/*.css -d dist",
@@ -35,6 +35,7 @@
     "cpx2": "^4.0.0",
     "cssnano": "^5.0.7",
     "ejs-cli": "^2.2.1",
+    "ejs-lint": "^1.2.1",
     "fantasticon": "^1.2.2",
     "html-minifier": "^4.0.0",
     "imagemin": "^8.0.1",
@@ -45,12 +46,12 @@
     "mkdirp": "^1.0.4",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.3.6",
+    "postcss-aspect-ratio-polyfill": "^2.0.0",
     "postcss-cli": "^8.3.1",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^14.0.2",
     "postcss-nested": "^5.0.6",
     "postcss-nested-ancestors": "^2.0.0",
-    "postcss-nesting": "^8.0.1",
     "postcss-sort-media-queries": "^3.11.12",
     "prettier": "^2.3.2",
     "purgecss": "^4.0.3",
@@ -63,7 +64,7 @@
     "stylelint-declaration-block-no-ignored-properties": "^2.4.0",
     "stylelint-no-unsupported-browser-features": "^5.0.1",
     "stylelint-prettier": "^1.2.0",
-    "uglify-es": "^3.3.9"
+    "uglify-js": "^3.14.5"
   },
   "dependencies": {
     "tailwindcss": "^2.2.15"
