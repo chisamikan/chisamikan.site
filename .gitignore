@@ -6,3 +6,12 @@ style.css.map
 
 # Local Netlify folder
 .netlify
+
+# Yarn2
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
