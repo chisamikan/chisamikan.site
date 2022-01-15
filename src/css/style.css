@@ -6,19 +6,19 @@
   html {
     height: -webkit-fill-available;
   }
+
   h1 {
-    font-size: 10vw;
-    @apply mb-2;
-    @screen md {
-      font-size: 5vw;
-    }
+    @apply mb-2 text-[10vw] md:text-[5vw];
   }
+
   h2 {
     @apply text-2xl md:text-3xl;
   }
+
   h3 {
     @apply text-lg md:text-xl mb-2;
   }
+
   h4 {
     @apply text-base md:text-lg font-bold;
   }
@@ -29,7 +29,7 @@
   /* colors */
   --colors-dark: #212121;
   --colors-light: #eceff1;
-  --colors-lightS: rgba(236, 239, 241, 0.5);
+  --colors-lightS: rgb(236 239 241 / 50%);
 
   /* neon */
   --neon-light: #d1f2ff;
@@ -41,9 +41,9 @@
 
 /* foundation */
 body {
-  font-family: 'M PLUS 1p', sans-serif;
+  @apply bg-black font-body;
+
   color: var(--colors-light);
-  @apply bg-black;
 }
 
 input:-webkit-autofill {
@@ -59,22 +59,18 @@ h2,
 h3,
 h4,
 h5,
-h6,
-.st-mono {
-  font-family: 'Share Tech Mono', 'M PLUS 1p', monospace;
+h6 {
+  @apply font-mono;
 }
 
 h2,
 h3,
 h4 {
   & small {
-    margin-left: 0.5em;
-    font-size: 50%;
-    @screen md {
-      font-size: 60%;
-    }
+    @apply ml-[0.5em] text-[50%] md:text-[60%];
   }
 }
+
 .h3 {
   @apply border-l-2 pl-2 tracking-wider mb-4 font-bold;
 }
@@ -96,14 +92,20 @@ textarea {
 /* Object */
 #forIE {
   z-index: 9999;
-  @apply fixed top-0 bottom-0 left-0 right-0 p-10 bg-black text-center flex-col justify-center;
+  @apply fixed top-0 bottom-0 left-0 right-0 p-10 text-center flex-col justify-center;
+
+  /* IEがCSSカスタムプロパティを読んでくれないので直接指定 */
+  background-color: #000;
+
   & .btn {
     @apply w-auto px-4 no-underline;
   }
+
   & a {
     @apply underline;
   }
 }
+
 #forIE,
 #lowerWin10,
 #forWin10 {
@@ -111,43 +113,54 @@ textarea {
 }
 
 .side {
-  top: -100vh;
+  @apply fixed flex flex-col content-around min-h-screen text-center z-10 md:z-auto w-full md:top-auto -top-[100vh];
+
   min-height: -webkit-fill-available;
   padding: 0 1rem 5rem;
   backdrop-filter: blur(3px);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgb(255 255 255 / 5%);
   transition: all 0.5s;
-  @apply fixed flex flex-col content-around min-h-screen text-center z-10 md:z-auto w-full md:top-auto;
+
   @screen md {
     width: var(--side-menu-width-md);
   }
+
   &-menu {
     @apply flex flex-grow items-center justify-center;
+
     &-active {
       @apply font-bold text-2xl;
     }
+
     li {
       @apply mt-4;
     }
   }
+
   &-sns {
     ul {
       @apply flex md:list-item justify-center;
     }
+
     li {
       @apply text-2xl;
+
       &:not(:first-child) {
         @apply ml-8 md:ml-0 md:mt-2;
       }
+
       & .icon-discord {
         @apply text-xl;
       }
     }
   }
+
   a {
-    color: rgba(236, 239, 241, 0.7);
-    transition: color ease 0.3s, font-size ease 0.1s;
     @apply no-underline;
+
+    color: rgb(236 239 241 / 70%);
+    transition: color ease 0.3s, font-size ease 0.1s;
+
     &:hover {
       color: var(--colors-light);
     }
@@ -158,31 +171,37 @@ textarea {
   @screen md {
     margin-left: var(--side-menu-width-md);
   }
+
   h2 {
-    background-image: url('/images/star.svg');
     @apply relative bg-contain bg-no-repeat py-3 md:py-4 pl-4 md:pl-6 leading-normal -ml-4 md:ml-0;
+
+    background-image: url('/images/star.svg');
   }
+
   a {
     &:not(.btn) {
-      color: rgba(158, 228, 255, 1);
+      color: rgb(158 228 255 / 100%);
       transition: color ease 0.3s;
+
       &:hover,
       &:focus,
       &:active {
-        color: rgba(158, 228, 255, 0.5);
         @apply no-underline;
+
+        color: rgb(158 228 255 / 50%);
       }
     }
+
     &[target='_blank']::after {
+      @apply font-black align-middle text-[0.9em] content-['\f102'];
+
       margin: 0 3px;
       font-family: icons, sans-serif;
-      font-size: 0.9em;
-      content: '\f102';
-      @apply font-black align-middle;
+
       &:not(.btn):hover,
       &:not(.btn):focus,
       &:not(.btn):active {
-        color: rgba(158, 228, 255, 0.5);
+        color: rgb(158 228 255 / 50%);
       }
     }
   }
@@ -190,23 +209,29 @@ textarea {
   /* purgecss start ignore */
   &-section {
     @apply flex flex-col items-center justify-center;
+
     &.hero {
       @apply min-h-screen;
     }
+
     &:not(:first-child) {
+      @apply opacity-0 pt-4 mb-12 md:mb-16;
+
       transition: all 800ms;
       transform: translateY(50px);
-      @apply opacity-0 pt-4 mb-12 md:mb-16;
+
       &.show {
-        transform: translateY(0);
         @apply opacity-100;
+
+        transform: translateY(0);
       }
     }
     &-box {
-      max-width: 80%;
-      @apply w-full;
+      @apply w-full max-w-[80%];
+
       &-txt {
         @apply my-6 mx-0 md:mx-6;
+
         & section {
           @apply mt-8;
         }
@@ -218,35 +243,42 @@ textarea {
 /* purgecss end ignore */
 .form {
   &-group {
-    z-index: 1;
     @apply relative;
+
+    z-index: 1;
+
     input {
       &[type='text'] {
-        padding-left: 4em;
+        @apply pl-[4em];
       }
+
       &[type='email'] {
-        padding-left: 8.5em;
+        @apply pl-[8.5em];
       }
+
       &[type='text'],
       &[type='email'] {
-        font-size: 15px;
-        letter-spacing: 1px;
-        @apply leading-6;
+        @apply leading-6 text-[0.9375rem] tracking-[1px];
       }
     }
     textarea {
       @apply pt-6;
     }
+
     input[type='text'],
     input[type='email'],
     textarea {
-      transition: 0.4s;
       @apply w-full;
+
+      transition: 0.4s;
+
       &:focus {
-        outline: none;
         @apply p-0;
+
+        outline: none;
       }
     }
+
     &,
     ~ .btn {
       &:not(:first-child) {
@@ -256,76 +288,76 @@ textarea {
   }
 
   &-control {
+    @apply py-1 px-0 bg-transparent;
+
     color: var(--colors-light);
-    background-color: transparent;
     border-bottom: 1px solid var(--colors-lightS);
-    @apply py-1 px-0;
+
     ~ .focus-line {
+      @apply absolute bottom-0 left-0 w-0 h-0.5;
+
       background-color: var(--colors-light);
       transition: 0.4s;
-      @apply absolute bottom-0 left-0 w-0 h-0.5;
+
       &.textarea {
-        bottom: 5px;
+        @apply bottom-[0.3125rem];
       }
     }
     ~ label {
-      top: 4px;
+      @apply w-full left-0 absolute top-1 tracking-[0.5px];
+
       z-index: -1;
-      letter-spacing: 0.5px;
       transition: 0.3s;
-      @apply w-full left-0 absolute;
     }
   }
 
   &-control:focus ~ .focus-line,
   &-group.form-control ~ .focus-line {
-    transition: 0.4s;
     @apply w-full;
+
+    transition: 0.4s;
   }
 
   &-control:focus ~ label,
   &-group.form-control ~ label {
-    top: -16px;
+    @apply text-xs -top-4;
+
     transition: 0.3s;
-    @apply text-xs;
   }
 }
 
 /* purgecss start ignore */
 .fadein {
-  top: 0 !important;
+  @apply !top-0;
 }
 
 #target {
+  @apply top-4 right-4 fixed block cursor-pointer md:hidden w-10 h-[1.875rem];
+
   z-index: 100;
-  width: 40px;
-  height: 30px;
   transition: 1.5s;
-  @apply top-4 right-4 fixed block cursor-pointer md:hidden;
 }
 
 .target_inner {
-  position: relative;
-  width: 40px;
-  height: 30px;
+  @apply relative w-10 h-[1.875rem];
+
   &_line {
-    width: 40px;
-    height: 5px;
+    @apply block absolute w-10 h-[0.3125rem] rounded-[3.125rem];
+
     background: var(--colors-lightS);
-    border-radius: 50px;
     transition: 1.5s;
-    @apply block absolute;
   }
+
   &_1 {
     @apply top-0;
   }
 
   &_2 {
-    top: 13px;
+    @apply top-[0.8125rem];
   }
 
   &_3 {
-    top: 26px;
+    @apply top-[1.625rem];
   }
 }
 
@@ -346,12 +378,14 @@ textarea {
 .rss {
   &-list {
     @apply m-0 py-2.5 px-0;
+
     &:not(:last-child) {
       border-bottom: 1px dashed #ccc;
     }
   }
+
   &-date {
-    font-size: 80%;
+    @apply text-[80%];
   }
 }
 
@@ -359,20 +393,21 @@ textarea {
 
 /* Utility */
 .btn {
-  width: 200px;
-  line-height: 45px;
+  @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent w-[12.5rem] leading-[2.8125rem];
+
   color: var(--colors-light);
   border: 1px solid transparent;
   outline: 1px solid;
   outline-color: var(--colors-lightS);
   outline-offset: 0;
   transition: all 1.2s cubic-bezier(0.2, 1, 0.2, 1);
-  @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent;
+
   &:hover,
   &:focus,
   &:active {
     @apply no-underline;
   }
+
   &:hover {
     color: inherit;
     text-shadow: 2px 2px 3px #000;
@@ -380,20 +415,21 @@ textarea {
     outline-color: transparent;
     outline-offset: 12px;
     box-shadow: inset 0 0 20px var(--colors-lightS),
-      0 0 20px rgba(255, 255, 255, 0.2);
+      0 0 20px rgb(255 255 255 / 20%);
   }
 }
 
 .loader {
-  z-index: 999;
   @apply bg-black justify-center items-center flex top-0 right-0 bottom-0 left-0 fixed;
+
+  z-index: 999;
+
   &::after {
-    width: 70px;
-    height: 70px;
-    content: '';
+    @apply w-[4.375rem] h-[4.375rem] content-[''];
+
     border: 1px solid var(--colors-light);
-    border-top: 1px solid rgba(236, 239, 241, 0.2);
-    border-right: 1px solid rgba(236, 239, 241, 0.2);
+    border-top: 1px solid rgb(236 239 241 / 20%);
+    border-right: 1px solid rgb(236 239 241 / 20%);
     border-radius: 50%;
     animation: loader 0.5s linear infinite;
   }
@@ -410,27 +446,32 @@ textarea {
 }
 
 .list-default {
-  padding-inline-start: 2em;
   @apply mb-4 mt-2;
+
+  padding-inline-start: 2em;
+
   & .list-default {
     @apply mb-1 mt-0;
   }
+
   ul& li {
     @apply relative;
+
     &::before {
-      top: 0.27rem;
-      left: -1.75em;
+      @apply text-xs absolute top-[0.27rem] -left-[1.75em] content-['\f108'];
+
       font-family: icons, sans-serif;
-      content: '\f108';
-      @apply text-xs absolute;
     }
   }
+
   ol& {
     @apply list-decimal;
+
     & li {
       &:not(:first-child) {
         @apply mt-2;
       }
+
       & .list-default {
         @apply mt-2;
       }
@@ -445,6 +486,7 @@ textarea {
     0 0 102px var(--neon-dark), 0 0 151px var(--neon-dark);
   animation: pulsate 0.11s ease-in-out infinite alternate;
 }
+
 @keyframes pulsate {
   100% {
     text-shadow: 0 0 4px var(--neon-light), 0 0 11px var(--neon-light),
@@ -452,6 +494,7 @@ textarea {
       0 0 80px var(--neon-dark), 0 0 90px var(--neon-dark),
       0 0 100px var(--neon-dark), 0 0 150px var(--neon-dark);
   }
+
   0% {
     text-shadow: 0 0 4px var(--neon-light), 0 0 10px var(--neon-light),
       0 0 18px var(--neon-light), 0 0 38px var(--neon-dark),
