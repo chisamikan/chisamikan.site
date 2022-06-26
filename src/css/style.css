@@ -3,10 +3,6 @@
 @import 'tailwindcss/utilities';
 
 @layer base {
-  html {
-    height: -webkit-fill-available;
-  }
-
   h1 {
     @apply mb-2 text-[10vw] md:text-[5vw];
   }
@@ -115,7 +111,8 @@ textarea {
 .side {
   @apply fixed flex flex-col content-around min-h-screen text-center z-10 md:z-auto w-full md:top-auto -top-[100vh];
 
-  min-height: -webkit-fill-available;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: 0 1rem 5rem;
   backdrop-filter: blur(3px);
   background-color: rgb(255 255 255 / 5%);
