@@ -109,8 +109,10 @@ textarea {
 }
 
 .side {
-  @apply fixed flex flex-col content-around min-h-screen text-center z-10 md:z-auto w-full md:top-auto -top-[100vh];
+  @apply fixed flex flex-col content-around text-center z-10 md:z-auto w-full md:top-auto;
 
+  top: -100vh;
+  top: -100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   padding: 0 1rem 5rem;
