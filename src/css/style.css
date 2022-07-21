@@ -18,21 +18,21 @@
   h4 {
     @apply text-base md:text-lg font-bold;
   }
-}
 
-/* Vars */
-:root {
-  /* colors */
-  --colors-dark: #212121;
-  --colors-light: #eceff1;
-  --colors-lightS: rgb(236 239 241 / 50%);
+  /* Vars */
+  :root {
+    /* colors */
+    --colors-dark: #212121;
+    --colors-light: #eceff1;
+    --colors-lights: rgb(236 239 241 / 50%);
 
-  /* neon */
-  --neon-light: #d1f2ff;
-  --neon-dark: #05baff;
+    /* neon */
+    --neon-light: #d1f2ff;
+    --neon-dark: #05baff;
 
-  /* Media queries breakpoints */
-  --side-menu-width-md: 20vw;
+    /* Media queries breakpoints */
+    --side-menu-width-md: 20vw;
+  }
 }
 
 /* foundation */
@@ -86,7 +86,7 @@ textarea {
 }
 
 /* Object */
-#forIE {
+#forie {
   z-index: 9999;
   @apply fixed top-0 bottom-0 left-0 right-0 p-10 text-center flex-col justify-center;
 
@@ -102,9 +102,9 @@ textarea {
   }
 }
 
-#forIE,
-#lowerWin10,
-#forWin10 {
+#forie,
+#lowerwin10,
+#forwin10 {
   @apply hidden;
 }
 
@@ -167,40 +167,32 @@ textarea {
 }
 
 .scroll {
-  @screen md {
-    margin-left: var(--side-menu-width-md);
-  }
+  @apply md:ml-[var(--side-menu-width-md)];
 
   h2 {
-    @apply relative bg-contain bg-no-repeat py-3 md:py-4 pl-4 md:pl-6 leading-normal -ml-4 md:ml-0;
-
-    background-image: url('/images/star.svg');
+    @apply relative bg-contain bg-no-repeat py-3 md:py-4 pl-4 md:pl-6 leading-normal -ml-4 md:ml-0 bg-[url('/images/star.svg')];
   }
 
   a {
     &:not(.btn) {
-      color: rgb(158 228 255 / 100%);
-      transition: color ease 0.3s;
+      @apply text-[#9ee4ff] transition-colors duration-[0.3s] ease-linear;
 
       &:hover,
       &:focus,
       &:active {
-        @apply no-underline;
-
-        color: rgb(158 228 255 / 50%);
+        @apply no-underline text-[#9ee4ff]/[0.5];
       }
     }
 
     &[target='_blank']::after {
-      @apply font-black align-middle text-[0.9em] content-['\f102'];
+      @apply font-black align-middle text-[0.9em] content-['\f102'] my-0 mx-[0.1875rem];
 
-      margin: 0 3px;
       font-family: icons, sans-serif;
 
       &:not(.btn):hover,
       &:not(.btn):focus,
       &:not(.btn):active {
-        color: rgb(158 228 255 / 50%);
+        @apply text-[#9ee4ff]/[0.5];
       }
     }
   }
@@ -214,17 +206,13 @@ textarea {
     }
 
     &:not(:first-child) {
-      @apply opacity-0 pt-4 mb-12 md:mb-16;
-
-      transition: all 800ms;
-      transform: translateY(50px);
+      @apply opacity-0 pt-4 mb-12 md:mb-16 transition-all duration-[800ms] translate-y-[50px];
 
       &.show {
-        @apply opacity-100;
-
-        transform: translateY(0);
+        @apply opacity-100 translate-y-0;
       }
     }
+
     &-box {
       @apply w-full max-w-[80%];
 
@@ -252,9 +240,7 @@ textarea {
 /* purgecss end ignore */
 .form {
   &-group {
-    @apply relative;
-
-    z-index: 1;
+    @apply relative z-[1];
 
     input {
       &[type='text'] {
@@ -270,6 +256,7 @@ textarea {
         @apply leading-6 text-[0.9375rem] tracking-[1px];
       }
     }
+
     textarea {
       @apply pt-6;
     }
@@ -277,9 +264,7 @@ textarea {
     input[type='text'],
     input[type='email'],
     textarea {
-      @apply w-full;
-
-      transition: 0.4s;
+      @apply w-full duration-[0.4s];
 
       &:focus {
         @apply p-0;
@@ -300,38 +285,31 @@ textarea {
     @apply py-1 px-0 bg-transparent;
 
     color: var(--colors-light);
-    border-bottom: 1px solid var(--colors-lightS);
+    border-bottom: 1px solid var(--colors-lights);
 
     ~ .focus-line {
-      @apply absolute bottom-0 left-0 w-0 h-0.5;
+      @apply absolute bottom-0 left-0 w-0 h-0.5 duration-[0.4s];
 
       background-color: var(--colors-light);
-      transition: 0.4s;
 
       &.textarea {
         @apply bottom-[0.3125rem];
       }
     }
-    ~ label {
-      @apply w-full left-0 absolute top-1 tracking-[0.5px];
 
-      z-index: -1;
-      transition: 0.3s;
+    ~ label {
+      @apply w-full left-0 absolute top-1 tracking-[0.5px] -z-[1] duration-[0.3s];
     }
   }
 
   &-control:focus ~ .focus-line,
   &-group.form-control ~ .focus-line {
-    @apply w-full;
-
-    transition: 0.4s;
+    @apply w-full duration-[0.4s];
   }
 
   &-control:focus ~ label,
   &-group.form-control ~ label {
-    @apply text-xs -top-4;
-
-    transition: 0.3s;
+    @apply text-xs -top-4 duration-[0.3s];
   }
 }
 
@@ -341,20 +319,16 @@ textarea {
 }
 
 #target {
-  @apply top-4 right-4 fixed block cursor-pointer md:hidden w-10 h-[1.875rem];
-
-  z-index: 100;
-  transition: 1.5s;
+  @apply top-4 right-4 fixed block cursor-pointer md:hidden w-10 h-[1.875rem] z-[100] duration-[1.5s];
 }
 
-.target_inner {
+.target-inner {
   @apply relative w-10 h-[1.875rem];
 
   &_line {
-    @apply block absolute w-10 h-[0.3125rem] rounded-[3.125rem];
+    @apply block absolute w-10 h-[0.3125rem] rounded-[3.125rem] duration-[1.5s];
 
-    background: var(--colors-lightS);
-    transition: 1.5s;
+    background: var(--colors-lights);
   }
 
   &_1 {
@@ -371,8 +345,7 @@ textarea {
 }
 
 .linea {
-  top: 13px;
-  transform: rotate(225deg);
+  @apply top-[13px] rotate-[225deg];
 }
 
 .lineb {
@@ -380,8 +353,7 @@ textarea {
 }
 
 .linec {
-  top: 13px;
-  transform: rotate(-225deg);
+  @apply top-[13px] -rotate-[225deg];
 }
 
 .rss {
@@ -389,7 +361,7 @@ textarea {
     @apply m-0 py-2.5 px-0;
 
     &:not(:last-child) {
-      border-bottom: 1px dashed #ccc;
+      @apply border-b border-dashed border-[#ccc];
     }
   }
 
@@ -402,13 +374,10 @@ textarea {
 
 /* Utility */
 .btn {
-  @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent w-[12.5rem] leading-[2.8125rem];
+  @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent w-[12.5rem] leading-[2.8125rem] border border-solid border-transparent outline-offset-0 outline outline-1;
 
   color: var(--colors-light);
-  border: 1px solid transparent;
-  outline: 1px solid;
-  outline-color: var(--colors-lightS);
-  outline-offset: 0;
+  outline-color: var(--colors-lights);
   transition: all 1.2s cubic-bezier(0.2, 1, 0.2, 1);
 
   &:hover,
@@ -418,28 +387,24 @@ textarea {
   }
 
   &:hover {
-    color: inherit;
+    @apply text-[color:inherit] outline-transparent outline-offset-[12px];
+
     text-shadow: 2px 2px 3px #000;
     border-color: var(--colors-light);
-    outline-color: transparent;
-    outline-offset: 12px;
-    box-shadow: inset 0 0 20px var(--colors-lightS),
+    box-shadow: inset 0 0 20px var(--colors-lights),
       0 0 20px rgb(255 255 255 / 20%);
   }
 }
 
 .loader {
-  @apply bg-black justify-center items-center flex top-0 right-0 bottom-0 left-0 fixed;
-
-  z-index: 999;
+  @apply bg-black justify-center items-center flex top-0 right-0 bottom-0 left-0 fixed z-[999];
 
   &::after {
-    @apply w-[4.375rem] h-[4.375rem] content-[''] animate-loader;
+    @apply w-[4.375rem] h-[4.375rem] content-[''] animate-loader rounded-[50%];
 
     border: 1px solid var(--colors-light);
     border-top: 1px solid rgb(236 239 241 / 20%);
     border-right: 1px solid rgb(236 239 241 / 20%);
-    border-radius: 50%;
   }
 }
 
@@ -497,19 +462,46 @@ textarea {
 
   & input[type='checkbox'] {
     @apply opacity-0 absolute m-0 -z-[1] w-0 h-0 overflow-hidden left-0 pointer-events-none;
+
+    &:focus + .checkbox-material .check::after {
+      @apply opacity-20;
+    }
+
+    &:checked + .checkbox-material .check::before {
+      @apply animate-checkbox-on;
+
+      box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px,
+        -5px 5px 0 10px, 20px -12px 0 11px;
+    }
+
+    &:not(:checked) + .checkbox-material::before {
+      @apply animate-ripple-off;
+    }
+
+    &:checked + .checkbox-material::before {
+      @apply animate-ripple-on;
+    }
+
+    &:not(:checked) + .checkbox-material .check::after {
+      @apply animate-ripple-off;
+    }
+
+    &:checked + .checkbox-material .check::after {
+      @apply animate-ripple-on;
+    }
   }
 
   & .checkbox-material {
     @apply align-middle relative top-[0.1875rem];
 
-    &:before {
+    &::before {
       @apply absolute left-2 top-0.5 content-[''] h-1 w-1 rounded-[100%] z-[1] opacity-0 m-0 bg-white/[0.5];
     }
 
     & .check {
       @apply relative inline-block w-5 h-5 border border-solid overflow-hidden z-[1] mr-2;
 
-      &:before {
+      &::before {
         @apply absolute content-[''] transform rotate-45 block -mt-1 ml-1.5 w-0 h-0 animate-checkbox-off;
 
         box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0,
@@ -518,44 +510,15 @@ textarea {
     }
   }
 
-  & input[type='checkbox'] {
-    &:focus + .checkbox-material .check:after {
-      @apply opacity-20;
-    }
-
-    &:checked + .checkbox-material .check:before {
-      @apply animate-checkbox-on;
-
-      box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px,
-        0px 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
-    }
-
-    &:not(:checked) + .checkbox-material:before {
-      @apply animate-ripple-off;
-    }
-
-    &:checked + .checkbox-material:before {
-      @apply animate-ripple-on;
-    }
-
-    &:not(:checked) + .checkbox-material .check:after {
-      @apply animate-ripple-off;
-    }
-
-    &:checked + .checkbox-material .check:after {
-      @apply animate-ripple-on;
-    }
-  }
-
   &
     input[type='checkbox'][disabled]:not(:checked)
     ~ .checkbox-material
-    .check:before,
+    .check::before,
   & input[type='checkbox'][disabled] + .circle {
     @apply opacity-50;
   }
 
-  & input[type='checkbox'][disabled] + .checkbox-material .check:after {
+  & input[type='checkbox'][disabled] + .checkbox-material .check::after {
     @apply bg-white/[0.84] transform -rotate-45;
   }
 }
