@@ -239,6 +239,16 @@ textarea {
   }
 }
 
+.privacy {
+  & .scroll-section:not(:first-child) {
+    @apply mb-4 md:mb-6;
+  }
+
+  & .scroll-section-box-txt p + p {
+    @apply mt-4;
+  }
+}
+
 /* purgecss end ignore */
 .form {
   &-group {
