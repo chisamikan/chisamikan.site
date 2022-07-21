@@ -434,23 +434,12 @@ textarea {
   z-index: 999;
 
   &::after {
-    @apply w-[4.375rem] h-[4.375rem] content-[''];
+    @apply w-[4.375rem] h-[4.375rem] content-[''] animate-loader;
 
     border: 1px solid var(--colors-light);
     border-top: 1px solid rgb(236 239 241 / 20%);
     border-right: 1px solid rgb(236 239 241 / 20%);
     border-radius: 50%;
-    animation: loader 0.5s linear infinite;
-  }
-}
-
-@keyframes loader {
-  0% {
-    transform: rotate(0);
-  }
-
-  100% {
-    transform: rotate(360deg);
   }
 }
 
@@ -489,27 +478,12 @@ textarea {
 }
 
 .neon {
+  @apply animate-pulsate;
+
   text-shadow: 0 0 7px var(--neon-light), 0 0 10px var(--neon-light),
     0 0 21px var(--neon-light), 0 0 42px var(--neon-dark),
     0 0 82px var(--neon-dark), 0 0 92px var(--neon-dark),
     0 0 102px var(--neon-dark), 0 0 151px var(--neon-dark);
-  animation: pulsate 0.11s ease-in-out infinite alternate;
-}
-
-@keyframes pulsate {
-  100% {
-    text-shadow: 0 0 4px var(--neon-light), 0 0 11px var(--neon-light),
-      0 0 19px var(--neon-light), 0 0 40px var(--neon-dark),
-      0 0 80px var(--neon-dark), 0 0 90px var(--neon-dark),
-      0 0 100px var(--neon-dark), 0 0 150px var(--neon-dark);
-  }
-
-  0% {
-    text-shadow: 0 0 4px var(--neon-light), 0 0 10px var(--neon-light),
-      0 0 18px var(--neon-light), 0 0 38px var(--neon-dark),
-      0 0 73px var(--neon-dark), 0 0 80px var(--neon-dark),
-      0 0 94px var(--neon-dark), 0 0 140px var(--neon-dark);
-  }
 }
 
 .form-group.checkbox {
@@ -536,11 +510,10 @@ textarea {
       @apply relative inline-block w-5 h-5 border border-solid overflow-hidden z-[1] mr-2;
 
       &:before {
-        @apply absolute content-[''] transform rotate-45 block -mt-1 ml-1.5 w-0 h-0;
+        @apply absolute content-[''] transform rotate-45 block -mt-1 ml-1.5 w-0 h-0 animate-checkbox-off;
 
         box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0,
           0 0 0 0 inset;
-        animation: checkbox-off 0.3s forwards ease-out;
       }
     }
   }
@@ -549,25 +522,28 @@ textarea {
     &:focus + .checkbox-material .check:after {
       @apply opacity-20;
     }
+
     &:checked + .checkbox-material .check:before {
+      @apply animate-checkbox-on;
+
       box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px,
         0px 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
-      animation: checkbox-on 0.3s forwards ease-out;
     }
+
     &:not(:checked) + .checkbox-material:before {
-      animation: ripple-off 700ms forwards ease-out;
+      @apply animate-ripple-off;
     }
 
     &:checked + .checkbox-material:before {
-      animation: ripple-on 700ms forwards ease-out;
+      @apply animate-ripple-on;
     }
 
     &:not(:checked) + .checkbox-material .check:after {
-      animation: ripple-off 700ms forwards ease-out;
+      @apply animate-ripple-off;
     }
 
     &:checked + .checkbox-material .check:after {
-      animation: ripple-on 700ms forwards ease-out;
+      @apply animate-ripple-on;
     }
   }
 
@@ -581,73 +557,5 @@ textarea {
 
   & input[type='checkbox'][disabled] + .checkbox-material .check:after {
     @apply bg-white/[0.84] transform -rotate-45;
-  }
-}
-
-@keyframes checkbox-on {
-  0% {
-    box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px,
-      -5px 5px 0 10px, 15px 2px 0 11px;
-  }
-  50% {
-    box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px,
-      -5px 5px 0 10px, 20px 2px 0 11px;
-  }
-  100% {
-    box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px,
-      -5px 5px 0 10px, 20px -12px 0 11px;
-  }
-}
-
-@keyframes checkbox-off {
-  0% {
-    box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px,
-      -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
-  }
-  25% {
-    box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px,
-      -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
-  }
-  50% {
-    @apply transform rotate-45 -mt-1 ml-1.5 w-0 h-0;
-
-    box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px,
-      -5px 5px 0 10px, 15px 2px 0 11px, 0 0 0 0 inset;
-  }
-  51% {
-    @apply transform rotate-0 -mt-0.5 -ml-0.5 w-5 h-5;
-
-    box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0,
-      0px 0px 0 10px inset;
-  }
-  100% {
-    @apply transform rotate-0 -mt-0.5 -ml-0.5 w-5 h-5;
-
-    box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0,
-      0px 0px 0 0px inset;
-  }
-}
-
-@keyframes ripple-on {
-  0% {
-    @apply opacity-50;
-  }
-
-  100% {
-    @apply opacity-0;
-
-    transform: scale(13, 13);
-  }
-}
-
-@keyframes ripple-off {
-  0% {
-    @apply opacity-50;
-  }
-
-  100% {
-    @apply opacity-0;
-
-    transform: scale(13, 13);
   }
 }
