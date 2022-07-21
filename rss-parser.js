@@ -13,7 +13,7 @@ let parser = new Parser();
     (feed.ogImageUrl = feed.siteRootUrl + 'images/og-image.jpg'),
     (feed.fbAppId = ''),
     (feed.twitterSite = '@chisamikan'),
-    (feed.googleAnalyticsId = 'UA-35769734-2'),
+    (feed.googleAnalyticsId = 'G-XZSD8BQ5DE'),
     fs.writeFile('site.json', JSON.stringify(feed, null, '    '), (err) => {
       if (err) console.log(`error!::${err}`);
     });

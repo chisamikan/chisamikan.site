@@ -35,6 +35,15 @@
 
   <%# Others %>
   <link rel="canonical" href="<%= siteRootUrl %><%= pageUrl %>" />
+
+  <%# Global site tag (gtag.js) - Google Analytics %>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE"></script>
+  <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', '<%= googleAnalyticsId %>');
+  </script>
 </head>
 
 <body>
