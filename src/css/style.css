@@ -12,11 +12,11 @@
   }
 
   h3 {
-    @apply text-lg md:text-xl mb-2;
+    @apply mb-2 text-lg md:text-xl;
   }
 
   h4 {
-    @apply text-base md:text-lg font-bold;
+    @apply text-base font-bold md:text-lg;
   }
 
   /* Vars */
@@ -47,7 +47,7 @@ input:-webkit-autofill {
 }
 
 .canvas-background {
-  @apply w-full h-full top-0 left-0 fixed;
+  @apply fixed top-0 left-0 h-full w-full;
 }
 
 h1,
@@ -68,11 +68,11 @@ h4 {
 }
 
 .h3 {
-  @apply border-l-2 pl-2 tracking-wider mb-4 font-bold;
+  @apply mb-4 border-l-2 pl-2 font-bold tracking-wider;
 }
 
 main {
-  @apply top-0 right-0 bottom-0 left-0 absolute;
+  @apply absolute top-0 right-0 bottom-0 left-0;
 }
 
 /* iOS Safariでフォームに角丸が付く問題の対処 */
@@ -82,13 +82,13 @@ input[type='email'],
 input[type='submit'],
 input[type='image'],
 textarea {
-  @apply rounded-none appearance-none;
+  @apply appearance-none rounded-none;
 }
 
 /* Object */
 #forie {
   z-index: 9999;
-  @apply fixed top-0 bottom-0 left-0 right-0 p-10 text-center flex-col justify-center;
+  @apply fixed top-0 bottom-0 left-0 right-0 flex-col justify-center p-10 text-center;
 
   /* IEがCSSカスタムプロパティを読んでくれないので直接指定 */
   background-color: #000;
@@ -109,7 +109,7 @@ textarea {
 }
 
 .side {
-  @apply fixed flex flex-col content-around text-center z-10 md:z-auto w-full md:top-auto;
+  @apply fixed z-10 flex w-full flex-col content-around text-center md:top-auto md:z-auto;
 
   top: -100vh;
   top: -100dvh;
@@ -128,7 +128,7 @@ textarea {
     @apply flex flex-grow items-center justify-center;
 
     &-active {
-      @apply font-bold text-2xl;
+      @apply text-2xl font-bold;
     }
 
     li {
@@ -138,7 +138,7 @@ textarea {
 
   &-sns {
     ul {
-      @apply flex md:list-item justify-center;
+      @apply flex justify-center md:list-item;
     }
 
     li {
@@ -170,7 +170,7 @@ textarea {
   @apply md:ml-[var(--side-menu-width-md)];
 
   h2 {
-    @apply relative bg-contain bg-no-repeat py-3 md:py-4 pl-4 md:pl-6 leading-normal -ml-4 md:ml-0 bg-[url('/images/star.svg')];
+    @apply relative -ml-4 bg-[url('/images/star.svg')] bg-contain bg-no-repeat py-3 pl-4 leading-normal md:ml-0 md:py-4 md:pl-6;
   }
 
   a {
@@ -180,12 +180,12 @@ textarea {
       &:hover,
       &:focus,
       &:active {
-        @apply no-underline text-[#9ee4ff]/[0.5];
+        @apply text-[#9ee4ff]/[0.5] no-underline;
       }
     }
 
     &[target='_blank']::after {
-      @apply font-black align-middle text-[0.9em] content-['\f102'] my-0 mx-[0.1875rem];
+      @apply my-0 mx-[0.1875rem] align-middle text-[0.9em] font-black content-['\f102'];
 
       font-family: icons, sans-serif;
 
@@ -206,10 +206,10 @@ textarea {
     }
 
     &:not(:first-child) {
-      @apply opacity-0 pt-4 mb-12 md:mb-16 transition-all duration-[800ms] translate-y-[50px];
+      @apply mb-12 translate-y-[50px] pt-4 opacity-0 transition-all duration-[800ms] md:mb-16;
 
       &.show {
-        @apply opacity-100 translate-y-0;
+        @apply translate-y-0 opacity-100;
       }
     }
 
@@ -253,7 +253,7 @@ textarea {
 
       &[type='text'],
       &[type='email'] {
-        @apply leading-6 text-[0.9375rem] tracking-[1px];
+        @apply text-[0.9375rem] leading-6 tracking-[1px];
       }
     }
 
@@ -282,13 +282,13 @@ textarea {
   }
 
   &-control {
-    @apply py-1 px-0 bg-transparent;
+    @apply bg-transparent py-1 px-0;
 
     color: var(--colors-light);
     border-bottom: 1px solid var(--colors-lights);
 
     ~ .focus-line {
-      @apply absolute bottom-0 left-0 w-0 h-0.5 duration-[0.4s];
+      @apply absolute bottom-0 left-0 h-0.5 w-0 duration-[0.4s];
 
       background-color: var(--colors-light);
 
@@ -298,7 +298,7 @@ textarea {
     }
 
     ~ label {
-      @apply w-full left-0 absolute top-1 tracking-[0.5px] -z-[1] duration-[0.3s];
+      @apply absolute left-0 top-1 -z-[1] w-full tracking-[0.5px] duration-[0.3s];
     }
   }
 
@@ -309,7 +309,7 @@ textarea {
 
   &-control:focus ~ label,
   &-group.form-control ~ label {
-    @apply text-xs -top-4 duration-[0.3s];
+    @apply -top-4 text-xs duration-[0.3s];
   }
 }
 
@@ -319,14 +319,14 @@ textarea {
 }
 
 #target {
-  @apply top-4 right-4 fixed block cursor-pointer md:hidden w-10 h-[1.875rem] z-[100] duration-[1.5s];
+  @apply fixed top-4 right-4 z-[100] block h-[1.875rem] w-10 cursor-pointer duration-[1.5s] md:hidden;
 }
 
 .target-inner {
-  @apply relative w-10 h-[1.875rem];
+  @apply relative h-[1.875rem] w-10;
 
   &_line {
-    @apply block absolute w-10 h-[0.3125rem] rounded-[3.125rem] duration-[1.5s];
+    @apply absolute block h-[0.3125rem] w-10 rounded-[3.125rem] duration-[1.5s];
 
     background: var(--colors-lights);
   }
@@ -374,7 +374,7 @@ textarea {
 
 /* Utility */
 .btn {
-  @apply relative inline-block font-bold text-center no-underline shadow-none uppercase cursor-pointer bg-transparent w-[12.5rem] leading-[2.8125rem] border border-solid border-transparent outline-offset-0 outline outline-1;
+  @apply relative inline-block w-[12.5rem] cursor-pointer border border-solid border-transparent bg-transparent text-center font-bold uppercase leading-[2.8125rem] no-underline shadow-none outline outline-1 outline-offset-0;
 
   color: var(--colors-light);
   outline-color: var(--colors-lights);
@@ -387,7 +387,7 @@ textarea {
   }
 
   &:hover {
-    @apply text-[color:inherit] outline-transparent outline-offset-[12px];
+    @apply text-[color:inherit] outline-offset-[12px] outline-transparent;
 
     text-shadow: 2px 2px 3px #000;
     border-color: var(--colors-light);
@@ -397,10 +397,10 @@ textarea {
 }
 
 .loader {
-  @apply bg-black justify-center items-center flex top-0 right-0 bottom-0 left-0 fixed z-[999];
+  @apply fixed top-0 right-0 bottom-0 left-0 z-[999] flex items-center justify-center bg-black;
 
   &::after {
-    @apply w-[4.375rem] h-[4.375rem] content-[''] animate-loader rounded-[50%];
+    @apply h-[4.375rem] w-[4.375rem] animate-loader rounded-[50%] content-[''];
 
     border: 1px solid var(--colors-light);
     border-top: 1px solid rgb(236 239 241 / 20%);
@@ -421,7 +421,7 @@ textarea {
     @apply relative;
 
     &::before {
-      @apply text-xs absolute top-[0.27rem] -left-[1.75em] content-['\f108'];
+      @apply absolute top-[0.27rem] -left-[1.75em] text-xs content-['\f108'];
 
       font-family: icons, sans-serif;
     }
@@ -452,7 +452,7 @@ textarea {
 }
 
 .form-group.checkbox {
-  @apply mt-6 md:text-center mb-12;
+  @apply mt-6 mb-12 md:text-center;
 
   transform: translateZ(0);
 
@@ -461,7 +461,7 @@ textarea {
   }
 
   & input[type='checkbox'] {
-    @apply opacity-0 absolute m-0 -z-[1] w-0 h-0 overflow-hidden left-0 pointer-events-none;
+    @apply pointer-events-none absolute left-0 -z-[1] m-0 h-0 w-0 overflow-hidden opacity-0;
 
     &:focus + .checkbox-material .check::after {
       @apply opacity-20;
@@ -492,17 +492,17 @@ textarea {
   }
 
   & .checkbox-material {
-    @apply align-middle relative top-[0.1875rem];
+    @apply relative top-[0.1875rem] align-middle;
 
     &::before {
-      @apply absolute left-2 top-0.5 content-[''] h-1 w-1 rounded-[100%] z-[1] opacity-0 m-0 bg-white/[0.5];
+      @apply absolute left-2 top-0.5 z-[1] m-0 h-1 w-1 rounded-[100%] bg-white/[0.5] opacity-0 content-[''];
     }
 
     & .check {
-      @apply relative inline-block w-5 h-5 border border-solid overflow-hidden z-[1] mr-2;
+      @apply relative z-[1] mr-2 inline-block h-5 w-5 overflow-hidden border border-solid;
 
       &::before {
-        @apply absolute content-[''] transform rotate-45 block -mt-1 ml-1.5 w-0 h-0 animate-checkbox-off;
+        @apply absolute -mt-1 ml-1.5 block h-0 w-0 rotate-45 transform animate-checkbox-off content-[''];
 
         box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0,
           0 0 0 0 inset;
@@ -519,6 +519,6 @@ textarea {
   }
 
   & input[type='checkbox'][disabled] + .checkbox-material .check::after {
-    @apply bg-white/[0.84] transform -rotate-45;
+    @apply -rotate-45 transform bg-white/[0.84];
   }
 }
