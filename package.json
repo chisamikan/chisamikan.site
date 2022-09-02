@@ -21,7 +21,8 @@
   "license": "UNLICENSED",
   "private": true,
   "browserslist": [
-    "last 2 versions and >1% in JP"
+    "> 0.5% in JP, not dead",
+    "not IE 11"
   ],
   "devDependencies": {
     "@babel/cli": "^7.18.10",
