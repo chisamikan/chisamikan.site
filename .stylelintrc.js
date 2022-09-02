@@ -10,7 +10,7 @@ module.exports = {
     'stylelint-prettier/recommended',
     'stylelint-config-prettier',
   ],
-  ignoreFiles: ['**/node_modules/**', '**/.yarn/**'],
+  ignoreFiles: ['**/node_modules/**', '**/.yarn/**', '**/dist/**'],
   rules: {
     'at-rule-no-unknown': [
       true,
