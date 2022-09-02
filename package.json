@@ -8,7 +8,7 @@
     "build:js": "babel src/js --out-dir src/js/babel && uglifyjs 'src/js/babel/*.js' -o dist/bundle.js && rimraf src/js/babel",
     "build:imagemin": "node .imagemin.mjs && cpx \"src/images/favicon.ico\" dist/images",
     "build:icons": "mkdirp dist/icons && fantasticon src/icons -o dist/icons --normalize && rimraf dist/icons/icons.html dist/icons/icons.ts dist/icons/icons.json && postcss -r dist/icons/icons.css",
-    "build:css": "tailwindcss -i src/css/*.css -d dist --postcss --minify",
+    "build:css": "tailwindcss -i ./src/css/style.css -o ./dist/style.css --postcss --minify",
     "build": "rimraf dist && run-s 'build:*'",
     "test": "browser-sync start --config bs-config.js",
     "start:css": "chokidar \"src/css/**.css\" -c \"yarn build:css\"",
