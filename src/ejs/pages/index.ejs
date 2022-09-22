@@ -222,7 +222,7 @@ pageUrl:'', pageDescription:'千紗みかんウェブサイト'}) %>
 <article class="scroll-section" id="contact">
   <div class="scroll-section-box">
     <h2>Contact<small>お問い合わせ</small></h2>
-    <form class="scroll-section-box-txt" name="contact" method="POST" netlify>
+    <form class="scroll-section-box-txt" name="contact" method="POST" data-netlify-recaptcha="true" data-netlify="true">
       <div class="form-group">
         <input class="form-control" type="text" name="name" placeholder="例：山田　太郎" required />
         <label>お名前</label>
@@ -240,6 +240,9 @@ pageUrl:'', pageDescription:'千紗みかんウェブサイト'}) %>
       </div>
       <div class="form-group checkbox">
         <label><input type="checkbox" name="privacy" required /><span class="checkbox-material"><span class="check"></span></span><a href="/privacy" target="_blank">プライバシーポリシー</a>に同意する</label>
+      </div>
+      <div class="form-group">
+        <div data-netlify-recaptcha="true"></div>
       </div>
       <div class="text-center mt-3">
         <button type="submit" class="btn">送信</button>
