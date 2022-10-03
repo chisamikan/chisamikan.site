@@ -236,7 +236,12 @@ pageUrl:'', pageDescription:'千紗みかんウェブサイト'}) %>
 <article class="scroll-section" id="contact">
   <div class="scroll-section-box">
     <h2>Contact<small>お問い合わせ</small></h2>
-    <form class="scroll-section-box-txt" name="contact" method="POST" data-netlify-recaptcha="true" data-netlify="true">
+    <form class="scroll-section-box-txt" name="contact" method="POST" data-netlify-recaptcha="true" netlify-honeypot="bot-field" data-netlify="true">
+      <p class="hidden">
+        <label>
+          Don’t fill this out if you’re human: <input name="bot-field" />
+        </label>
+      </p>
       <div class="form-group">
         <input class="form-control" type="text" name="name" placeholder="例：山田　太郎" required />
         <label>お名前</label>
