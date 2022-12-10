@@ -26,12 +26,12 @@
   ],
   "devDependencies": {
     "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.19.3",
-    "@babel/preset-env": "^7.19.4",
-    "autoprefixer": "^10.4.12",
+    "@babel/core": "^7.20.5",
+    "@babel/preset-env": "^7.20.2",
+    "autoprefixer": "^10.4.13",
     "browser-sync": "^2.27.10",
     "chokidar-cli": "^3.0.0",
-    "core-js": "3.25.5",
+    "core-js": "3.26.1",
     "cpx2": "^4.2.0",
     "ejs-cli": "^2.2.3",
     "fantasticon": "^1.2.3",
@@ -43,26 +43,26 @@
     "imagemin-svgo": "^10.0.1",
     "mkdirp": "^1.0.4",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.18",
+    "postcss": "^8.4.19",
     "postcss-aspect-ratio-polyfill": "^2.0.0",
-    "postcss-cli": "^10.0.0",
+    "postcss-cli": "^10.1.0",
     "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-import": "^15.0.0",
+    "postcss-import": "^15.1.0",
     "postcss-sort-media-queries": "^4.3.0",
-    "prettier": "^2.7.1",
-    "prettier-plugin-tailwindcss": "^0.1.13",
+    "prettier": "^2.8.1",
+    "prettier-plugin-tailwindcss": "^0.2.1",
     "rimraf": "^3.0.2",
     "rss-parser": "^3.12.0",
-    "stylelint": "^14.14.0",
-    "stylelint-config-prettier": "^9.0.3",
+    "stylelint": "^14.16.0",
+    "stylelint-config-prettier": "^9.0.4",
     "stylelint-config-recess-order": "^3.0.0",
     "stylelint-config-standard": "^29.0.0",
-    "stylelint-declaration-block-no-ignored-properties": "^2.5.0",
+    "stylelint-declaration-block-no-ignored-properties": "^2.6.0",
     "stylelint-no-unsupported-browser-features": "^6.0.1",
     "stylelint-prettier": "^2.0.0",
-    "uglify-js": "^3.17.3"
+    "uglify-js": "^3.17.4"
   },
   "dependencies": {
-    "tailwindcss": "^3.1.8"
+    "tailwindcss": "^3.2.4"
   }
 }
