@@ -214,7 +214,7 @@ textarea {
     }
 
     &-box {
-      @apply w-full max-w-[80%];
+      @apply w-full px-6 md:max-w-[80%] md:px-0;
 
       &-txt {
         @apply my-6 mx-0 md:mx-6;
