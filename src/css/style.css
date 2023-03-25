@@ -415,6 +415,8 @@ textarea {
 
   & .list-default {
     @apply mb-1 mt-0;
+
+    padding-inline-start: 1em;
   }
 
   ul& li {
