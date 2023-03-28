@@ -1,5 +1,5 @@
 # chisamikan.site
-
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e0a59905-48a6-4737-9c0b-25b8f4b989ad/deploy-status)](https://app.netlify.com/sites/chisamikan/deploys)
 　　＋　　　　　ﾟ　　.　＋　　　　　　　　　　　　.　.　．ﾟ .ﾟ。ﾟ　。　,ﾟ．。ﾟ.　ﾟ．。　.。  
 　　　．　.　　　ﾟ　　.　o　　　　ﾟ　　。　　.　　,　.　.o 。　*　.ﾟ　+　。☆　ﾟ。。．　　.  
 　　　　　　　　　　　　＊- - -＊　　　。　　　　　 　｡　　*。,　+　。.　o　ﾟ,　。*,　o　。.  
