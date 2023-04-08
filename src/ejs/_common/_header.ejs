@@ -39,10 +39,13 @@
   <%# Global site tag (gtag.js) - Google Analytics %>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE"></script>
   <script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', '<%= googleAnalyticsId %>');
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', '<%= googleAnalyticsId %>');
   </script>
 </head>
 
@@ -56,7 +59,7 @@
       </p>
       <p class="text-4xl mt-8">お使いのブラウザには対応しておりません</p>
       <p class="mt-6">このサイトはお使いのブラウザ(Internet Explorer)には対応しておりません。</p>
-      <p><a href="https://www.google.com/intl/ja_jp/chrome/" target="_blank">Google Chrome</a>、<a href="https://www.mozilla.org/ja/firefox/new/" target="_blank">Firefox</a>、<a href="https://www.microsoft.com/ja-jp/edge" target="_blank">Microsoft Edge</a>のいずれかからアクセスしてください。</p>
+      <p><a href="https://www.google.com/intl/ja_jp/chrome/" target="_blank" rel="noopener">Google Chrome</a>、<a href="https://www.mozilla.org/ja/firefox/new/" target="_blank" rel="noopener">Firefox</a>、<a href="https://www.microsoft.com/ja-jp/edge" target="_blank" rel="noopener">Microsoft Edge</a>のいずれかからアクセスしてください。</p>
       <a id="forwin10" class="btn mt-10 mx-auto" href="microsoft-edge:<%= siteRootUrl %><%= pageUrl %>">Microsoft Edgeで開く</a>
     </div>
     <aside class="mt-10">
@@ -95,11 +98,11 @@
       </nav>
       <nav class="side-sns">
         <ul>
-          <li><a href="https://twitter.com/chisamikan" target="_blank"><i class="icon icon-twitter align-middle"></i></a></li>
-          <li><a href="https://www.pixiv.net/users/263417" target="_blank"><i class="icon icon-pixiv align-middle"></i></a></li>
-          <li><a href="https://www.youtube.com/user/chisamikan" target="_blank"><i class="icon icon-youtube-play align-middle"></i></a></li>
-          <li><a href="https://discord.com/invite/KhYNuGStvj" target="_blank"><i class="icon icon-discord align-middle"></i></a></li>
-          <li><a href="https://github.com/chisamikan" target="_blank"><i class="icon icon-github align-middle"></i></a></li>
+          <li><a href="https://twitter.com/chisamikan" target="_blank" rel="noopener"><i class="icon icon-twitter align-middle"></i></a></li>
+          <li><a href="https://www.pixiv.net/users/263417" target="_blank" rel="noopener"><i class="icon icon-pixiv align-middle"></i></a></li>
+          <li><a href="https://www.youtube.com/user/chisamikan" target="_blank" rel="noopener"><i class="icon icon-youtube-play align-middle"></i></a></li>
+          <li><a href="https://discord.com/invite/KhYNuGStvj" target="_blank" rel="noopener"><i class="icon icon-discord align-middle"></i></a></li>
+          <li><a href="https://github.com/chisamikan" target="_blank" rel="noopener"><i class="icon icon-github align-middle"></i></a></li>
         </ul>
       </nav>
     </aside>
