@@ -2,7 +2,7 @@
   "name": "chisamikan.site",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "yarn@3.3.0",
+  "packageManager": "yarn@4.0.1",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -30,5 +30,8 @@
     "vite": "^4.2.0",
     "vite-plugin-vuetify": "^1.0.0",
     "vue-tsc": "^1.2.0"
+  },
+  "volta": {
+    "node": "20.9.0"
   }
 }
