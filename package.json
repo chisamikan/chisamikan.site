@@ -64,5 +64,9 @@
   },
   "dependencies": {
     "tailwindcss": "^3.3.5"
+  },
+  "packageManager": "yarn@4.0.1",
+  "volta": {
+    "node": "20.9.0"
   }
 }
