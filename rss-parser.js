@@ -1,11 +1,11 @@
 let Parser = require('rss-parser');
 const fs = require('fs');
-let parser = new Parser();
+let parser = new Parser({
+  headers: { 'User-Agent': 'something different' },
+});
 
 (async () => {
-  let feed = await parser.parseURL(
-    'https://rsshub-instance.zeabur.app/fanbox/chisamikan',
-  );
+  let feed = await parser.parseURL('https://hub.slarker.me/fanbox/chisamikan');
 
   feed.items.length = 5; //一度に表示する件数
   (feed.siteName = 'chisamikan.site'),
