@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import url('tailwindcss/base');
+@import url('tailwindcss/components');
+@import url('tailwindcss/utilities');
 
 @layer base {
   h1 {
@@ -43,7 +43,9 @@ body {
 }
 
 input:-webkit-autofill {
-  transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+  transition:
+    background-color 5000s ease-in-out 0s,
+    color 5000s ease-in-out 0s !important;
 }
 
 .canvas-background {
@@ -88,6 +90,7 @@ textarea {
 /* Object */
 #forie {
   z-index: 9999;
+
   @apply fixed top-0 bottom-0 left-0 right-0 flex-col justify-center p-10 text-center;
 
   /* IEがCSSカスタムプロパティを読んでくれないので直接指定 */
@@ -116,8 +119,8 @@ textarea {
   min-height: 100vh;
   min-height: 100dvh;
   padding: 0 1rem 5rem;
-  backdrop-filter: blur(3px);
   background-color: rgb(255 255 255 / 5%);
+  backdrop-filter: blur(3px);
   transition: all 0.5s;
 
   @screen md {
@@ -158,7 +161,9 @@ textarea {
     @apply no-underline;
 
     color: rgb(236 239 241 / 70%);
-    transition: color ease 0.3s, font-size ease 0.1s;
+    transition:
+      color ease 0.3s,
+      font-size ease 0.1s;
 
     &:hover {
       color: var(--colors-light);
@@ -391,7 +396,8 @@ textarea {
 
     text-shadow: 2px 2px 3px #000;
     border-color: var(--colors-light);
-    box-shadow: inset 0 0 20px var(--colors-lights),
+    box-shadow:
+      inset 0 0 20px var(--colors-lights),
       0 0 20px rgb(255 255 255 / 20%);
   }
 }
@@ -445,12 +451,15 @@ textarea {
 }
 
 .neon {
-  @apply animate-pulsate;
-
-  text-shadow: 0 0 7px var(--neon-light), 0 0 10px var(--neon-light),
-    0 0 21px var(--neon-light), 0 0 42px var(--neon-dark),
-    0 0 82px var(--neon-dark), 0 0 92px var(--neon-dark),
-    0 0 102px var(--neon-dark), 0 0 151px var(--neon-dark);
+  text-shadow:
+    0 0 7px var(--neon-light),
+    0 0 10px var(--neon-light),
+    0 0 21px var(--neon-light),
+    0 0 42px var(--neon-dark),
+    0 0 82px var(--neon-dark),
+    0 0 92px var(--neon-dark),
+    0 0 102px var(--neon-dark),
+    0 0 151px var(--neon-dark);
 }
 
 .form-group.checkbox {
@@ -472,8 +481,13 @@ textarea {
     &:checked + .checkbox-material .check::before {
       @apply animate-checkbox-on;
 
-      box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px,
-        -5px 5px 0 10px, 20px -12px 0 11px;
+      box-shadow:
+        0 0 0 10px,
+        10px -10px 0 10px,
+        32px 0 0 20px,
+        0 32px 0 20px,
+        -5px 5px 0 10px,
+        20px -12px 0 11px;
     }
 
     &:not(:checked) + .checkbox-material::before {
@@ -506,7 +520,13 @@ textarea {
       &::before {
         @apply absolute -mt-1 ml-1.5 block h-0 w-0 rotate-45 transform animate-checkbox-off content-[''];
 
-        box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0,
+        box-shadow:
+          0 0 0 0,
+          0 0 0 0,
+          0 0 0 0,
+          0 0 0 0,
+          0 0 0 0,
+          0 0 0 0,
           0 0 0 0 inset;
       }
     }
