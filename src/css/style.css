@@ -112,13 +112,12 @@ textarea {
 }
 
 .side {
-  @apply fixed z-10 flex w-full flex-col content-around text-center md:top-auto md:z-auto;
+  @apply fixed z-10 flex w-full flex-col content-around text-center md:top-auto md:z-auto px-4 py-8 justify-center md:justify-between md:gap-y-0 gap-y-10;
 
   top: -100vh;
   top: -100dvh;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 0 1rem 5rem;
   background-color: rgb(255 255 255 / 5%);
   backdrop-filter: blur(3px);
   transition: all 0.5s;
@@ -128,7 +127,7 @@ textarea {
   }
 
   &-menu {
-    @apply flex flex-grow items-center justify-center;
+    @apply flex items-center justify-center;
 
     &-active {
       @apply text-2xl font-bold;
