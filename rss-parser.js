@@ -5,7 +5,7 @@ let parser = new Parser({
 });
 
 (async () => {
-  let feed = await parser.parseURL('https://hub.slarker.me/fanbox/chisamikan');
+  let feed = await parser.parseURL('https://rsshub.app/fanbox/chisamikan');
 
   feed.items.length = 5; //一度に表示する件数
   (feed.siteName = 'chisamikan.site'),
