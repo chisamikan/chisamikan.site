@@ -428,7 +428,7 @@ textarea {
     @apply relative;
 
     &::before {
-      @apply absolute top-[0.27rem] -left-[1.75em] text-xs content-['\f108'];
+      @apply absolute top-[0.27rem] -left-[1.75em] text-xs content-['\f109'];
 
       font-family: icons, sans-serif;
     }
