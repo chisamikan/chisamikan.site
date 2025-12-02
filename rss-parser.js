@@ -6,7 +6,7 @@ let parser = new Parser({
 
 (async () => {
   let feed = await parser.parseURL(
-    'https://rsshub.isrss.com/fanbox/chisamikan',
+    'https://rsshub.umzzz.com/fanbox/chisamikan',
   );
 
   feed.items.length = 5; //一度に表示する件数
