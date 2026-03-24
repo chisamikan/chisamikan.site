@@ -21,7 +21,7 @@ pageUrl:'', pageDescription:'千紗みかんウェブサイト'}) %>
         (item.content.includes('Fee Required') == true) { premium = ''; } %>
         <li class="rss-list">
           <a href="<%= item.link %>" target="_blank" rel="noopener"><i class="icon icon-lock <%= premium %> align-middle" style="margin-right: 0.25em"></i><%= item.title %></a>
-          <br /><span class="rss-date"><%= year %>年<%= month %>月<%= day %>日</span>
+          <br /><span class="rss-date">Last update: <time><%= year %>.<%= month %>.<%= day %></time></span>
         </li>
         <% }); %>
       </ul>
