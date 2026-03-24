@@ -6,7 +6,7 @@ let parser = new Parser({
 
 (async () => {
   let feed = await parser.parseURL(
-    'https://rsshub-vercel-chisamikan.vercel.app/fanbox/chisamikan',
+    'https://rsshub-vercel-chisamikan.vercel.app/fanbox/chisamikan?sorted=false',
   );
 
   feed.items.length = 5; //一度に表示する件数
