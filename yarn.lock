@@ -2233,10 +2233,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async@npm:^3.2.2, async@npm:^3.2.3":
-  version: 3.2.4
-  resolution: "async@npm:3.2.4"
-  checksum: 10/bebb5dc2258c45b83fa1d3be179ae0eb468e1646a62d443c8d60a45e84041b28fccebe1e2d1f234bfc3dcad44e73dcdbf4ba63d98327c9f6556e3dbd47c2ae8b
+"async@npm:^3.2.6":
+  version: 3.2.6
+  resolution: "async@npm:3.2.6"
+  checksum: 10/cb6e0561a3c01c4b56a799cc8bab6ea5fef45f069ab32500b6e19508db270ef2dffa55e5aed5865c5526e9907b1f8be61b27530823b411ffafb5e1538c86c368
   languageName: node
   linkType: hard
 
@@ -2780,7 +2780,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:4.1.2, chalk@npm:^4.0.2, chalk@npm:^4.1.2":
+"chalk@npm:4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:
@@ -2824,14 +2824,13 @@ __metadata:
     chokidar-cli: "npm:^3.0.0"
     core-js: "npm:3.49.0"
     cssnano: "npm:^7.1.3"
-    ejs-cli: "npm:^2.2.3"
+    ejs-cli: "https://github.com/seinolab/ejs-cli"
     html-minifier: "npm:^4.0.0"
     imagemin: "npm:^9.0.1"
     imagemin-gifsicle: "npm:^7.0.0"
     imagemin-mozjpeg: "npm:^10.0.0"
     imagemin-pngquant: "npm:^10.0.0"
     imagemin-svgo: "npm:^12.0.0"
-    mkdirp: "npm:^3.0.1"
     npm-run-all: "npm:^4.1.5"
     postcss: "npm:^8.5.8"
     postcss-aspect-ratio-polyfill: "npm:^2.0.0"
@@ -3737,30 +3736,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs-cli@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "ejs-cli@npm:2.2.3"
+"ejs-cli@https://github.com/seinolab/ejs-cli":
+  version: 2.3.0
+  resolution: "ejs-cli@https://github.com/seinolab/ejs-cli.git#commit=fae2477bfebc6f150102365e8be96cfc84bb22d4"
   dependencies:
-    async: "npm:^3.2.2"
-    chalk: "npm:^4.1.2"
-    ejs: "npm:^3.1.6"
-    glob: "npm:^7.2.0"
-    mkdirp: "npm:^1.0.4"
-    yargs: "npm:^17.2.1"
+    ejs: "npm:^3.1.10"
+    js-yaml: "npm:^4.1.0"
   bin:
     ejs-cli: bin/ejs-cli
-  checksum: 10/03e39c05a0d71fb655bc9ef05a0a44781207ac9a2d8dc47a78d7ef15c5572c9e472c5205710e3686a6d0b2192a1c75bc7e0b948a862778073c668bb4ac103224
+  checksum: 10/772ff99d0e11cb17e3723b36199c57a0aefac943cf1e829dd14d824fce6d42f619ce613d110d08a90b6af70cc120f1f8da4037f555e57dbdbdfd5bb382e6e7f2
   languageName: node
   linkType: hard
 
-"ejs@npm:^3.1.6":
-  version: 3.1.8
-  resolution: "ejs@npm:3.1.8"
+"ejs@npm:^3.1.10":
+  version: 3.1.10
+  resolution: "ejs@npm:3.1.10"
   dependencies:
     jake: "npm:^10.8.5"
   bin:
     ejs: bin/cli.js
-  checksum: 10/879f84c8ee56d06dea7b47a8b493e1b398dba578ec7a701660cf77c8a6d565b932c5896639d1dc4a3be29204eccdb70ee4e1bdf634647c2490227f727d5d6a3d
+  checksum: 10/a9cb7d7cd13b7b1cd0be5c4788e44dd10d92f7285d2f65b942f33e127230c054f99a42db4d99f766d8dbc6c57e94799593ee66a14efd7c8dd70c4812bf6aa384
   languageName: node
   linkType: hard
 
@@ -4268,12 +4263,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"filelist@npm:^1.0.1":
-  version: 1.0.4
-  resolution: "filelist@npm:1.0.4"
+"filelist@npm:^1.0.4":
+  version: 1.0.6
+  resolution: "filelist@npm:1.0.6"
   dependencies:
     minimatch: "npm:^5.0.1"
-  checksum: 10/4b436fa944b1508b95cffdfc8176ae6947b92825483639ef1b9a89b27d82f3f8aa22b21eed471993f92709b431670d4e015b39c087d435a61e1bb04564cf51de
+  checksum: 10/84a0be69efe6724c105f18c34e8a772370d9c45e53a1ba8ced7eecf4addd2c5a357347d94bfd8bfa9cbc36b09392cad70d82206305263e26bba184eea4ca8042
   languageName: node
   linkType: hard
 
@@ -5728,16 +5723,15 @@ __metadata:
   linkType: hard
 
 "jake@npm:^10.8.5":
-  version: 10.8.5
-  resolution: "jake@npm:10.8.5"
+  version: 10.9.4
+  resolution: "jake@npm:10.9.4"
   dependencies:
-    async: "npm:^3.2.3"
-    chalk: "npm:^4.0.2"
-    filelist: "npm:^1.0.1"
-    minimatch: "npm:^3.0.4"
+    async: "npm:^3.2.6"
+    filelist: "npm:^1.0.4"
+    picocolors: "npm:^1.1.1"
   bin:
-    jake: ./bin/cli.js
-  checksum: 10/6eaf1cd7fe78b92fa52d7258fb0f16f9bef856a18dc6e2f4da8e610264d293210d6e6e09a89d4e4ce1fc83d07c82963bd00bdcbb88e7a09aa62cc4cdf6e3bdf2
+    jake: bin/cli.js
+  checksum: 10/97e48f73f5e315a3b6e1a48b4bcc0cdf2c2cf82100ec9e76a032fd5d614dcd32c4315572cfcb66e9f9bdecca3900aaa61fe72b781a74b06aefd3ec4c1c917f0b
   languageName: node
   linkType: hard
 
@@ -6491,15 +6485,6 @@ __metadata:
   bin:
     mkdirp: bin/cmd.js
   checksum: 10/d71b8dcd4b5af2fe13ecf3bd24070263489404fe216488c5ba7e38ece1f54daf219e72a833a3a2dc404331e870e9f44963a33399589490956bff003a3404d3b2
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "mkdirp@npm:3.0.1"
-  bin:
-    mkdirp: dist/cjs/src/bin.js
-  checksum: 10/16fd79c28645759505914561e249b9a1f5fe3362279ad95487a4501e4467abeb714fd35b95307326b8fd03f3c7719065ef11a6f97b7285d7888306d1bd2232ba
   languageName: node
   linkType: hard
 
@@ -10127,7 +10112,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.0.0, yargs@npm:^17.2.1, yargs@npm:^17.3.1":
+"yargs@npm:^17.0.0, yargs@npm:^17.3.1":
   version: 17.6.2
   resolution: "yargs@npm:17.6.2"
   dependencies:
