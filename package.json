@@ -4,7 +4,7 @@
   "description": "千紗みかんウェブサイト",
   "main": "index.js",
   "scripts": {
-    "build:ejs": "node -e \"require('fs').mkdirSync('./dist/temp', { recursive: true })\" && node rss-parser.js && ejs-cli --base-dir src/ejs/pages '**/**.ejs' --out dist/temp --options site.json && html-minifier --input-dir dist/temp --output-dir dist -c html-minifier.json --file-ext html && rimraf 'dist/temp'",
+    "build:ejs": "node -e \"require('fs').mkdirSync('./dist/temp', { recursive: true })\" && node rss-parser.js && node build-ejs.mjs && html-minifier --input-dir dist/temp --output-dir dist -c html-minifier.json --file-ext html && rimraf 'dist/temp'",
     "build:js": "babel src/js --out-dir src/js/babel && uglifyjs 'src/js/babel/*.js' -o dist/bundle.js && rimraf src/js/babel",
     "build:imagemin": "node .imagemin.mjs && cpx \"src/images/favicon.ico\" dist/images",
     "build:icons": "node -e \"require('fs').mkdirSync('dist/icons', { recursive: true })\" && fantasticon src/icons -o dist/icons --normalize && rimraf dist/icons/icons.html dist/icons/icons.ts dist/icons/icons.json && postcss -r dist/icons/icons.css",
@@ -37,7 +37,7 @@
     "chokidar-cli": "^3.0.0",
     "core-js": "3.49.0",
     "cssnano": "^7.1.3",
-    "ejs-cli": "https://github.com/seinolab/ejs-cli/archive/fae2477bfebc6f150102365e8be96cfc84bb22d4.tar.gz",
+    "ejs": "^5.0.1",
     "html-minifier": "^4.0.0",
     "imagemin": "^9.0.1",
     "imagemin-gifsicle": "^7.0.0",
