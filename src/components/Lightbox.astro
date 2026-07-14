@@ -1,0 +1,80 @@
+---
+// ページ内に1つだけ配置する。サムネイル側は
+// class="lightbox-trigger" data-full="{画像URL}" data-alt="{alt}" を付与するだけで連動する。
+---
+
+<dialog id="lightbox" class="lightbox-dialog">
+  <button type="button" id="lightbox-close" aria-label="閉じる" class="lightbox-close">
+    &times;
+  </button>
+  <img id="lightbox-img" src="" alt="" />
+</dialog>
+
+<style>
+  .lightbox-dialog {
+    max-width: min(90vw, 900px);
+    max-height: 85vh;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .lightbox-dialog::backdrop {
+    background: rgba(34, 31, 27, 0.82);
+  }
+
+  .lightbox-dialog img {
+    display: block;
+    max-width: min(90vw, 900px);
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+    border-radius: 2px;
+    box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: -2.5rem;
+    right: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #faf7f0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .lightbox-close:hover {
+    color: #e85d3f;
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
+  const img = document.querySelector<HTMLImageElement>('#lightbox-img');
+  const closeBtn = document.querySelector<HTMLButtonElement>('#lightbox-close');
+
+  document.querySelectorAll<HTMLElement>('.lightbox-trigger').forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      if (!dialog || !img) return;
+      const full = trigger.dataset.full;
+      if (!full) return;
+      img.src = full;
+      img.alt = trigger.dataset.alt ?? '';
+      dialog.showModal();
+    });
+  });
+
+  // 背景(dialog自身)をクリックしたら閉じる
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+  closeBtn?.addEventListener('click', () => dialog?.close());
+</script>

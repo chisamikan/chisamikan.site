@@ -1,17 +1,22 @@
-node_modules
+# build output
 dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# environment variables
 .env
-site.json
-style.css.map
+.env.production
 
-# Local Netlify folder
-.netlify
+# cloudflare
+.wrangler/
+.dev.vars
 
-# Yarn2
-.yarn/*
-!.yarn/patches
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-.pnp.*
+# editor / os
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Others
+manual.md

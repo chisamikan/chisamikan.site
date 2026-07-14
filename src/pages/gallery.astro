@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ArtworkCard from '../components/ArtworkCard.astro';
+import { getGalleryItems } from '../lib/notion';
+
+const items = await getGalleryItems();
+const categories = Array.from(new Set(items.map((i) => i.category).filter(Boolean))) as string[];
+const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5', '2.5', '-2.5'];
+---
+
+<BaseLayout title="Gallery" description="これまでに描いたイラスト作品のギャラリーです。">
+  <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="Selected Works" title="ギャラリー" color="marker" />
+
+    {categories.length > 0 && (
+      <div class="mb-10 flex flex-wrap gap-2" role="group" aria-label="カテゴリで絞り込み">
+        <button
+          type="button"
+          data-filter="all"
+          class="filter-btn is-active rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
+        >
+          すべて
+        </button>
+        {categories.map((cat) => (
+          <button
+            type="button"
+            data-filter={cat}
+            class="filter-btn rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+    )}
+
+    <div id="gallery-grid" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item, i) => (
+        <div data-category={item.category ?? ''}>
+          <ArtworkCard item={item} tilt={tilts[i % tilts.length]} />
+        </div>
+      ))}
+    </div>
+
+    {items.length === 0 && (
+      <p class="font-mono text-sm text-graphite">まだ作品が登録されていません。</p>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .filter-btn.is-active {
+    @apply border-marker bg-marker text-white;
+  }
+</style>
+
+<script>
+  // カテゴリボタンでの絞り込み(依存ライブラリなしのシンプルなvanilla JS)
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const cards = document.querySelectorAll<HTMLElement>('#gallery-grid > [data-category]');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const filter = btn.dataset.filter;
+
+      cards.forEach((card) => {
+        const match = filter === 'all' || card.dataset.category === filter;
+        card.style.display = match ? '' : 'none';
+      });
+    });
+  });
+</script>

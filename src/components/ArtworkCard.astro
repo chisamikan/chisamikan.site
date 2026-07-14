@@ -1,0 +1,51 @@
+---
+import type { ArtworkItem } from '../lib/notion';
+
+interface Props {
+  item: ArtworkItem;
+  tilt?: '1.5' | '-1.5' | '2.5' | '-2.5' | '0';
+}
+const { item, tilt = '0' } = Astro.props;
+const tiltClass =
+  tilt === '0'
+    ? ''
+    : {
+        '1.5': 'rotate-1.5',
+        '-1.5': '-rotate-1.5',
+        '2.5': 'rotate-2.5',
+        '-2.5': '-rotate-2.5',
+      }[tilt];
+---
+
+<figure class:list={['paper-tilt group overflow-hidden rounded-sm bg-white shadow-pin', tiltClass]}>
+  <div class="relative aspect-[4/5] overflow-hidden bg-paper-dim">
+    {item.imageUrl ? (
+      <img
+        src={item.imageUrl}
+        alt={item.title}
+        loading="lazy"
+        class="h-full w-full object-cover"
+      />
+    ) : (
+      <div class="flex h-full w-full items-center justify-center text-graphite">
+        <span class="font-mono text-xs">No Image</span>
+      </div>
+    )}
+    {item.category && (
+      <span class="absolute left-2 top-2 rounded-sm bg-ink/85 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-paper">
+        {item.category}
+      </span>
+    )}
+  </div>
+  <figcaption class="border-t border-ink/10 p-4">
+    <h3 class="font-display text-lg font-medium leading-snug text-ink">{item.title}</h3>
+    {item.description && (
+      <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>
+    )}
+    {item.date && (
+      <p class="mt-2 font-mono text-[11px] text-graphite">
+        {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+      </p>
+    )}
+  </figcaption>
+</figure>

@@ -1,0 +1,49 @@
+---
+interface Props {
+  color?: 'marker' | 'indigo';
+  class?: string;
+}
+const { color = 'marker', class: className = '' } = Astro.props;
+const stroke = color === 'marker' ? '#E85D3F' : '#3A4A8C';
+---
+
+<!--
+  手描きのマーカーで引いたような、わずかに揺れる下線。
+  見出しの直下に絶対配置で重ねて使用する。(page-load時に軽く伸びるアニメーション)
+-->
+<svg
+  class={`marker-underline pointer-events-none absolute -bottom-1.5 left-0 h-3 w-full ${className}`}
+  viewBox="0 0 200 12"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <path
+    d="M2 8 C 40 3, 70 10, 100 6 S 160 2, 198 7"
+    fill="none"
+    stroke={stroke}
+    stroke-width="5"
+    stroke-linecap="round"
+    opacity="0.85"
+  ></path>
+</svg>
+
+<style>
+  .marker-underline path {
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    animation: draw-underline 700ms 150ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marker-underline path {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes draw-underline {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

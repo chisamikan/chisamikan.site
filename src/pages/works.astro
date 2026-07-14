@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import WorkItemComponent from '../components/WorkItem.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { getWorkHistory } from '../lib/notion';
+
+const works = await getWorkHistory();
+---
+
+<BaseLayout title="Works" description="これまでのお仕事の履歴です。">
+  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="Career" title="仕事履歴" color="indigo" />
+
+    {works.length > 0 ? (
+      <div>
+        {works.map((item) => <WorkItemComponent item={item} />)}
+      </div>
+    ) : (
+      <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
+    )}
+  </section>
+
+  <Lightbox />
+</BaseLayout>

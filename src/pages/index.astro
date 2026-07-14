@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ArtworkCard from '../components/ArtworkCard.astro';
+import WorkItemCard from '../components/WorkItemCard.astro';
+import NewsItem from '../components/NewsItem.astro';
+import MarkerUnderline from '../components/MarkerUnderline.astro';
+import ProfileContent from '../components/ProfileContent.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { getGalleryItems, getWorkHistory } from '../lib/notion';
+import { getNewsItems } from '../lib/rss';
+
+const [gallery, works, news] = await Promise.all([
+  getGalleryItems(),
+  getWorkHistory(),
+  getNewsItems(5),
+]);
+
+const featuredGallery = gallery.slice(0, 3);
+const latestWorks = works.slice(0, 3);
+const tilts: Array<'1.5' | '-1.5' | '2.5'> = ['-1.5', '2.5', '1.5'];
+---
+
+<BaseLayout>
+  <!-- ヒーロー: スケッチブックを開いたような1枚絵的な構成 -->
+  <section class="mx-auto max-w-5xl px-6 pb-20 pt-16 sm:pt-24">
+    <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-graphite">
+      Illustration Portfolio
+    </p>
+    <h1 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight sm:text-6xl">
+      紙とインクの<br class="sm:hidden" />あいだで、絵を描いています。
+      <MarkerUnderline class="!-bottom-3 !h-4" />
+    </h1>
+    <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/75 sm:text-lg">
+      キャラクターデザインから書籍装画まで、線と色でものがたりを描くイラストレーターです。
+      日々のスケッチと、これまでのお仕事をこのサイトにまとめています。
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a
+        href="/gallery"
+        class="rounded-sm bg-ink px-5 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5"
+      >
+        ギャラリーを見る
+      </a>
+      <a
+        href="/#contact"
+        class="rounded-sm border border-ink/20 px-5 py-2.5 font-mono text-sm text-ink transition-colors hover:border-marker hover:text-marker"
+      >
+        お仕事の依頼をする
+      </a>
+    </div>
+  </section>
+
+  <!-- プロフィール -->
+  <section id="profile" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="About" title="プロフィール" color="marker" />
+    <div class="max-w-2xl">
+      <ProfileContent />
+    </div>
+  </section>
+
+  <!-- ギャラリー抜粋(スケッチをピンで留めたような配置) -->
+  <section id="gallery" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="Selected Works" title="ギャラリー" color="marker" />
+    <div class="grid gap-8 sm:grid-cols-3">
+      {featuredGallery.map((item, i) => (
+        <ArtworkCard item={item} tilt={tilts[i % tilts.length]} />
+      ))}
+    </div>
+    <a
+      href="/gallery"
+      class="mt-10 inline-block font-mono text-sm text-indigo underline decoration-dotted underline-offset-4 hover:text-marker"
+    >
+      すべての作品を見る &rarr;
+    </a>
+  </section>
+
+  <!-- 仕事履歴(最新3件・PCでは3カラム表示) -->
+  <section id="works" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="Career" title="仕事履歴" color="indigo" />
+    {latestWorks.length > 0 ? (
+      <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
+        {latestWorks.map((item) => <WorkItemCard item={item} />)}
+      </div>
+    ) : (
+      <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
+    )}
+    <a
+      href="/works"
+      class="mt-10 inline-block font-mono text-sm text-indigo underline decoration-dotted underline-offset-4 hover:text-marker"
+    >
+      仕事履歴をすべて見る &rarr;
+    </a>
+  </section>
+
+  <!-- お知らせ(最新5件) -->
+  <section id="news" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="Latest" title="お知らせ" color="indigo" />
+    <div class="max-w-2xl">
+      {news.length > 0 ? (
+        <ul>
+          {news.map((item) => <NewsItem item={item} />)}
+        </ul>
+      ) : (
+        <p class="font-mono text-sm text-graphite">お知らせはまだありません。</p>
+      )}
+    </div>
+  </section>
+
+  <!-- お問い合わせ -->
+  <section id="contact" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="Get in touch" title="お問い合わせ" color="marker" />
+    <div class="max-w-2xl">
+      <p class="mb-10 text-sm leading-relaxed text-ink/70">
+        お仕事のご依頼・ご質問はこちらのフォームからお送りください。内容を確認のうえ、
+        折り返しご連絡いたします。
+      </p>
+      <ContactForm />
+    </div>
+  </section>
+
+  <Lightbox />
+</BaseLayout>

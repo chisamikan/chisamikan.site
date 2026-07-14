@@ -1,0 +1,27 @@
+---
+import type { NewsItem } from '../lib/rss';
+
+interface Props {
+  item: NewsItem;
+}
+const { item } = Astro.props;
+---
+
+<li class="group border-b border-ink/10 py-4 first:pt-0 last:border-b-0">
+  <a
+    href={item.link}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+  >
+    {item.date && (
+      <span class="shrink-0 font-mono text-xs text-graphite">
+        {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+      </span>
+    )}
+    <span class="text-ink transition-colors group-hover:text-marker">
+      {item.title}
+      <span class="ml-1 text-graphite">&#8599;</span>
+    </span>
+  </a>
+</li>

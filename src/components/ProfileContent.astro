@@ -1,0 +1,81 @@
+---
+import { getProfileBlocks } from '../lib/notion';
+
+const blocks = await getProfileBlocks();
+
+// bulleted_list / numbered_list は隣接ブロックを1つのリストにまとめて描画する
+type Grouped = typeof blocks;
+const grouped: Grouped = [];
+for (const b of blocks) {
+  const last = grouped[grouped.length - 1];
+  if (last && last.type === b.type && (b.type === 'bulleted_list' || b.type === 'numbered_list')) {
+    (last as any).items.push(...(b as any).items);
+  } else {
+    grouped.push(b);
+  }
+}
+
+// Notion側の見出しレベル(H1/H2/H3)ごとの文字サイズ
+// Tailwindのpreflightで見出しの既定サイズがリセットされるため明示的に指定する
+const headingSizeClass: Record<1 | 2 | 3, string> = {
+  1: 'text-3xl sm:text-4xl',
+  2: 'text-2xl sm:text-3xl',
+  3: 'text-xl sm:text-2xl',
+};
+---
+
+<div class="prose-custom space-y-6">
+  {grouped.map((block) => {
+    if (block.type === 'heading') {
+      const Tag = `h${block.level}` as 'h1' | 'h2' | 'h3';
+      return (
+        <Tag
+          class:list={[
+            'mt-8 whitespace-pre-line font-display font-semibold leading-snug text-ink first:mt-0',
+            headingSizeClass[block.level],
+          ]}
+        >
+          {block.text}
+        </Tag>
+      );
+    }
+    if (block.type === 'paragraph') {
+      return <p class="whitespace-pre-line leading-relaxed text-ink/80">{block.text}</p>;
+    }
+    if (block.type === 'quote') {
+      return (
+        <blockquote class="whitespace-pre-line border-l-2 border-marker pl-4 italic text-ink/70">
+          {block.text}
+        </blockquote>
+      );
+    }
+    if (block.type === 'image') {
+      return (
+        <figure class="my-6">
+          <img src={block.url} alt={block.caption} class="w-full rounded-sm shadow-pin" loading="lazy" />
+          {block.caption && (
+            <figcaption class="mt-2 whitespace-pre-line font-mono text-xs text-graphite">{block.caption}</figcaption>
+          )}
+        </figure>
+      );
+    }
+    if (block.type === 'bulleted_list') {
+      return (
+        <ul class="list-disc space-y-1 pl-5 text-ink/80">
+          {block.items.map((i) => <li class="whitespace-pre-line">{i}</li>)}
+        </ul>
+      );
+    }
+    if (block.type === 'numbered_list') {
+      return (
+        <ol class="list-decimal space-y-1 pl-5 text-ink/80">
+          {block.items.map((i) => <li class="whitespace-pre-line">{i}</li>)}
+        </ol>
+      );
+    }
+    if (block.type === 'divider') {
+      return <hr class="border-ink/10" />;
+    }
+    return null;
+  })}
+</div>

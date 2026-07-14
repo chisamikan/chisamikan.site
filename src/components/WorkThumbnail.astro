@@ -1,0 +1,43 @@
+---
+import type { WorkItem } from '../lib/notion';
+
+interface Props {
+  item: WorkItem;
+  class?: string;
+}
+const { item, class: className = '' } = Astro.props;
+
+const PLACEHOLDER = '/images/work-placeholder.svg';
+const hasImage = Boolean(item.imageUrl);
+const src = item.imageUrl ?? PLACEHOLDER;
+---
+
+{hasImage ? (
+  <button
+    type="button"
+    class:list={[
+      'lightbox-trigger group aspect-square overflow-hidden rounded-sm border border-ink/10 bg-white shadow-pin',
+      className,
+    ]}
+    data-full={src}
+    data-alt={`${item.client}の画像`}
+    aria-label={`${item.client}の画像を拡大表示`}
+  >
+    <img
+      src={src}
+      alt=""
+      loading="lazy"
+      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+    />
+  </button>
+) : (
+  <div
+    class:list={[
+      'aspect-square cursor-default overflow-hidden rounded-sm border border-ink/10 bg-white shadow-pin',
+      className,
+    ]}
+    aria-hidden="true"
+  >
+    <img src={src} alt="" loading="lazy" class="h-full w-full object-cover" />
+  </div>
+)}

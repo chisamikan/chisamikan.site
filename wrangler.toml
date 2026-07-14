@@ -1,0 +1,8 @@
+name = "illustrator-portfolio"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# 本番の環境変数(NOTION_TOKEN など)は Cloudflare Pages の
+# ダッシュボード > Settings > Environment variables で設定してください。
+# ローカル開発では .env ファイルを使用します(.env.example 参照)。

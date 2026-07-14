@@ -1,0 +1,104 @@
+---
+---
+
+<form id="contact-form" class="space-y-6" novalidate>
+  <div>
+    <label for="name" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
+      お名前 <span class="text-marker">*</span>
+    </label>
+    <input
+      id="name"
+      name="name"
+      type="text"
+      required
+      autocomplete="name"
+      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-indigo"
+    />
+  </div>
+
+  <div>
+    <label for="email" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
+      メールアドレス <span class="text-marker">*</span>
+    </label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-indigo"
+    />
+  </div>
+
+  <div>
+    <label for="message" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
+      お問い合わせ内容 <span class="text-marker">*</span>
+    </label>
+    <textarea
+      id="message"
+      name="message"
+      rows="6"
+      required
+      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-indigo"
+    ></textarea>
+  </div>
+
+  <!-- ハニーポット: スパム対策(人には見えないがボットは埋めてしまう) -->
+  <div class="hidden" aria-hidden="true">
+    <label for="company">Company</label>
+    <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <button
+    type="submit"
+    class="rounded-sm bg-ink px-6 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+  >
+    送信する
+  </button>
+
+  <p id="form-status" role="status" class="font-mono text-sm"></p>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
+  const status = document.querySelector<HTMLParagraphElement>('#form-status');
+  const submitBtn = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !status) return;
+
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // ハニーポットに値が入っていたらスパムとみなし、成功したように見せて何もしない
+    if (data.company) {
+      status.textContent = '送信しました。ありがとうございます。';
+      status.className = 'font-mono text-sm text-indigo';
+      form.reset();
+      return;
+    }
+
+    submitBtn?.setAttribute('disabled', 'true');
+    status.textContent = '送信中です…';
+    status.className = 'font-mono text-sm text-graphite';
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: data.name, email: data.email, message: data.message }),
+      });
+
+      if (!res.ok) throw new Error('failed');
+
+      status.textContent = '送信しました。ありがとうございます。折り返しご連絡いたします。';
+      status.className = 'font-mono text-sm text-indigo';
+      form.reset();
+    } catch {
+      status.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
+      status.className = 'font-mono text-sm text-marker-dark';
+    } finally {
+      submitBtn?.removeAttribute('disabled');
+    }
+  });
+</script>
