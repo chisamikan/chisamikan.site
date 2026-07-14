@@ -20,43 +20,66 @@ const [gallery, works, news] = await Promise.all([
 const featuredGallery = gallery.slice(0, 3);
 const latestWorks = works.slice(0, 3);
 const tilts: Array<'1.5' | '-1.5' | '2.5'> = ['-1.5', '2.5', '1.5'];
+
+// ファーストビューの全画面イラスト: ギャラリーの先頭作品があればそれを、
+// なければ用意したイラストをフォールバックとして使用する
+const heroImage = gallery[0]?.imageUrl ?? '/images/hero-illustration.svg';
 ---
 
 <BaseLayout>
-  <!-- ヒーロー: スケッチブックを開いたような1枚絵的な構成 -->
-  <section class="mx-auto max-w-5xl px-6 pb-20 pt-16 sm:pt-24">
-    <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-graphite">
-      Illustration Portfolio
-    </p>
-    <h1 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight sm:text-6xl">
-      紙とインクの<br class="sm:hidden" />あいだで、絵を描いています。
-      <MarkerUnderline class="!-bottom-3 !h-4" />
-    </h1>
-    <p class="mt-8 max-w-xl text-base leading-relaxed text-ink/75 sm:text-lg">
-      キャラクターデザインから書籍装画まで、線と色でものがたりを描くイラストレーターです。
-      日々のスケッチと、これまでのお仕事をこのサイトにまとめています。
-    </p>
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a
-        href="/gallery"
-        class="rounded-sm bg-ink px-5 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5"
-      >
-        ギャラリーを見る
-      </a>
-      <a
-        href="/#contact"
-        class="rounded-sm border border-ink/20 px-5 py-2.5 font-mono text-sm text-ink transition-colors hover:border-marker hover:text-marker"
-      >
-        お仕事の依頼をする
-      </a>
+  <!-- ファーストビュー: 全画面イラスト -->
+  <section class="relative h-[100svh] w-full overflow-hidden">
+    <img
+      src={heroImage}
+      alt="ファーストビューのイラスト"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/5"></div>
+
+    <div class="relative z-10 mx-auto flex h-full max-w-5xl flex-col justify-end px-6 pb-20 pt-16 sm:pb-24">
+      <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-paper/80">
+        Illustration Portfolio
+      </p>
+      <h1 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
+        紙とインクの<br class="sm:hidden" />あいだで、絵を描いています。
+        <MarkerUnderline class="!-bottom-3 !h-4" />
+      </h1>
+      <p class="mt-8 max-w-xl text-base leading-relaxed text-paper/85 sm:text-lg">
+        キャラクターデザインから書籍装画まで、線と色でものがたりを描くイラストレーターです。
+        日々のスケッチと、これまでのお仕事をこのサイトにまとめています。
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          href="/gallery"
+          class="rounded-sm bg-marker px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
+        >
+          ギャラリーを見る
+        </a>
+        <a
+          href="/#contact"
+          class="rounded-sm border border-paper/50 px-5 py-2.5 font-mono text-sm text-paper transition-colors hover:border-paper hover:bg-paper/10"
+        >
+          お仕事の依頼をする
+        </a>
+      </div>
+    </div>
+
+    <div class="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
+      <span class="animate-bounce font-mono text-xs tracking-widest text-paper/70">SCROLL &darr;</span>
     </div>
   </section>
 
-  <!-- プロフィール -->
-  <section id="profile" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="About" title="プロフィール" color="marker" />
+  <!-- お知らせ(最新5件) -->
+  <section id="news" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
+    <SectionHeading eyebrow="Latest" title="お知らせ" color="indigo" />
     <div class="max-w-2xl">
-      <ProfileContent />
+      {news.length > 0 ? (
+        <ul>
+          {news.map((item) => <NewsItem item={item} />)}
+        </ul>
+      ) : (
+        <p class="font-mono text-sm text-graphite">お知らせはまだありません。</p>
+      )}
     </div>
   </section>
 
@@ -76,6 +99,14 @@ const tilts: Array<'1.5' | '-1.5' | '2.5'> = ['-1.5', '2.5', '1.5'];
     </a>
   </section>
 
+  <!-- プロフィール -->
+  <section id="profile" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="About" title="プロフィール" color="marker" />
+    <div class="max-w-2xl">
+      <ProfileContent />
+    </div>
+  </section>
+
   <!-- 仕事履歴(最新3件・PCでは3カラム表示) -->
   <section id="works" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Career" title="仕事履歴" color="indigo" />
@@ -92,20 +123,6 @@ const tilts: Array<'1.5' | '-1.5' | '2.5'> = ['-1.5', '2.5', '1.5'];
     >
       仕事履歴をすべて見る &rarr;
     </a>
-  </section>
-
-  <!-- お知らせ(最新5件) -->
-  <section id="news" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Latest" title="お知らせ" color="indigo" />
-    <div class="max-w-2xl">
-      {news.length > 0 ? (
-        <ul>
-          {news.map((item) => <NewsItem item={item} />)}
-        </ul>
-      ) : (
-        <p class="font-mono text-sm text-graphite">お知らせはまだありません。</p>
-      )}
-    </div>
   </section>
 
   <!-- お問い合わせ -->

@@ -6,9 +6,9 @@ export const site = {
 
 export const nav = [
   { href: '/', label: 'Top' },
-  { href: '/#profile', label: 'Profile' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/works', label: 'Works' },
   { href: '/#news', label: 'News' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/#profile', label: 'Profile' },
+  { href: '/works', label: 'Works' },
   { href: '/#contact', label: 'Contact' },
 ];
