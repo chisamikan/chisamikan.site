@@ -1,0 +1,154 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ArtworkCard from '../components/ArtworkCard.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { getGalleryItems } from '../lib/notion';
+
+const items = await getGalleryItems();
+const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
+const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5', '2.5', '-2.5'];
+---
+
+<BaseLayout title="Gallery" description="これまでに描いたイラスト作品のギャラリーです。">
+  <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="Selected Works" title="ギャラリー" color="marker" />
+
+    {tags.length > 0 && (
+      <div class="mb-10 flex flex-wrap gap-2" role="group" aria-label="タグで絞り込み">
+        <button
+          type="button"
+          data-filter="all"
+          class="filter-btn is-active rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
+        >
+          すべて
+        </button>
+        {tags.map((tag) => (
+          <button
+            type="button"
+            data-filter={tag}
+            class="filter-btn rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    )}
+
+    <div id="gallery-grid" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item, i) => (
+        <div data-tags={item.tags.join('|')}>
+          <ArtworkCard item={item} tilt={tilts[i % tilts.length]} />
+        </div>
+      ))}
+    </div>
+
+    {items.length === 0 && (
+      <p class="font-mono text-sm text-graphite">まだ作品が登録されていません。</p>
+    )}
+
+    <!-- ページネーションは絞り込み結果の件数に応じてJSが表示/非表示・ページ数を計算する -->
+    <nav
+      id="pagination-nav"
+      aria-label="ページ送り"
+      class="mt-16 hidden items-center justify-center gap-4 font-mono text-sm"
+    >
+      <button
+        type="button"
+        id="prev-page"
+        class="rounded-sm border border-ink/20 px-4 py-2 transition-colors hover:border-marker hover:text-marker disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-ink/30 disabled:hover:border-ink/10 disabled:hover:text-ink/30"
+      >
+        &larr; 前へ
+      </button>
+      <span id="page-indicator" class="text-graphite"></span>
+      <button
+        type="button"
+        id="next-page"
+        class="rounded-sm border border-ink/20 px-4 py-2 transition-colors hover:border-marker hover:text-marker disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-ink/30 disabled:hover:border-ink/10 disabled:hover:text-ink/30"
+      >
+        次へ &rarr;
+      </button>
+    </nav>
+  </section>
+
+  <Lightbox />
+</BaseLayout>
+
+<style>
+  .filter-btn.is-active {
+    @apply border-marker bg-marker text-white;
+  }
+</style>
+
+<script>
+  // タグ絞り込みとページネーションをクライアント側で連動させる。
+  // (絞り込み後の件数をもとにページ数を再計算するため、ページ遷移なしで完結する)
+  const PAGE_SIZE = 9;
+
+  const grid = document.querySelector<HTMLElement>('#gallery-grid');
+  const cards = Array.from(grid?.querySelectorAll<HTMLElement>(':scope > [data-tags]') ?? []);
+  const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const nav = document.querySelector<HTMLElement>('#pagination-nav');
+  const prevBtn = document.querySelector<HTMLButtonElement>('#prev-page');
+  const nextBtn = document.querySelector<HTMLButtonElement>('#next-page');
+  const indicator = document.querySelector<HTMLElement>('#page-indicator');
+
+  let currentFilter = 'all';
+  let currentPage = 1;
+
+  function matchesFilter(card: HTMLElement): boolean {
+    if (currentFilter === 'all') return true;
+    const tags = (card.dataset.tags ?? '').split('|').filter(Boolean);
+    return tags.includes(currentFilter);
+  }
+
+  function render() {
+    const filtered = cards.filter(matchesFilter);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+
+    let visibleIndex = 0;
+    cards.forEach((card) => {
+      if (!matchesFilter(card)) {
+        card.style.display = 'none';
+        return;
+      }
+      const show = visibleIndex >= start && visibleIndex < end;
+      card.style.display = show ? '' : 'none';
+      visibleIndex += 1;
+    });
+
+    if (nav) nav.style.display = totalPages > 1 ? 'flex' : 'none';
+    if (indicator) indicator.textContent = `${currentPage} / ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+  }
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      currentFilter = btn.dataset.filter ?? 'all';
+      currentPage = 1;
+      render();
+    });
+  });
+
+  prevBtn?.addEventListener('click', () => {
+    currentPage -= 1;
+    render();
+    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    currentPage += 1;
+    render();
+    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  render();
+</script>
