@@ -34,7 +34,7 @@ export interface ArtworkItem {
   id: string;
   title: string;
   imageUrl: string | null;
-  category: string | null;
+  tags: string[];
   description: string;
   date: string | null;
 }
@@ -127,7 +127,7 @@ function blockToProfileBlock(block: BlockObjectResponse): ProfileBlock | null {
 /**
  * ギャラリー用データベースを取得します。
  * Notion側のプロパティ名(想定):
- *   Name(title) / Image(files) / Category(select) / Description(rich_text) / Date(date) / Published(checkbox)
+ *   Name(title) / Image(files) / Tags(multi_select) / Description(rich_text) / Date(date) / Published(checkbox)
  */
 export async function getGalleryItems(): Promise<ArtworkItem[]> {
   const dbId = import.meta.env.NOTION_GALLERY_DB_ID;
@@ -157,15 +157,15 @@ function pageToArtwork(page: PageObjectResponse): ArtworkItem {
     imageUrl = file.type === 'external' ? file.external.url : file.file.url;
   }
 
-  const category =
-    props.Category?.type === 'select' ? (props.Category.select?.name ?? null) : null;
+  const tags =
+    props.Tags?.type === 'multi_select' ? props.Tags.multi_select.map((t) => t.name) : [];
 
   const description =
     props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
 
   const date = props.Date?.type === 'date' ? (props.Date.date?.start ?? null) : null;
 
-  return { id: page.id, title, imageUrl, category, description, date };
+  return { id: page.id, title, imageUrl, tags, description, date };
 }
 
 const sampleGallery: ArtworkItem[] = [
@@ -173,7 +173,7 @@ const sampleGallery: ArtworkItem[] = [
     id: 'sample-1',
     title: '(サンプル) 朝の光',
     imageUrl: null,
-    category: 'キャラクター',
+    tags: ['キャラクター', '朝'],
     description: 'NOTION_GALLERY_DB_ID を設定するとNotionの作品がここに並びます。',
     date: '2026-01-01',
   },
@@ -185,7 +185,7 @@ const sampleGallery: ArtworkItem[] = [
  * 仕事履歴用データベースを取得します。
  * Notion側のプロパティ名(想定):
  *   Client(title) / Role(rich_text) / Period(date, endを含む範囲) /
- *   URL(url) / Image(files) / Tags(multi_select)
+ *   URL(url) / Image(files) / Tags(multi_select) / Published(checkbox)
  */
 export async function getWorkHistory(): Promise<WorkItem[]> {
   const dbId = import.meta.env.NOTION_WORKS_DB_ID;
@@ -196,6 +196,7 @@ export async function getWorkHistory(): Promise<WorkItem[]> {
 
   const res = await notion.databases.query({
     database_id: dbId,
+    filter: { property: 'Published', checkbox: { equals: true } },
     sorts: [{ property: 'Period', direction: 'descending' }],
   });
 

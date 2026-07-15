@@ -44,11 +44,13 @@ const hasImage = Boolean(item.imageUrl);
     {item.description && (
       <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>
     )}
-    {item.category && (
+    {item.tags.length > 0 && (
       <ul class="mt-3 flex flex-wrap gap-1.5">
-        <li class="rounded-full border border-ink/15 px-2.5 py-0.5 font-mono text-[11px] text-ink/70">
-          {item.category}
-        </li>
+        {item.tags.map((tag) => (
+          <li class="rounded-full border border-ink/15 px-2.5 py-0.5 font-mono text-[11px] text-ink/70">
+            {tag}
+          </li>
+        ))}
       </ul>
     )}
     {item.date && (
