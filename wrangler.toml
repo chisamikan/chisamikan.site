@@ -1,7 +1,12 @@
 name = "chisamikan-site"
 compatibility_date = "2026-07-15"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "dist"
+main = "./dist/_worker.js/index.js"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
 
 # 本番の環境変数(NOTION_TOKEN など)は Cloudflare Pages の
 # ダッシュボード > Settings > Environment variables で設定してください。
