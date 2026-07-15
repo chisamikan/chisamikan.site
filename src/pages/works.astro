@@ -6,20 +6,85 @@ import Lightbox from '../components/Lightbox.astro';
 import { getWorkHistory } from '../lib/notion';
 
 const works = await getWorkHistory();
+const tags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
 ---
 
 <BaseLayout title="Works" description="これまでのお仕事の履歴です。">
   <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
     <SectionHeading eyebrow="Career" title="仕事履歴" color="indigo" />
 
+    {tags.length > 0 && (
+      <div class="mb-4 flex flex-wrap gap-2" role="group" aria-label="タグで絞り込み">
+        <button
+          type="button"
+          data-filter="all"
+          class="filter-btn is-active rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
+        >
+          すべて
+        </button>
+        {tags.map((tag) => (
+          <button
+            type="button"
+            data-filter={tag}
+            class="filter-btn rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    )}
+
     {works.length > 0 ? (
-      <div>
-        {works.map((item) => <WorkItemComponent item={item} />)}
+      <div id="works-list">
+        {works.map((item) => (
+          <div data-tags={item.tags.join('|')}>
+            <WorkItemComponent item={item} />
+          </div>
+        ))}
       </div>
     ) : (
       <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
     )}
+
+    <p id="works-empty" class="hidden font-mono text-sm text-graphite">
+      該当するタグの実績がありません。
+    </p>
   </section>
 
   <Lightbox />
 </BaseLayout>
+
+<style>
+  .filter-btn.is-active {
+    @apply border-indigo bg-indigo text-white;
+  }
+</style>
+
+<script>
+  // タグボタンでの絞り込み(依存ライブラリなしのシンプルなvanilla JS)
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>('#works-list > [data-tags]')
+  );
+  const emptyMessage = document.querySelector<HTMLElement>('#works-empty');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const filter = btn.dataset.filter;
+
+      let visibleCount = 0;
+      items.forEach((item) => {
+        const tags = (item.dataset.tags ?? '').split('|').filter(Boolean);
+        const match = filter === 'all' || tags.includes(filter ?? '');
+        item.style.display = match ? '' : 'none';
+        if (match) visibleCount += 1;
+      });
+
+      if (emptyMessage) {
+        emptyMessage.classList.toggle('hidden', visibleCount > 0);
+      }
+    });
+  });
+</script>
