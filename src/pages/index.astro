@@ -21,9 +21,10 @@ const featuredGallery = gallery.slice(0, 3);
 const latestWorks = works.slice(0, 3);
 const tilts: Array<'1.5' | '-1.5' | '2.5'> = ['-1.5', '2.5', '1.5'];
 
-// ファーストビューの全画面イラスト: ギャラリーの先頭作品があればそれを、
+// ファーストビューの全画面イラスト: ギャラリーの先頭作品(NSFWは除外)があればそれを、
 // なければ用意したイラストをフォールバックとして使用する
-const heroImage = gallery[0]?.imageUrl ?? '/images/hero-illustration.svg';
+const heroImage =
+  gallery.find((item) => !item.nsfw && item.imageUrl)?.imageUrl ?? '/images/hero-illustration.svg';
 ---
 
 <BaseLayout>

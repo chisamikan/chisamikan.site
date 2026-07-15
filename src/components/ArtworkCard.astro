@@ -25,14 +25,24 @@ const hasImage = Boolean(item.imageUrl);
       class="lightbox-trigger relative block aspect-[4/5] w-full overflow-hidden bg-paper-dim"
       data-full={item.imageUrl}
       data-alt={item.title}
-      aria-label={`${item.title}を拡大表示`}
+      aria-label={item.nsfw ? `${item.title}(NSFW)を拡大表示` : `${item.title}を拡大表示`}
     >
       <img
         src={item.imageUrl}
         alt={item.title}
         loading="lazy"
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        class:list={[
+          'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105',
+          item.nsfw && 'scale-110 blur-xl',
+        ]}
       />
+      {item.nsfw && (
+        <span class="absolute inset-0 flex items-center justify-center bg-ink/35">
+          <span class="rounded-full bg-ink/85 px-3 py-1 font-mono text-xs uppercase tracking-widest text-paper">
+            NSFW
+          </span>
+        </span>
+      )}
     </button>
   ) : (
     <div class="flex aspect-[4/5] w-full cursor-default items-center justify-center bg-paper-dim text-graphite" aria-hidden="true">
