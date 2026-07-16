@@ -125,7 +125,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    console.error('[api/contact] Notionへの書き込みに失敗しました:', err);
-    return new Response(JSON.stringify({ error: 'server_error' }), { status: 500 });
+    // 実際の原因(トークン未設定/DB未共有/プロパティ名不一致など)を調査しやすいよう、
+    // レスポンスボディにも詳細を含める(ブラウザの開発者ツール > Network タブで確認可能)。
+    // 原因が判明し安定稼働したら、この detail は削除して問題ありません。
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error('[api/contact] Notionへの書き込みに失敗しました:', detail);
+    return new Response(JSON.stringify({ error: 'server_error', detail }), { status: 500 });
   }
 };
