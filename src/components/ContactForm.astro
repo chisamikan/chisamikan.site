@@ -54,22 +54,12 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   <input type="hidden" id="loaded-at" name="loadedAt" value="" />
 
   {turnstileSiteKey && (
-    <div>
-      <div
-        class="cf-turnstile"
-        data-sitekey={turnstileSiteKey}
-        data-callback="onTurnstileVerified"
-        data-expired-callback="onTurnstileExpired"
-        data-error-callback="onTurnstileExpired"
-      >
-      </div>
-    </div>
+    <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
   )}
 
   <button
     type="submit"
     id="contact-submit"
-    disabled={Boolean(turnstileSiteKey)}
     class="rounded-sm bg-ink px-6 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
   >
     送信する
@@ -87,6 +77,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   const status = document.querySelector<HTMLParagraphElement>('#form-status');
   const submitBtn = document.querySelector<HTMLButtonElement>('#contact-submit');
   const loadedAtInput = document.querySelector<HTMLInputElement>('#loaded-at');
+  const turnstileWidget = document.querySelector<HTMLElement>('.cf-turnstile');
 
   // フォームが実際に表示された時刻を記録する(タイムトラップ用)。
   // JSを実行しない単純なボットは、この値が空のまま送信することになる。
@@ -94,14 +85,11 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     loadedAtInput.value = String(Date.now());
   }
 
-  // Turnstileウィジェットの検証結果に応じて送信ボタンの有効/無効を切り替える
-  // (Turnstile未設置の場合はボタンは最初から有効)
-  (window as any).onTurnstileVerified = () => {
-    submitBtn?.removeAttribute('disabled');
-  };
-  (window as any).onTurnstileExpired = () => {
-    submitBtn?.setAttribute('disabled', 'true');
-  };
+  function showError(message: string) {
+    if (!status) return;
+    status.textContent = message;
+    status.className = 'font-mono text-sm text-marker-dark';
+  }
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -114,6 +102,15 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       status.textContent = '送信しました。ありがとうございます。';
       status.className = 'font-mono text-sm text-indigo';
       form.reset();
+      return;
+    }
+
+    // Turnstileウィジェットがある場合、認証トークンを取得できているか送信時に確認する。
+    // (ボタンを強制的に無効化する方式だと、トークンの自動更新が間に合わなかった際に
+    //  ボタンが押せないまま固まって見えてしまうため、送信時チェックのみに留めている)
+    const turnstileToken = (data['cf-turnstile-response'] as string) ?? '';
+    if (turnstileWidget && !turnstileToken) {
+      showError('認証を確認できませんでした。数秒待ってからもう一度お試しください。');
       return;
     }
 
@@ -130,22 +127,32 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           email: data.email,
           message: data.message,
           loadedAt: data.loadedAt,
-          turnstileToken: data['cf-turnstile-response'],
+          turnstileToken,
         }),
       });
 
-      if (!res.ok) throw new Error('failed');
-
-      status.textContent = '送信しました。ありがとうございます。折り返しご連絡いたします。';
-      status.className = 'font-mono text-sm text-indigo';
-      form.reset();
-      if (loadedAtInput) loadedAtInput.value = String(Date.now());
-      // Turnstileは1回のトークンにつき1回のみ有効なため、次回送信のためにリセットする
-      // (リセット後は再検証が完了するまでボタンは無効のまま)
-      (window as any).turnstile?.reset();
+      if (res.ok) {
+        status.textContent = '送信しました。ありがとうございます。折り返しご連絡いたします。';
+        status.className = 'font-mono text-sm text-indigo';
+        form.reset();
+        if (loadedAtInput) loadedAtInput.value = String(Date.now());
+      } else {
+        const body = await res.json().catch(() => ({}));
+        if (body.error === 'turnstile_missing' || body.error === 'turnstile_failed') {
+          showError('認証に失敗しました。もう一度お試しください。');
+        } else if (body.error === 'invalid_email') {
+          showError('メールアドレスの形式をご確認ください。');
+        } else if (body.error === 'missing_fields') {
+          showError('未入力の項目があります。ご確認ください。');
+        } else {
+          showError('送信に失敗しました。時間をおいて再度お試しください。');
+        }
+      }
     } catch {
-      status.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
-      status.className = 'font-mono text-sm text-marker-dark';
+      showError('送信に失敗しました。通信環境をご確認のうえ再度お試しください。');
+    } finally {
+      // Turnstileのトークンは1回のみ有効なため、次回送信に備えてウィジェットをリセットする
+      (window as any).turnstile?.reset();
       submitBtn?.removeAttribute('disabled');
     }
   });

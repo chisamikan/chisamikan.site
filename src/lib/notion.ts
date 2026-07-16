@@ -266,16 +266,27 @@ export interface ContactPayload {
  * お問い合わせ内容をNotionデータベースに1件のページとして追加します。
  * Notion側のプロパティ名(想定):
  *   Name(title) / Email(email) / Message(rich_text) / ReceivedAt(date) / Status(select: "未対応")
+ *
+ * このAPIはCloudflare上でリクエストごとに実行されるため、ビルド時専用の import.meta.env ではなく
+ * Cloudflareのランタイム環境(Astro.locals.runtime.env)から渡された値を優先して使用します。
+ * (Cloudflareの設定によっては、ビルド時とリクエスト実行時で参照できる環境変数が異なる場合があるため)
  */
-export async function createContactEntry(payload: ContactPayload): Promise<void> {
-  const dbId = import.meta.env.NOTION_CONTACT_DB_ID;
-  if (!notion || !dbId) {
+export async function createContactEntry(
+  payload: ContactPayload,
+  env?: { NOTION_TOKEN?: string; NOTION_CONTACT_DB_ID?: string }
+): Promise<void> {
+  const runtimeToken = env?.NOTION_TOKEN || import.meta.env.NOTION_TOKEN;
+  const dbId = env?.NOTION_CONTACT_DB_ID || import.meta.env.NOTION_CONTACT_DB_ID;
+
+  if (!runtimeToken || !dbId) {
     throw new Error(
       'NOTION_TOKEN / NOTION_CONTACT_DB_ID が設定されていないため、お問い合わせを送信できません。'
     );
   }
 
-  await notion.pages.create({
+  const client = new Client({ auth: runtimeToken });
+
+  await client.pages.create({
     parent: { database_id: dbId },
     properties: {
       Name: { title: [{ text: { content: payload.name } }] },

@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro';
+import type { APIContext, APIRoute } from 'astro';
 import { createContactEntry } from '../../lib/notion';
 
 // このエンドポイントだけは事前ビルド(静的化)せず、Cloudflare上でリクエストごとに実行します。
@@ -12,11 +12,24 @@ function isValidEmail(value: string): boolean {
 }
 
 /**
- * Cloudflare Turnstileのトークンをサーバー側で検証します。
- * TURNSTILE_SECRET_KEY が未設定の場合は検証をスキップします(未導入でも動作するように)。
+ * Cloudflareのランタイム環境(Astro.locals.runtime.env)から値を取得します。
+ * ビルド時とリクエスト実行時で参照できる環境変数の設定先がCloudflare側で異なる場合があるため、
+ * ランタイム値を優先しつつ、無ければビルド時の import.meta.env にフォールバックします。
  */
-async function verifyTurnstile(token: string, remoteIp: string | null): Promise<boolean> {
-  const secret = import.meta.env.TURNSTILE_SECRET_KEY;
+function getEnvValue(locals: APIContext['locals'], key: string): string | undefined {
+  const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })?.runtime?.env;
+  return runtimeEnv?.[key] || (import.meta.env as unknown as Record<string, string>)[key];
+}
+
+/**
+ * Cloudflare Turnstileのトークンをサーバー側で検証します。
+ * secretが未設定の場合は検証をスキップします(未導入でも動作するように)。
+ */
+async function verifyTurnstile(
+  token: string,
+  remoteIp: string | null,
+  secret: string | undefined
+): Promise<boolean> {
   if (!secret) return true;
 
   const form = new URLSearchParams();
@@ -37,7 +50,7 @@ async function verifyTurnstile(token: string, remoteIp: string | null): Promise<
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   let body: {
     name?: string;
     email?: string;
@@ -71,13 +84,14 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  // 3. Cloudflare Turnstile(設定されている場合のみ検証)
-  if (import.meta.env.TURNSTILE_SECRET_KEY) {
+  // 3. Cloudflare Turnstile(secretが設定されている場合のみ検証)
+  const turnstileSecret = getEnvValue(locals, 'TURNSTILE_SECRET_KEY');
+  if (turnstileSecret) {
     if (!body.turnstileToken) {
       return new Response(JSON.stringify({ error: 'turnstile_missing' }), { status: 400 });
     }
     const remoteIp = request.headers.get('CF-Connecting-IP');
-    const verified = await verifyTurnstile(body.turnstileToken, remoteIp);
+    const verified = await verifyTurnstile(body.turnstileToken, remoteIp, turnstileSecret);
     if (!verified) {
       return new Response(JSON.stringify({ error: 'turnstile_failed' }), { status: 400 });
     }
@@ -99,7 +113,13 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    await createContactEntry({ name, email, message });
+    await createContactEntry(
+      { name, email, message },
+      {
+        NOTION_TOKEN: getEnvValue(locals, 'NOTION_TOKEN'),
+        NOTION_CONTACT_DB_ID: getEnvValue(locals, 'NOTION_CONTACT_DB_ID'),
+      }
+    );
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
