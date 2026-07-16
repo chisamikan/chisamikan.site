@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   readonly RSS_FEED_URL: string;
   readonly SITE_TITLE: string;
   readonly SITE_DESCRIPTION: string;
+  readonly TURNSTILE_SITE_KEY: string;
+  readonly TURNSTILE_SECRET_KEY: string;
 }
 
 interface ImportMeta {
