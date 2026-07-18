@@ -23,9 +23,9 @@ export default {
         graphite: '#8C8578',
       },
       fontFamily: {
-        display: ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
-        body: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        display: ['"Oswald"', '"Zen Kaku Gothic New"', 'sans-serif'],
+        body: ['"Oswald"', '"Zen Kaku Gothic New"', 'sans-serif'],
+        mono: ['"Oswald"', '"Zen Kaku Gothic New"', 'sans-serif'],
       },
       rotate: {
         1.5: '1.5deg',
