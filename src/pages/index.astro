@@ -91,7 +91,7 @@ const heroImages =
 
   <!-- ギャラリー抜粋 -->
   <section id="gallery" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
-    <SectionHeading eyebrow="Selected Works" title="ギャラリー" />
+    <SectionHeading eyebrow="Gallery" title="ギャラリー" />
     <div class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item) => (
         <ArtworkCard item={item} />
@@ -109,7 +109,7 @@ const heroImages =
 
   <!-- プロフィール -->
   <section id="profile" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="About" title="プロフィール" />
+    <SectionHeading eyebrow="Profile" title="プロフィール" />
     <div class="mx-auto max-w-2xl text-center">
       <ProfileContent />
       <SnsLinks />
@@ -118,7 +118,7 @@ const heroImages =
 
   <!-- 仕事履歴(最新3件・PCでは3カラム表示) -->
   <section id="works" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Career" title="仕事履歴" />
+    <SectionHeading eyebrow="Works" title="仕事履歴" />
     {latestWorks.length > 0 ? (
       <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
         {latestWorks.map((item) => <WorkItemCard item={item} />)}
@@ -138,7 +138,7 @@ const heroImages =
 
   <!-- お問い合わせ -->
   <section id="contact" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Get in touch" title="お問い合わせ" />
+    <SectionHeading eyebrow="Contact" title="お問い合わせ" />
     <div class="mx-auto max-w-2xl text-center">
       <p class="mb-10 text-sm leading-relaxed text-ink/70">
         お仕事のご依頼・ご質問はこちらのフォームからお送りください。<br>
