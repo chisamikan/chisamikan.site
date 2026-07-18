@@ -51,22 +51,24 @@ const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5',
     <nav
       id="pagination-nav"
       aria-label="ページ送り"
-      class="mt-16 hidden items-center justify-center gap-4 font-mono text-sm"
+      class="mt-16 hidden items-center justify-center gap-2 font-mono text-sm"
     >
       <button
         type="button"
         id="prev-page"
-        class="rounded-sm border border-ink/20 px-4 py-2 transition-colors hover:border-marker hover:text-marker disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-ink/30 disabled:hover:border-ink/10 disabled:hover:text-ink/30"
+        aria-label="前のページ"
+        class="rounded-sm border border-ink/20 px-3 py-1.5 transition-colors hover:border-marker hover:text-marker"
       >
-        &larr; 前へ
+        &lt;
       </button>
-      <span id="page-indicator" class="text-graphite"></span>
+      <div id="page-numbers" class="flex items-center gap-2"></div>
       <button
         type="button"
         id="next-page"
-        class="rounded-sm border border-ink/20 px-4 py-2 transition-colors hover:border-marker hover:text-marker disabled:cursor-not-allowed disabled:border-ink/10 disabled:text-ink/30 disabled:hover:border-ink/10 disabled:hover:text-ink/30"
+        aria-label="次のページ"
+        class="rounded-sm border border-ink/20 px-3 py-1.5 transition-colors hover:border-marker hover:text-marker"
       >
-        次へ &rarr;
+        &gt;
       </button>
     </nav>
   </section>
@@ -91,7 +93,7 @@ const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5',
   const nav = document.querySelector<HTMLElement>('#pagination-nav');
   const prevBtn = document.querySelector<HTMLButtonElement>('#prev-page');
   const nextBtn = document.querySelector<HTMLButtonElement>('#next-page');
-  const indicator = document.querySelector<HTMLElement>('#page-indicator');
+  const pageNumbers = document.querySelector<HTMLElement>('#page-numbers');
 
   let currentFilter = 'all';
   let currentPage = 1;
@@ -100,6 +102,44 @@ const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5',
     if (currentFilter === 'all') return true;
     const tags = (card.dataset.tags ?? '').split('|').filter(Boolean);
     return tags.includes(currentFilter);
+  }
+
+  // current を中心とした3ページ分の窓を作り、先頭/末尾に接していなければ
+  // その側に 1 (または total) と省略記号を追加する。窓が範囲外にはみ出す
+  // 場合は範囲内に収まるようスライドさせる。
+  function getPageItems(current: number, total: number): Array<number | 'ellipsis'> {
+    let start = current - 1;
+    let end = current + 1;
+    if (start < 1) {
+      end += 1 - start;
+      start = 1;
+    }
+    if (end > total) {
+      start -= end - total;
+      end = total;
+    }
+    start = Math.max(start, 1);
+    end = Math.min(end, total);
+
+    const window: number[] = [];
+    for (let page = start; page <= end; page += 1) window.push(page);
+
+    const items: Array<number | 'ellipsis'> = [];
+    if (window[0] === 1) {
+      items.push(...window);
+    } else {
+      items.push(1, 'ellipsis', ...window);
+    }
+    if (window[window.length - 1] !== total) {
+      items.push('ellipsis', total);
+    }
+    return items;
+  }
+
+  function goToPage(page: number) {
+    currentPage = page;
+    render();
+    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function render() {
@@ -123,9 +163,37 @@ const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5',
     });
 
     if (nav) nav.style.display = totalPages > 1 ? 'flex' : 'none';
-    if (indicator) indicator.textContent = `${currentPage} / ${totalPages}`;
-    if (prevBtn) prevBtn.disabled = currentPage <= 1;
-    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+    if (prevBtn) prevBtn.style.display = currentPage <= 1 ? 'none' : '';
+    if (nextBtn) nextBtn.style.display = currentPage >= totalPages ? 'none' : '';
+
+    if (pageNumbers) {
+      pageNumbers.innerHTML = '';
+      getPageItems(currentPage, totalPages).forEach((item) => {
+        if (item === 'ellipsis') {
+          const span = document.createElement('span');
+          span.textContent = '…';
+          span.className = 'px-1 text-ink/40';
+          pageNumbers.appendChild(span);
+          return;
+        }
+
+        const isActive = item === currentPage;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = String(item);
+        if (isActive) {
+          btn.disabled = true;
+          btn.setAttribute('aria-current', 'page');
+          btn.className =
+            'rounded-sm border border-ink/10 bg-ink/10 px-3 py-1.5 text-ink/40 cursor-not-allowed';
+        } else {
+          btn.className =
+            'rounded-sm border border-ink/20 px-3 py-1.5 transition-colors hover:border-marker hover:text-marker';
+          btn.addEventListener('click', () => goToPage(item));
+        }
+        pageNumbers.appendChild(btn);
+      });
+    }
   }
 
   filterButtons.forEach((btn) => {
@@ -138,17 +206,8 @@ const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5',
     });
   });
 
-  prevBtn?.addEventListener('click', () => {
-    currentPage -= 1;
-    render();
-    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  nextBtn?.addEventListener('click', () => {
-    currentPage += 1;
-    render();
-    grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+  prevBtn?.addEventListener('click', () => goToPage(currentPage - 1));
+  nextBtn?.addEventListener('click', () => goToPage(currentPage + 1));
 
   render();
 </script>
