@@ -6,6 +6,7 @@ import WorkItemCard from '../components/WorkItemCard.astro';
 import NewsItem from '../components/NewsItem.astro';
 import MarkerUnderline from '../components/MarkerUnderline.astro';
 import ProfileContent from '../components/ProfileContent.astro';
+import SnsLinks from '../components/SnsLinks.astro';
 import ContactForm from '../components/ContactForm.astro';
 import Lightbox from '../components/Lightbox.astro';
 import { getGalleryItems, getWorkHistory } from '../lib/notion';
@@ -111,6 +112,7 @@ const heroImage =
     <SectionHeading eyebrow="About" title="プロフィール" color="marker" />
     <div class="max-w-2xl">
       <ProfileContent />
+      <SnsLinks />
     </div>
   </section>
 

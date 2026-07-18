@@ -1,0 +1,23 @@
+---
+import { snsLinks } from '../lib/config';
+import MisskeyIcon from './icons/MisskeyIcon.astro';
+---
+
+<div class="mt-8 flex flex-wrap gap-3">
+  {snsLinks.map((link) => (
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={link.label}
+      title={link.label}
+      class="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-ink/15 bg-paper text-base text-ink transition-colors hover:border-marker hover:text-marker"
+    >
+      {link.icon === 'custom:misskey' ? (
+        <MisskeyIcon />
+      ) : (
+        <i class:list={[link.icon]} aria-hidden="true"></i>
+      )}
+    </a>
+  ))}
+</div>
