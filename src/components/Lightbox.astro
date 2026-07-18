@@ -22,6 +22,12 @@
 
   .lightbox-dialog::backdrop {
     background: rgba(34, 31, 27, 0.82);
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+
+  .lightbox-dialog.is-open::backdrop {
+    opacity: 1;
   }
 
   .lightbox-dialog img {
@@ -32,6 +38,15 @@
     height: auto;
     border-radius: 2px;
     box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
+    cursor: zoom-out;
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+
+  .lightbox-dialog img.is-visible {
+    transform: scale(1);
+    opacity: 1;
   }
 
   .lightbox-close {
@@ -61,6 +76,18 @@
   const img = document.querySelector<HTMLImageElement>('#lightbox-img');
   const closeBtn = document.querySelector<HTMLButtonElement>('#lightbox-close');
 
+  function closeWithZoomOut() {
+    if (!dialog || !img || !dialog.open) return;
+    img.classList.remove('is-visible');
+    dialog.classList.remove('is-open');
+    const onEnd = (e: TransitionEvent) => {
+      if (e.propertyName !== 'transform') return;
+      img.removeEventListener('transitionend', onEnd);
+      dialog.close();
+    };
+    img.addEventListener('transitionend', onEnd);
+  }
+
   document.querySelectorAll<HTMLElement>('.lightbox-trigger').forEach((trigger) => {
     trigger.addEventListener('click', () => {
       if (!dialog || !img) return;
@@ -68,13 +95,34 @@
       if (!full) return;
       img.src = full;
       img.alt = trigger.dataset.alt ?? '';
+      img.classList.remove('is-visible');
+      dialog.classList.remove('is-open');
       dialog.showModal();
+      // 初期状態(縮小・透明)を描画してからズームイン/背景フェードインさせる
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          img.classList.add('is-visible');
+          dialog.classList.add('is-open');
+        });
+      });
     });
   });
 
-  // 背景(dialog自身)をクリックしたら閉じる
-  dialog?.addEventListener('click', (e) => {
-    if (e.target === dialog) dialog.close();
+  // 画像自体をタップしたらズームアウトして閉じる
+  img?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeWithZoomOut();
   });
-  closeBtn?.addEventListener('click', () => dialog?.close());
+
+  // 背景(dialog自身)をクリックしたらズームアウトして閉じる
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) closeWithZoomOut();
+  });
+  closeBtn?.addEventListener('click', closeWithZoomOut);
+
+  // Escキーでもズームアウトしてから閉じる
+  dialog?.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    closeWithZoomOut();
+  });
 </script>
