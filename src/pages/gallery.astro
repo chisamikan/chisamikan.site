@@ -7,7 +7,6 @@ import { getGalleryItems } from '../lib/notion';
 
 const items = await getGalleryItems();
 const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
-const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5', '2.5', '-2.5'];
 ---
 
 <BaseLayout title="Gallery" description="これまでに描いたイラスト作品のギャラリーです。">
@@ -36,9 +35,9 @@ const tilts: Array<'1.5' | '-1.5' | '2.5' | '-2.5' | '0'> = ['0', '1.5', '-1.5',
     )}
 
     <div id="gallery-grid" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item, i) => (
-        <div data-tags={item.tags.join('|')}>
-          <ArtworkCard item={item} tilt={tilts[i % tilts.length]} headingLevel={2} />
+      {items.map((item) => (
+        <div class="h-full" data-tags={item.tags.join('|')}>
+          <ArtworkCard item={item} headingLevel={2} />
         </div>
       ))}
     </div>

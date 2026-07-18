@@ -35,6 +35,8 @@ export default {
       },
       boxShadow: {
         pin: '0 6px 16px -4px rgba(34, 31, 27, 0.25)',
+        glass: '0 8px 32px -8px rgba(34, 31, 27, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
+        'glass-lg': '0 20px 48px -12px rgba(34, 31, 27, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.6)',
       },
     },
   },

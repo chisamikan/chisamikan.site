@@ -35,17 +35,18 @@
     @apply relative inline-block px-[55px] before:absolute before:top-1/2 before:left-0 before:h-[2px] before:w-[45px] before:border-y before:content-[''] after:absolute after:top-1/2 after:right-0 after:h-[2px] after:w-[45px] after:border-y after:content-[''];
   }
 
-  .paper-tilt {
-    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 240ms ease;
+  /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動 */
+  .glass-card {
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease, border-color 300ms ease;
   }
 
-  .paper-tilt:hover {
-    transform: rotate(0deg) translateY(-4px) scale(1.015);
+  .glass-card:hover {
+    transform: translateY(-6px);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .paper-tilt,
-    .paper-tilt:hover {
+    .glass-card,
+    .glass-card:hover {
       transition: none !important;
       transform: none !important;
     }
