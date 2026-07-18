@@ -97,18 +97,20 @@ const heroImages =
         <ArtworkCard item={item} />
       ))}
     </div>
-    <a
-      href="/gallery"
-      class="mt-10 inline-block rounded-sm bg-marker px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
-    >
-      すべての作品を見る &rarr;
-    </a>
+    <div class="mt-10 text-center">
+      <a
+        href="/gallery"
+        class="inline-block rounded-sm bg-marker px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
+      >
+        すべての作品を見る &rarr;
+      </a>
+    </div>
   </section>
 
   <!-- プロフィール -->
   <section id="profile" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="About" title="プロフィール" />
-    <div class="max-w-2xl">
+    <div class="mx-auto max-w-2xl text-center">
       <ProfileContent />
       <SnsLinks />
     </div>
@@ -124,21 +126,23 @@ const heroImages =
     ) : (
       <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
     )}
-    <a
-      href="/works"
-      class="mt-10 inline-block rounded-sm bg-indigo px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
-    >
-      仕事履歴をすべて見る &rarr;
-    </a>
+    <div class="mt-10 text-center">
+      <a
+        href="/works"
+        class="inline-block rounded-sm bg-indigo px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
+      >
+        仕事履歴をすべて見る &rarr;
+      </a>
+    </div>
   </section>
 
   <!-- お問い合わせ -->
   <section id="contact" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Get in touch" title="お問い合わせ" />
-    <div class="max-w-2xl">
+    <div class="mx-auto max-w-2xl text-center">
       <p class="mb-10 text-sm leading-relaxed text-ink/70">
-        お仕事のご依頼・ご質問はこちらのフォームからお送りください。内容を確認のうえ、
-        折り返しご連絡いたします。
+        お仕事のご依頼・ご質問はこちらのフォームからお送りください。<br>
+		内容を確認のうえ、折り返しご連絡いたします。
       </p>
       <ContactForm />
     </div>

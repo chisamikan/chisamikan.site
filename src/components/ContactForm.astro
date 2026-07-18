@@ -2,7 +2,7 @@
 const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 ---
 
-<form id="contact-form" class="space-y-6" novalidate>
+<form id="contact-form" class="space-y-6 text-left" novalidate>
   <div>
     <label for="name" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
       お名前 <span class="text-marker">*</span>
@@ -54,16 +54,20 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   <input type="hidden" id="loaded-at" name="loadedAt" value="" />
 
   {turnstileSiteKey && (
-    <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
+    <div class="flex justify-center">
+      <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
+    </div>
   )}
 
-  <button
-    type="submit"
-    id="contact-submit"
-    class="rounded-sm bg-ink px-6 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
-  >
-    送信する
-  </button>
+  <div class="text-center">
+    <button
+      type="submit"
+      id="contact-submit"
+      class="rounded-sm bg-ink px-6 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+    >
+      送信する
+    </button>
+  </div>
 
   <p id="form-status" role="status" class="font-mono text-sm"></p>
 </form>
