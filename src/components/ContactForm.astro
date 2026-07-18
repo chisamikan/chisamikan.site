@@ -5,7 +5,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 <form id="contact-form" class="space-y-6 text-left" novalidate>
   <div>
     <label for="name" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
-      お名前 <span class="text-marker">*</span>
+      お名前 <span class="text-accent">*</span>
     </label>
     <input
       id="name"
@@ -13,13 +13,13 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       type="text"
       required
       autocomplete="name"
-      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-indigo"
+      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-accent"
     />
   </div>
 
   <div>
     <label for="email" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
-      メールアドレス <span class="text-marker">*</span>
+      メールアドレス <span class="text-accent">*</span>
     </label>
     <input
       id="email"
@@ -27,20 +27,20 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       type="email"
       required
       autocomplete="email"
-      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-indigo"
+      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-accent"
     />
   </div>
 
   <div>
     <label for="message" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
-      お問い合わせ内容 <span class="text-marker">*</span>
+      お問い合わせ内容 <span class="text-accent">*</span>
     </label>
     <textarea
       id="message"
       name="message"
       rows="6"
       required
-      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-indigo"
+      class="w-full rounded-sm border border-ink/20 bg-white px-3.5 py-2.5 text-ink outline-none transition-colors focus:border-accent"
     ></textarea>
   </div>
 
@@ -59,13 +59,13 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       name="privacyConsent"
       type="checkbox"
       required
-      class="mt-1 h-4 w-4 shrink-0 rounded-sm border border-ink/20 text-indigo focus:outline-none focus:ring-2 focus:ring-indigo"
+      class="mt-1 h-4 w-4 shrink-0 rounded-sm border border-ink/20 text-accent focus:outline-none focus:ring-2 focus:ring-accent"
     />
     <label for="privacy-consent" class="text-sm text-ink">
-      <a href="/privacy" target="_blank" rel="noopener noreferrer" class="underline transition-colors hover:text-marker">
+      <a href="/privacy" target="_blank" rel="noopener noreferrer" class="underline transition-colors hover:text-accent">
         プライバシーポリシー
       </a>
-      に同意する <span class="text-marker">*</span>
+      に同意する <span class="text-accent">*</span>
     </label>
   </div>
 
@@ -79,7 +79,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     <button
       type="submit"
       id="contact-submit"
-      class="rounded-sm bg-ink px-6 py-2.5 font-mono text-sm text-paper transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+      class="btn-glass btn-glass-accent px-6 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
     >
       送信する
     </button>
@@ -108,7 +108,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   function showError(message: string) {
     if (!status) return;
     status.textContent = message;
-    status.className = 'font-mono text-sm text-marker-dark';
+    status.className = 'font-mono text-sm text-red-600';
   }
 
   form?.addEventListener('submit', async (e) => {
@@ -120,7 +120,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     // ハニーポットに値が入っていたらスパムとみなし、成功したように見せて何もしない
     if (data.company) {
       status.textContent = '送信しました。ありがとうございます。';
-      status.className = 'font-mono text-sm text-indigo';
+      status.className = 'font-mono text-sm text-accent';
       form.reset();
       return;
     }
@@ -154,7 +154,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 
       if (res.ok) {
         status.textContent = '送信しました。ご入力いただいたメールアドレス宛に自動返信メールをお送りしましたので、ご確認ください。';
-        status.className = 'font-mono text-sm text-indigo';
+        status.className = 'font-mono text-sm text-accent';
         form.reset();
         if (loadedAtInput) loadedAtInput.value = String(Date.now());
       } else {

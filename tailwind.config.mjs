@@ -12,13 +12,10 @@ export default {
           DEFAULT: '#221F1B',
           soft: '#453F37',
         },
-        indigo: {
-          DEFAULT: '#3A4A8C',
-          light: '#5A6BB0',
-        },
-        marker: {
-          DEFAULT: '#E85D3F',
-          dark: '#C74A2E',
+        accent: {
+          DEFAULT: '#0099FF',
+          dark: '#0077CC',
+          light: '#4DB8FF',
         },
         graphite: '#8C8578',
       },
@@ -37,6 +34,7 @@ export default {
         pin: '0 6px 16px -4px rgba(34, 31, 27, 0.25)',
         glass: '0 8px 32px -8px rgba(34, 31, 27, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
         'glass-lg': '0 20px 48px -12px rgba(34, 31, 27, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.6)',
+        'glass-accent': '0 8px 28px -6px rgba(0, 153, 255, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.35)',
       },
     },
   },

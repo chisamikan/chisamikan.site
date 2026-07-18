@@ -8,7 +8,7 @@ function isActive(href: string) {
 }
 ---
 
-<header class="sticky top-0 z-40 border-b border-ink/10 bg-paper/85 backdrop-blur-sm">
+<header class="sticky top-0 z-40 border-b border-white/40 bg-paper/70 shadow-glass backdrop-blur-xl">
   <div class="mx-auto max-w-5xl px-6 py-4">
     <input type="checkbox" id="nav-toggle" class="peer hidden" />
 
@@ -25,13 +25,13 @@ function isActive(href: string) {
                 href={item.href}
                 aria-current={isActive(item.href) ? 'page' : undefined}
                 class:list={[
-                  'relative rounded px-2.5 py-1.5 transition-colors hover:text-marker sm:px-3',
-                  isActive(item.href) ? 'text-marker' : 'text-ink/70',
+                  'relative rounded px-2.5 py-1.5 transition-colors hover:text-accent sm:px-3',
+                  isActive(item.href) ? 'text-accent' : 'text-ink/70',
                 ]}
               >
                 {item.label}
                 {isActive(item.href) && (
-                  <span class="absolute inset-x-2 -bottom-0.5 h-[2px] bg-marker" aria-hidden="true"></span>
+                  <span class="absolute inset-x-2 -bottom-0.5 h-[2px] bg-accent" aria-hidden="true"></span>
                 )}
               </a>
             </li>
@@ -41,7 +41,7 @@ function isActive(href: string) {
 
       <label
         for="nav-toggle"
-        class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-marker sm:hidden"
+        class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-accent sm:hidden"
         aria-label="メニューを開閉する"
       >
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -60,8 +60,8 @@ function isActive(href: string) {
               href={item.href}
               aria-current={isActive(item.href) ? 'page' : undefined}
               class:list={[
-                'relative block rounded px-2.5 py-2 transition-colors hover:text-marker',
-                isActive(item.href) ? 'text-marker' : 'text-ink/70',
+                'relative block rounded px-2.5 py-2 transition-colors hover:text-accent',
+                isActive(item.href) ? 'text-accent' : 'text-ink/70',
               ]}
             >
               {item.label}

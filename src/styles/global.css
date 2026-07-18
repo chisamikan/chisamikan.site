@@ -9,23 +9,49 @@
 
   body {
     @apply bg-paper text-ink font-body antialiased;
+    /* ガラス面が光を透かして見えるよう、固定位置のソフトなカラーブロブを紙のドット柄の奥に敷く(アクセントカラーと同系の青で統一) */
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(34, 31, 27, 0.055) 1px, transparent 0);
-    background-size: 22px 22px;
+      radial-gradient(ellipse 60% 45% at 12% -8%, rgba(0, 153, 255, 0.18), transparent 100%),
+      radial-gradient(ellipse 55% 42% at 100% 12%, rgba(77, 184, 255, 0.16), transparent 100%),
+      radial-gradient(ellipse 60% 48% at 45% 100%, rgba(0, 119, 204, 0.14), transparent 100%),
+      radial-gradient(circle at 1px 1px, rgba(34, 31, 27, 0.05) 1px, transparent 0);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    background-attachment: fixed, fixed, fixed, scroll;
   }
 
   ::selection {
-    @apply bg-marker/25 text-ink;
+    @apply bg-accent/25 text-ink;
   }
 
   :focus-visible {
-    outline: 2.5px solid theme('colors.indigo.DEFAULT');
+    outline: 2.5px solid theme('colors.accent.DEFAULT');
     outline-offset: 3px;
     border-radius: 2px;
   }
 
   h1, h2, h3, h4 {
     @apply font-display text-ink;
+  }
+}
+
+@layer components {
+  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
+  .btn-glass {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-white/40 bg-white/25 px-5 py-2.5 font-mono text-sm text-ink shadow-glass backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/40 hover:shadow-glass-lg;
+  }
+
+  .btn-glass-sm {
+    @apply px-3.5 py-1.5 text-xs;
+  }
+
+  .btn-glass-accent {
+    @apply border-accent/30 bg-accent/80 text-white shadow-glass-accent hover:border-accent/50 hover:bg-accent hover:text-white;
+  }
+
+  /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
+  .btn-glass-ghost {
+    @apply rounded-full border border-white/40 bg-white/20 px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:bg-white/35 hover:text-accent;
   }
 }
 
@@ -46,7 +72,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     .glass-card,
-    .glass-card:hover {
+    .glass-card:hover,
+    .btn-glass,
+    .btn-glass:hover {
       transition: none !important;
       transform: none !important;
     }

@@ -15,19 +15,11 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
 
     {tags.length > 0 && (
       <div class="mb-10 flex flex-wrap gap-2" role="group" aria-label="タグで絞り込み">
-        <button
-          type="button"
-          data-filter="all"
-          class="filter-btn is-active rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
-        >
+        <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
           すべて
         </button>
         {tags.map((tag) => (
-          <button
-            type="button"
-            data-filter={tag}
-            class="filter-btn rounded-full border border-ink/20 px-4 py-1.5 font-mono text-xs transition-colors"
-          >
+          <button type="button" data-filter={tag} class="filter-btn btn-glass-ghost">
             {tag}
           </button>
         ))}
@@ -52,21 +44,11 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       aria-label="ページ送り"
       class="mt-16 hidden items-center justify-center gap-2 font-mono text-sm"
     >
-      <button
-        type="button"
-        id="prev-page"
-        aria-label="前のページ"
-        class="rounded-sm border border-ink/20 px-3 py-1.5 transition-colors hover:border-marker hover:text-marker"
-      >
+      <button type="button" id="prev-page" aria-label="前のページ" class="btn-glass-ghost !px-3">
         &lt;
       </button>
       <div id="page-numbers" class="flex items-center gap-2"></div>
-      <button
-        type="button"
-        id="next-page"
-        aria-label="次のページ"
-        class="rounded-sm border border-ink/20 px-3 py-1.5 transition-colors hover:border-marker hover:text-marker"
-      >
+      <button type="button" id="next-page" aria-label="次のページ" class="btn-glass-ghost !px-3">
         &gt;
       </button>
     </nav>
@@ -77,7 +59,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
 
 <style>
   .filter-btn.is-active {
-    @apply border-marker bg-marker text-white;
+    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
   }
 </style>
 
@@ -184,10 +166,9 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
           btn.disabled = true;
           btn.setAttribute('aria-current', 'page');
           btn.className =
-            'rounded-sm border border-ink/10 bg-ink/10 px-3 py-1.5 text-ink/40 cursor-not-allowed';
+            'rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-ink/40 backdrop-blur-md cursor-not-allowed';
         } else {
-          btn.className =
-            'rounded-sm border border-ink/20 px-3 py-1.5 transition-colors hover:border-marker hover:text-marker';
+          btn.className = 'btn-glass-ghost !px-3';
           btn.addEventListener('click', () => goToPage(item));
         }
         pageNumbers.appendChild(btn);

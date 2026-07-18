@@ -21,7 +21,7 @@ function formatPeriod(start: string | null, end: string | null) {
   <div class="flex flex-1 flex-col border-t border-white/30 p-4">
     <p class="font-mono text-xs text-graphite">{formatPeriod(item.periodStart, item.periodEnd)}</p>
     <h3 class="mt-1 font-display text-lg font-semibold text-ink">{item.client}</h3>
-    {item.role && <p class="mt-0.5 text-sm font-medium text-indigo">{item.role}</p>}
+    {item.role && <p class="mt-0.5 text-sm font-medium text-accent">{item.role}</p>}
 
     {item.tags.length > 0 && (
       <ul class="mt-auto flex flex-wrap gap-1.5 pt-3">

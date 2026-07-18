@@ -62,7 +62,7 @@ const heroImages =
                       {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                     </span>
                   )}
-                  <span class="text-paper/90 transition-colors group-hover:text-marker">
+                  <span class="text-paper/90 transition-colors group-hover:text-accent">
                     {item.title}
                     <span class="ml-1 text-paper/60">&#8599;</span>
                   </span>
@@ -76,7 +76,7 @@ const heroImages =
         <div class="mt-6 text-right">
           <a
             href="#news"
-            class="font-mono text-sm text-paper/90 underline underline-offset-4 transition-colors hover:text-marker"
+            class="font-mono text-sm text-paper/90 underline underline-offset-4 transition-colors hover:text-accent"
           >
             お知らせをもっと見る &rarr;
           </a>
@@ -98,10 +98,7 @@ const heroImages =
       ))}
     </div>
     <div class="mt-10 text-center">
-      <a
-        href="/gallery"
-        class="inline-block rounded-sm bg-marker px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
-      >
+      <a href="/gallery" class="btn-glass btn-glass-accent">
         すべての作品を見る &rarr;
       </a>
     </div>
@@ -127,10 +124,7 @@ const heroImages =
       <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
     )}
     <div class="mt-10 text-center">
-      <a
-        href="/works"
-        class="inline-block rounded-sm bg-indigo px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
-      >
+      <a href="/works" class="btn-glass btn-glass-accent">
         仕事履歴をすべて見る &rarr;
       </a>
     </div>
