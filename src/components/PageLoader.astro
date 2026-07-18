@@ -1,0 +1,122 @@
+---
+// 全ページ共通の初回表示ローディング演出。
+// 手描きの丸をペンでなぞっているような線画をループさせ、
+// ページの読み込み完了(window load)を待ってフェードアウトする。
+---
+
+<div id="page-loader" class="page-loader" role="status" aria-live="polite">
+  <span class="sr-only">読み込み中</span>
+  <svg class="page-loader-scribble" viewBox="0 0 100 100" aria-hidden="true">
+    <path
+      d="M50 12 C 72 10, 90 27, 89 50 C 88 73, 70 90 47 89 C 24 88 11 69 12 46 C 13 24 29 10 50 12 Z"
+      fill="none"
+      stroke="#E85D3F"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      pathLength="300"
+    ></path>
+  </svg>
+  <span class="page-loader-caption">Loading</span>
+</div>
+
+<style>
+  .page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background-color: #faf7f0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(34, 31, 27, 0.055) 1px, transparent 0);
+    background-size: 22px 22px;
+    transition: opacity 420ms ease, visibility 420ms ease;
+  }
+
+  .page-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .page-loader-scribble {
+    width: 64px;
+    height: 64px;
+    animation: page-loader-spin 1.6s linear infinite;
+  }
+
+  .page-loader-scribble path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: page-loader-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  .page-loader-caption {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(34, 31, 27, 0.55);
+  }
+
+  @keyframes page-loader-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes page-loader-draw {
+    0% {
+      stroke-dashoffset: 300;
+    }
+    50% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: -300;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-loader-scribble,
+    .page-loader-scribble path {
+      animation: none;
+    }
+    .page-loader-scribble path {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<script>
+  const loader = document.getElementById('page-loader');
+
+  if (loader) {
+    const MIN_VISIBLE_MS = 380;
+    const shownAt = performance.now();
+
+    const hide = () => {
+      const elapsed = performance.now() - shownAt;
+      const wait = Math.max(0, MIN_VISIBLE_MS - elapsed);
+      window.setTimeout(() => {
+        loader.classList.add('is-hidden');
+      }, wait);
+    };
+
+    if (document.readyState === 'complete') {
+      hide();
+    } else {
+      window.addEventListener('load', hide, { once: true });
+    }
+
+    // bfcacheで復元された場合はアニメーションなしで即座に非表示にする
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        loader.classList.add('is-hidden');
+      }
+    });
+  }
+</script>
