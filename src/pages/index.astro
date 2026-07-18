@@ -43,46 +43,45 @@ const heroImages =
     <HeroSlideshow images={heroImages} />
     <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/5"></div>
 
-    <div class="relative z-10 mx-auto flex h-full max-w-5xl flex-col justify-end px-6 pb-20 pt-16 sm:pb-24">
-      <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-paper/80">
-        Latest News
-      </p>
-      <h2 class="heading-lines before:border-paper after:border-paper self-center font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
-        お知らせ
-      </h2>
-      {news.length > 0 ? (
-        <ul class="mt-8 max-w-xl">
-          {news.slice(0, 3).map((item) => (
-            <li class="border-b border-paper/20 py-3 first:pt-0 last:border-b-0">
-              <a
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
-              >
-                {item.date && (
-                  <span class="shrink-0 font-mono text-xs text-paper/60">
-                    {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+    <div class="relative z-10 flex h-full flex-col justify-end px-6 pb-20 pt-16 sm:px-10 sm:pb-24">
+      <div class="max-w-md rounded-xl border border-paper/20 bg-paper/10 p-5 text-left shadow-lg backdrop-blur-md sm:p-6">
+        <h2 class="mb-4 font-display text-lg font-semibold tracking-tight text-paper sm:text-xl">
+          お知らせ<span class="font-mono text-xs uppercase tracking-[0.25em] text-paper/80 pl-2">Latest News</span>
+        </h2>
+        {news.length > 0 ? (
+          <ul>
+            {news.slice(0, 3).map((item) => (
+              <li class="border-b border-paper/20 py-3 first:pt-0 last:border-b-0">
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+                >
+                  {item.date && (
+                    <span class="shrink-0 font-mono text-xs text-paper/60">
+                      {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                    </span>
+                  )}
+                  <span class="text-paper/90 transition-colors group-hover:text-marker">
+                    {item.title}
+                    <span class="ml-1 text-paper/60">&#8599;</span>
                   </span>
-                )}
-                <span class="text-paper/90 transition-colors group-hover:text-marker">
-                  {item.title}
-                  <span class="ml-1 text-paper/60">&#8599;</span>
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p class="mt-8 max-w-xl text-base leading-relaxed text-paper/85 sm:text-lg">お知らせはまだありません。</p>
-      )}
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a
-          href="#news"
-          class="rounded-sm bg-marker px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
-        >
-          お知らせをもっと見る
-        </a>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="text-sm leading-relaxed text-paper/85">お知らせはまだありません。</p>
+        )}
+        <div class="mt-6 text-right">
+          <a
+            href="#news"
+            class="font-mono text-sm text-paper/90 underline underline-offset-4 transition-colors hover:text-marker"
+          >
+            お知らせをもっと見る &rarr;
+          </a>
+        </div>
       </div>
     </div>
 
