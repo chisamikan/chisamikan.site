@@ -94,6 +94,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     email?: string;
     message?: string;
     company?: string;
+    privacyConsent?: boolean;
     loadedAt?: string;
     turnstileToken?: string;
   };
@@ -146,6 +147,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   if (!name || !email || !message) {
     return new Response(JSON.stringify({ error: 'missing_fields' }), { status: 400 });
+  }
+  if (!body.privacyConsent) {
+    return new Response(JSON.stringify({ error: 'privacy_consent_required' }), { status: 400 });
   }
   if (!isValidEmail(email)) {
     return new Response(JSON.stringify({ error: 'invalid_email' }), { status: 400 });

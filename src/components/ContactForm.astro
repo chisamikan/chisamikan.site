@@ -53,6 +53,22 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   <!-- タイムトラップ: フォーム表示時刻をJSで記録し、極端に早い送信をスパムとみなす -->
   <input type="hidden" id="loaded-at" name="loadedAt" value="" />
 
+  <div class="flex items-start gap-2">
+    <input
+      id="privacy-consent"
+      name="privacyConsent"
+      type="checkbox"
+      required
+      class="mt-1 h-4 w-4 shrink-0 rounded-sm border border-ink/20 text-indigo focus:outline-none focus:ring-2 focus:ring-indigo"
+    />
+    <label for="privacy-consent" class="text-sm text-ink">
+      <a href="/privacy" target="_blank" rel="noopener noreferrer" class="underline transition-colors hover:text-marker">
+        プライバシーポリシー
+      </a>
+      に同意する <span class="text-marker">*</span>
+    </label>
+  </div>
+
   {turnstileSiteKey && (
     <div class="flex justify-center">
       <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
@@ -130,6 +146,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           name: data.name,
           email: data.email,
           message: data.message,
+          privacyConsent: data.privacyConsent === 'on',
           loadedAt: data.loadedAt,
           turnstileToken,
         }),
@@ -148,6 +165,8 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           showError('メールアドレスの形式をご確認ください。');
         } else if (body.error === 'missing_fields') {
           showError('未入力の項目があります。ご確認ください。');
+        } else if (body.error === 'privacy_consent_required') {
+          showError('プライバシーポリシーへの同意が必要です。');
         } else if (body.error === 'server_error') {
           // 原因調査用: Notion API等の実際のエラー内容と診断情報を表示する。
           // 原因が判明し安定稼働したら、この分岐は削除して構いません。
