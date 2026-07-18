@@ -1,5 +1,6 @@
 import type { APIContext, APIRoute } from 'astro';
 import { createContactEntry } from '../../lib/notion';
+import { notifyDiscord, notifyZapier } from '../../lib/notify';
 
 // このエンドポイントだけは事前ビルド(静的化)せず、Cloudflare上でリクエストごとに実行します。
 export const prerender = false;
@@ -52,6 +53,54 @@ async function verifyTurnstile(
   } catch (err) {
     console.error('[api/contact] Turnstileの検証に失敗しました:', err);
     return false;
+  }
+}
+
+/**
+ * Discord通知 / Zapier経由の管理者宛通知・送信者への自動返信をまとめて行います。
+ * それぞれ対応する環境変数が未設定なら該当の通知だけスキップします。
+ * 通知が1件失敗しても他の通知は続行し、例外は投げずログのみに記録します
+ * (お問い合わせ自体はNotionへの保存時点で成功しているため)。
+ */
+async function sendNotifications(
+  payload: { name: string; email: string; message: string },
+  locals: APIContext['locals']
+): Promise<void> {
+  const discordWebhookUrl = pickEnv(
+    locals,
+    'DISCORD_WEBHOOK_URL',
+    import.meta.env.DISCORD_WEBHOOK_URL
+  );
+  // 管理者宛通知用のZap(Catch Hook → Outlookで自分宛に送信)
+  const zapierAdminWebhookUrl = pickEnv(
+    locals,
+    'ZAPIER_ADMIN_WEBHOOK_URL',
+    import.meta.env.ZAPIER_ADMIN_WEBHOOK_URL
+  );
+  // 自動返信用のZap(Catch Hook → Outlookで問い合わせ者宛に送信)
+  const zapierAutoreplyWebhookUrl = pickEnv(
+    locals,
+    'ZAPIER_AUTOREPLY_WEBHOOK_URL',
+    import.meta.env.ZAPIER_AUTOREPLY_WEBHOOK_URL
+  );
+
+  const tasks: Promise<void>[] = [];
+
+  if (discordWebhookUrl) {
+    tasks.push(notifyDiscord(payload, discordWebhookUrl));
+  }
+  if (zapierAdminWebhookUrl) {
+    tasks.push(notifyZapier(payload, zapierAdminWebhookUrl));
+  }
+  if (zapierAutoreplyWebhookUrl) {
+    tasks.push(notifyZapier(payload, zapierAutoreplyWebhookUrl));
+  }
+
+  const results = await Promise.allSettled(tasks);
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      console.error('[api/contact] 通知の送信に失敗しました:', result.reason);
+    }
   }
 }
 
@@ -133,6 +182,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
         ),
       }
     );
+
+    // 通知はベストエフォート: Notionへの保存は既に成功しているため、
+    // ここで失敗してもユーザーへは成功として返し、ログにのみ記録する。
+    await sendNotifications({ name, email, message }, locals);
+
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
