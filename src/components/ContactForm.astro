@@ -85,7 +85,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     </button>
   </div>
 
-  <p id="form-status" role="status" class="font-mono text-sm"></p>
+  <p id="form-status" role="status" class="font-mono text-sm text-center"></p>
 </form>
 
 {turnstileSiteKey && (
@@ -153,7 +153,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       });
 
       if (res.ok) {
-        status.textContent = '送信しました。ありがとうございます。折り返しご連絡いたします。';
+        status.textContent = '送信しました。ご入力いただいたメールアドレス宛に自動返信メールをお送りしましたので、ご確認ください。';
         status.className = 'font-mono text-sm text-indigo';
         form.reset();
         if (loadedAtInput) loadedAtInput.value = String(Date.now());
