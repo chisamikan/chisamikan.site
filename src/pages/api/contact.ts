@@ -12,13 +12,20 @@ function isValidEmail(value: string): boolean {
 }
 
 /**
- * Cloudflareのランタイム環境(Astro.locals.runtime.env)から値を取得します。
- * ビルド時とリクエスト実行時で参照できる環境変数の設定先がCloudflare側で異なる場合があるため、
- * ランタイム値を優先しつつ、無ければビルド時の import.meta.env にフォールバックします。
+ * Cloudflareのランタイム環境(Astro.locals.runtime.env)の値を優先し、
+ * 無ければビルド時に静的展開された import.meta.env の値にフォールバックします。
+ *
+ * 注意: `import.meta.env[key]` のような動的プロパティアクセスは、Viteのビルド時
+ * 静的置換の対象にならず常に undefined になるため、buildTimeValue は
+ * 呼び出し側で `import.meta.env.NOTION_TOKEN` のように直接指定してもらう必要があります。
  */
-function getEnvValue(locals: APIContext['locals'], key: string): string | undefined {
+function pickEnv(
+  locals: APIContext['locals'],
+  key: string,
+  buildTimeValue: string | undefined
+): string | undefined {
   const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })?.runtime?.env;
-  return runtimeEnv?.[key] || (import.meta.env as unknown as Record<string, string>)[key];
+  return runtimeEnv?.[key] || buildTimeValue;
 }
 
 /**
@@ -28,10 +35,8 @@ function getEnvValue(locals: APIContext['locals'], key: string): string | undefi
 async function verifyTurnstile(
   token: string,
   remoteIp: string | null,
-  secret: string | undefined
+  secret: string
 ): Promise<boolean> {
-  if (!secret) return true;
-
   const form = new URLSearchParams();
   form.set('secret', secret);
   form.set('response', token);
@@ -85,7 +90,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   // 3. Cloudflare Turnstile(secretが設定されている場合のみ検証)
-  const turnstileSecret = getEnvValue(locals, 'TURNSTILE_SECRET_KEY');
+  const turnstileSecret = pickEnv(
+    locals,
+    'TURNSTILE_SECRET_KEY',
+    import.meta.env.TURNSTILE_SECRET_KEY
+  );
   if (turnstileSecret) {
     if (!body.turnstileToken) {
       return new Response(JSON.stringify({ error: 'turnstile_missing' }), { status: 400 });
@@ -116,8 +125,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     await createContactEntry(
       { name, email, message },
       {
-        NOTION_TOKEN: getEnvValue(locals, 'NOTION_TOKEN'),
-        NOTION_CONTACT_DB_ID: getEnvValue(locals, 'NOTION_CONTACT_DB_ID'),
+        NOTION_TOKEN: pickEnv(locals, 'NOTION_TOKEN', import.meta.env.NOTION_TOKEN),
+        NOTION_CONTACT_DB_ID: pickEnv(
+          locals,
+          'NOTION_CONTACT_DB_ID',
+          import.meta.env.NOTION_CONTACT_DB_ID
+        ),
       }
     );
     return new Response(JSON.stringify({ ok: true }), {
@@ -126,10 +139,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   } catch (err) {
     // 実際の原因(トークン未設定/DB未共有/プロパティ名不一致など)を調査しやすいよう、
-    // レスポンスボディにも詳細を含める(ブラウザの開発者ツール > Network タブで確認可能)。
-    // 原因が判明し安定稼働したら、この detail は削除して問題ありません。
+    // レスポンスボディにも詳細を含める(値そのものは含めず、存在有無のみを診断情報として返す)。
+    // 原因が判明し安定稼働したら、この detail/diagnostics は削除して問題ありません。
     const detail = err instanceof Error ? err.message : String(err);
-    console.error('[api/contact] Notionへの書き込みに失敗しました:', detail);
-    return new Response(JSON.stringify({ error: 'server_error', detail }), { status: 500 });
+    const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })?.runtime?.env;
+    const diagnostics = {
+      hasLocalsRuntime: Boolean((locals as { runtime?: unknown })?.runtime),
+      hasRuntimeEnv: Boolean(runtimeEnv),
+      runtimeHasNotionToken: Boolean(runtimeEnv?.NOTION_TOKEN),
+      runtimeHasContactDbId: Boolean(runtimeEnv?.NOTION_CONTACT_DB_ID),
+      buildTimeHasNotionToken: Boolean(import.meta.env.NOTION_TOKEN),
+      buildTimeHasContactDbId: Boolean(import.meta.env.NOTION_CONTACT_DB_ID),
+    };
+    console.error('[api/contact] Notionへの書き込みに失敗しました:', detail, diagnostics);
+    return new Response(JSON.stringify({ error: 'server_error', detail, diagnostics }), {
+      status: 500,
+    });
   }
 };

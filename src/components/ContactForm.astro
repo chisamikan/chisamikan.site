@@ -145,11 +145,12 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
         } else if (body.error === 'missing_fields') {
           showError('未入力の項目があります。ご確認ください。');
         } else if (body.error === 'server_error') {
-          // 原因調査用: Notion API等の実際のエラー内容を表示する。
+          // 原因調査用: Notion API等の実際のエラー内容と診断情報を表示する。
           // 原因が判明し安定稼働したら、この分岐は削除して構いません。
+          const diag = body.diagnostics ? ` / diag: ${JSON.stringify(body.diagnostics)}` : '';
           showError(
             body.detail
-              ? `送信に失敗しました。(詳細: ${body.detail})`
+              ? `送信に失敗しました。(詳細: ${body.detail}${diag})`
               : '送信に失敗しました。時間をおいて再度お試しください。'
           );
         } else {
