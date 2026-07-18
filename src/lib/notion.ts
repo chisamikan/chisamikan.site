@@ -1,8 +1,5 @@
-import { Client, isFullPage, isFullBlock } from '@notionhq/client';
-import type {
-  PageObjectResponse,
-  BlockObjectResponse,
-} from '@notionhq/client/build/src/api-endpoints';
+import { Client, isFullPage } from '@notionhq/client';
+import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
 // ---------------------------------------------------------------------------
 // Notionクライアント
@@ -32,15 +29,6 @@ function imageProxyUrl(kind: 'gallery' | 'works' | 'profile', id: string): strin
 
 // --- 型定義 -----------------------------------------------------------------
 
-export type ProfileBlock =
-  | { type: 'heading'; level: 1 | 2 | 3; text: string }
-  | { type: 'paragraph'; text: string }
-  | { type: 'image'; url: string; caption: string }
-  | { type: 'quote'; text: string }
-  | { type: 'bulleted_list'; items: string[] }
-  | { type: 'numbered_list'; items: string[] }
-  | { type: 'divider' };
-
 export interface ArtworkItem {
   id: string;
   title: string;
@@ -63,77 +51,8 @@ export interface WorkItem {
   tags: string[];
 }
 
-// --- プロフィール -------------------------------------------------------------
-
-/**
- * 指定したNotionページのブロックを取得し、Astroで描画しやすい
- * シンプルな配列(ProfileBlock[])に変換します。
- */
-export async function getProfileBlocks(): Promise<ProfileBlock[]> {
-  const pageId = import.meta.env.NOTION_PROFILE_PAGE_ID;
-  if (!notion || !pageId) {
-    warnMissingToken('プロフィール');
-    return [
-      {
-        type: 'heading',
-        level: 2,
-        text: '（サンプル）はじめまして、イラストレーターです。',
-      },
-      {
-        type: 'paragraph',
-        text: 'NOTION_TOKEN と NOTION_PROFILE_PAGE_ID を設定すると、Notionページの内容がここに表示されます。',
-      },
-    ];
-  }
-
-  const blocks: BlockObjectResponse[] = [];
-  let cursor: string | undefined;
-  do {
-    const res = await notion.blocks.children.list({
-      block_id: pageId,
-      start_cursor: cursor,
-      page_size: 100,
-    });
-    for (const b of res.results) {
-      if (isFullBlock(b)) blocks.push(b);
-    }
-    cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined;
-  } while (cursor);
-
-  return blocks.map(blockToProfileBlock).filter((b): b is ProfileBlock => b !== null);
-}
-
 function richTextToPlain(richText: { plain_text: string }[]): string {
   return richText.map((t) => t.plain_text).join('');
-}
-
-function blockToProfileBlock(block: BlockObjectResponse): ProfileBlock | null {
-  switch (block.type) {
-    case 'heading_1':
-      return { type: 'heading', level: 1, text: richTextToPlain(block.heading_1.rich_text) };
-    case 'heading_2':
-      return { type: 'heading', level: 2, text: richTextToPlain(block.heading_2.rich_text) };
-    case 'heading_3':
-      return { type: 'heading', level: 3, text: richTextToPlain(block.heading_3.rich_text) };
-    case 'paragraph':
-      return { type: 'paragraph', text: richTextToPlain(block.paragraph.rich_text) };
-    case 'quote':
-      return { type: 'quote', text: richTextToPlain(block.quote.rich_text) };
-    case 'divider':
-      return { type: 'divider' };
-    case 'image': {
-      const img = block.image;
-      const url =
-        img.type === 'external' ? img.external.url : imageProxyUrl('profile', block.id);
-      return { type: 'image', url, caption: richTextToPlain(img.caption ?? []) };
-    }
-    case 'bulleted_list_item':
-      return { type: 'bulleted_list', items: [richTextToPlain(block.bulleted_list_item.rich_text)] };
-    case 'numbered_list_item':
-      return { type: 'numbered_list', items: [richTextToPlain(block.numbered_list_item.rich_text)] };
-    default:
-      return null;
-  }
 }
 
 // --- ギャラリー ---------------------------------------------------------------
