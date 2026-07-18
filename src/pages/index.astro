@@ -4,7 +4,6 @@ import SectionHeading from '../components/SectionHeading.astro';
 import ArtworkCard from '../components/ArtworkCard.astro';
 import WorkItemCard from '../components/WorkItemCard.astro';
 import NewsItem from '../components/NewsItem.astro';
-import MarkerUnderline from '../components/MarkerUnderline.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import SnsLinks from '../components/SnsLinks.astro';
 import ContactForm from '../components/ContactForm.astro';
@@ -48,9 +47,8 @@ const heroImages =
       <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-paper/80">
         Latest News
       </p>
-      <h2 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
+      <h2 class="heading-lines before:border-paper after:border-paper self-center font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
         お知らせ
-        <MarkerUnderline class="!-bottom-3 !h-4" />
       </h2>
       {news.length > 0 ? (
         <ul class="mt-8 max-w-xl">
@@ -95,7 +93,7 @@ const heroImages =
 
   <!-- ギャラリー抜粋(スケッチをピンで留めたような配置) -->
   <section id="gallery" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
-    <SectionHeading eyebrow="Selected Works" title="ギャラリー" color="marker" />
+    <SectionHeading eyebrow="Selected Works" title="ギャラリー" />
     <div class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item, i) => (
         <ArtworkCard item={item} tilt={tilts[i % tilts.length]} />
@@ -111,7 +109,7 @@ const heroImages =
 
   <!-- プロフィール -->
   <section id="profile" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="About" title="プロフィール" color="marker" />
+    <SectionHeading eyebrow="About" title="プロフィール" />
     <div class="max-w-2xl">
       <ProfileContent />
       <SnsLinks />
@@ -120,7 +118,7 @@ const heroImages =
 
   <!-- 仕事履歴(最新3件・PCでは3カラム表示) -->
   <section id="works" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Career" title="仕事履歴" color="indigo" />
+    <SectionHeading eyebrow="Career" title="仕事履歴" />
     {latestWorks.length > 0 ? (
       <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
         {latestWorks.map((item) => <WorkItemCard item={item} />)}
@@ -138,7 +136,7 @@ const heroImages =
 
   <!-- お問い合わせ -->
   <section id="contact" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Get in touch" title="お問い合わせ" color="marker" />
+    <SectionHeading eyebrow="Get in touch" title="お問い合わせ" />
     <div class="max-w-2xl">
       <p class="mb-10 text-sm leading-relaxed text-ink/70">
         お仕事のご依頼・ご質問はこちらのフォームからお送りください。内容を確認のうえ、

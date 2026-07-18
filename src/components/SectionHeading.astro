@@ -1,22 +1,18 @@
 ---
-import MarkerUnderline from './MarkerUnderline.astro';
-
 interface Props {
   eyebrow?: string;
   title: string;
-  color?: 'marker' | 'indigo';
   level?: 1 | 2;
 }
-const { eyebrow, title, color = 'marker', level = 2 } = Astro.props;
+const { eyebrow, title, level = 2 } = Astro.props;
 const Tag = `h${level}` as 'h1' | 'h2';
 ---
 
-<div class="mb-10">
+<div class="mb-10 text-center">
   {eyebrow && (
     <p class="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-graphite">{eyebrow}</p>
   )}
-  <Tag class="marker-heading text-3xl font-semibold sm:text-4xl">
+  <Tag class="heading-lines before:border-ink after:border-ink text-3xl font-semibold sm:text-4xl">
     {title}
-    <MarkerUnderline color={color} />
   </Tag>
 </div>
