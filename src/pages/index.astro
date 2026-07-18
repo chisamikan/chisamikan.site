@@ -9,6 +9,7 @@ import ProfileContent from '../components/ProfileContent.astro';
 import SnsLinks from '../components/SnsLinks.astro';
 import ContactForm from '../components/ContactForm.astro';
 import Lightbox from '../components/Lightbox.astro';
+import HeroSlideshow from '../components/HeroSlideshow.astro';
 import { getGalleryItems, getWorkHistory } from '../lib/notion';
 import { getNewsItems } from '../lib/rss';
 import { site } from '../lib/config';
@@ -23,10 +24,15 @@ const featuredGallery = gallery.slice(0, 3);
 const latestWorks = works.slice(0, 3);
 const tilts: Array<'1.5' | '-1.5' | '2.5'> = ['-1.5', '2.5', '1.5'];
 
-// ファーストビューの全画面イラスト: ギャラリーの先頭作品(NSFWは除外)があればそれを、
-// なければ用意したイラストをフォールバックとして使用する
-const heroImage =
-  gallery.find((item) => !item.nsfw && item.imageUrl)?.imageUrl ?? '/images/hero-illustration.svg';
+// ファーストビューの全画面イラスト: ギャラリーで「slideshow」がオンの作品(NSFWは除外)を
+// スライドショー表示する。対象が無ければ先頭作品、それも無ければ用意したイラストを使用する
+const slideshowImages = gallery
+  .filter((item) => item.slideshow && !item.nsfw && item.imageUrl)
+  .map((item) => item.imageUrl as string);
+const heroImages =
+  slideshowImages.length > 0
+    ? slideshowImages
+    : [gallery.find((item) => !item.nsfw && item.imageUrl)?.imageUrl ?? '/images/hero-illustration.svg'];
 ---
 
 <BaseLayout>
@@ -35,11 +41,7 @@ const heroImage =
 
   <!-- ファーストビュー: 全画面イラスト -->
   <section class="relative h-[100svh] w-full overflow-hidden">
-    <img
-      src={heroImage}
-      alt="ファーストビューのイラスト"
-      class="absolute inset-0 h-full w-full object-cover"
-    />
+    <HeroSlideshow images={heroImages} />
     <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/5"></div>
 
     <div class="relative z-10 mx-auto flex h-full max-w-5xl flex-col justify-end px-6 pb-20 pt-16 sm:pb-24">

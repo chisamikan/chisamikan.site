@@ -49,6 +49,7 @@ export interface ArtworkItem {
   description: string;
   date: string | null;
   nsfw: boolean;
+  slideshow: boolean;
 }
 
 export interface WorkItem {
@@ -141,7 +142,7 @@ function blockToProfileBlock(block: BlockObjectResponse): ProfileBlock | null {
  * ギャラリー用データベースを取得します。
  * Notion側のプロパティ名(想定):
  *   Name(title) / Image(files) / Tags(multi_select) / Description(rich_text) /
- *   Date(date) / Published(checkbox) / NSFW(checkbox)
+ *   Date(date) / Published(checkbox) / NSFW(checkbox) / Slideshow(checkbox)
  */
 export async function getGalleryItems(): Promise<ArtworkItem[]> {
   const dbId = import.meta.env.NOTION_GALLERY_DB_ID;
@@ -181,7 +182,10 @@ function pageToArtwork(page: PageObjectResponse): ArtworkItem {
 
   const nsfw = props.NSFW?.type === 'checkbox' ? props.NSFW.checkbox : false;
 
-  return { id: page.id, title, imageUrl, tags, description, date, nsfw };
+  const slideshow =
+    props.Slideshow?.type === 'checkbox' ? props.Slideshow.checkbox : false;
+
+  return { id: page.id, title, imageUrl, tags, description, date, nsfw, slideshow };
 }
 
 const sampleGallery: ArtworkItem[] = [
@@ -193,6 +197,7 @@ const sampleGallery: ArtworkItem[] = [
     description: 'NOTION_GALLERY_DB_ID を設定するとNotionの作品がここに並びます。',
     date: '2026-01-01',
     nsfw: false,
+    slideshow: true,
   },
 ];
 

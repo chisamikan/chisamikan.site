@@ -1,0 +1,41 @@
+---
+// ファーストビューの全画面イラストをスライドショー表示する。
+// 画像が1枚のみの場合は静止画のまま(不要なアニメーションを避ける)。
+interface Props {
+  images: string[];
+}
+
+const { images } = Astro.props;
+---
+
+<div class="hero-slideshow absolute inset-0 h-full w-full">
+  {images.map((src, i) => (
+    <img
+      src={src}
+      alt="ファーストビューのイラスト"
+      class="hero-slide absolute inset-0 h-full w-full object-cover"
+      style={i === 0 ? undefined : 'opacity: 0;'}
+    />
+  ))}
+</div>
+
+<style>
+  .hero-slide {
+    transition: opacity 1.2s ease;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.hero-slideshow').forEach((container) => {
+    const slides = container.querySelectorAll<HTMLImageElement>('.hero-slide');
+    if (slides.length <= 1) return;
+
+    let current = 0;
+    setInterval(() => {
+      const next = (current + 1) % slides.length;
+      slides[current].style.opacity = '0';
+      slides[next].style.opacity = '1';
+      current = next;
+    }, 5000);
+  });
+</script>
