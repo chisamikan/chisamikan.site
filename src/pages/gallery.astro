@@ -14,7 +14,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     <SectionHeading eyebrow="Gallery" title="ギャラリー" level={1} />
 
     {tags.length > 0 && (
-      <div class="mb-10 flex flex-wrap gap-2" role="group" aria-label="タグで絞り込み">
+      <div class="mb-10 flex flex-wrap justify-center gap-2" role="group" aria-label="タグで絞り込み">
         <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
           すべて
         </button>
