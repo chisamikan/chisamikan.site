@@ -39,28 +39,44 @@ const heroImage =
 
     <div class="relative z-10 mx-auto flex h-full max-w-5xl flex-col justify-end px-6 pb-20 pt-16 sm:pb-24">
       <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-paper/80">
-        Illustration Portfolio
+        Latest News
       </p>
       <h1 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
-        紙とインクの<br class="sm:hidden" />あいだで、絵を描いています。
+        お知らせ
         <MarkerUnderline class="!-bottom-3 !h-4" />
       </h1>
-      <p class="mt-8 max-w-xl text-base leading-relaxed text-paper/85 sm:text-lg">
-        キャラクターデザインから書籍装画まで、線と色でものがたりを描くイラストレーターです。
-        日々のスケッチと、これまでのお仕事をこのサイトにまとめています。
-      </p>
+      {news.length > 0 ? (
+        <ul class="mt-8 max-w-xl">
+          {news.slice(0, 3).map((item) => (
+            <li class="border-b border-paper/20 py-3 first:pt-0 last:border-b-0">
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+              >
+                {item.date && (
+                  <span class="shrink-0 font-mono text-xs text-paper/60">
+                    {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                  </span>
+                )}
+                <span class="text-paper/90 transition-colors group-hover:text-marker">
+                  {item.title}
+                  <span class="ml-1 text-paper/60">&#8599;</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-8 max-w-xl text-base leading-relaxed text-paper/85 sm:text-lg">お知らせはまだありません。</p>
+      )}
       <div class="mt-8 flex flex-wrap gap-3">
         <a
-          href="/gallery"
+          href="#news"
           class="rounded-sm bg-marker px-5 py-2.5 font-mono text-sm text-white transition-transform hover:-translate-y-0.5"
         >
-          ギャラリーを見る
-        </a>
-        <a
-          href="/#contact"
-          class="rounded-sm border border-paper/50 px-5 py-2.5 font-mono text-sm text-paper transition-colors hover:border-paper hover:bg-paper/10"
-        >
-          お仕事の依頼をする
+          お知らせをもっと見る
         </a>
       </div>
     </div>
@@ -70,22 +86,8 @@ const heroImage =
     </div>
   </section>
 
-  <!-- お知らせ(最新5件) -->
-  <section id="news" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
-    <SectionHeading eyebrow="Latest" title="お知らせ" color="indigo" />
-    <div class="max-w-2xl">
-      {news.length > 0 ? (
-        <ul>
-          {news.map((item) => <NewsItem item={item} />)}
-        </ul>
-      ) : (
-        <p class="font-mono text-sm text-graphite">お知らせはまだありません。</p>
-      )}
-    </div>
-  </section>
-
   <!-- ギャラリー抜粋(スケッチをピンで留めたような配置) -->
-  <section id="gallery" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+  <section id="gallery" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
     <SectionHeading eyebrow="Selected Works" title="ギャラリー" color="marker" />
     <div class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item, i) => (
