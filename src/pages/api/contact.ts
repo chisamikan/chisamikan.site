@@ -1,6 +1,7 @@
 import type { APIContext, APIRoute } from 'astro';
 import { createContactEntry } from '../../lib/notion';
 import { notifyDiscord, notifyZapier } from '../../lib/notify';
+import { pickEnv } from '../../lib/env';
 
 // このエンドポイントだけは事前ビルド(静的化)せず、Cloudflare上でリクエストごとに実行します。
 export const prerender = false;
@@ -10,23 +11,6 @@ const MIN_SUBMIT_MS = 3000;
 
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-/**
- * Cloudflareのランタイム環境(Astro.locals.runtime.env)の値を優先し、
- * 無ければビルド時に静的展開された import.meta.env の値にフォールバックします。
- *
- * 注意: `import.meta.env[key]` のような動的プロパティアクセスは、Viteのビルド時
- * 静的置換の対象にならず常に undefined になるため、buildTimeValue は
- * 呼び出し側で `import.meta.env.NOTION_TOKEN` のように直接指定してもらう必要があります。
- */
-function pickEnv(
-  locals: APIContext['locals'],
-  key: string,
-  buildTimeValue: string | undefined
-): string | undefined {
-  const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })?.runtime?.env;
-  return runtimeEnv?.[key] || buildTimeValue;
 }
 
 /**

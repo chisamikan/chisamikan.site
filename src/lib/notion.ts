@@ -19,6 +19,17 @@ function warnMissingToken(context: string) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Notionへ独自にアップロードした画像(file.type === 'file')のURLは
+// 署名付きで数時間程度で失効し、ビルド時(SSG)に埋め込むと表示されなくなる。
+// そのためURLをそのまま使わず、リクエストの都度Notionから最新URLを
+// 取得し直す /api/image/[kind]/[id] 経由のパスに差し替える。
+// (外部URL(file.type === 'external')は失効しないためそのまま使用する)
+// ---------------------------------------------------------------------------
+function imageProxyUrl(kind: 'gallery' | 'works' | 'profile', id: string): string {
+  return `/api/image/${kind}/${id}`;
+}
+
 // --- 型定義 -----------------------------------------------------------------
 
 export type ProfileBlock =
@@ -111,7 +122,8 @@ function blockToProfileBlock(block: BlockObjectResponse): ProfileBlock | null {
       return { type: 'divider' };
     case 'image': {
       const img = block.image;
-      const url = img.type === 'external' ? img.external.url : img.file.url;
+      const url =
+        img.type === 'external' ? img.external.url : imageProxyUrl('profile', block.id);
       return { type: 'image', url, caption: richTextToPlain(img.caption ?? []) };
     }
     case 'bulleted_list_item':
@@ -156,7 +168,7 @@ function pageToArtwork(page: PageObjectResponse): ArtworkItem {
   let imageUrl: string | null = null;
   if (props.Image?.type === 'files' && props.Image.files.length > 0) {
     const file = props.Image.files[0];
-    imageUrl = file.type === 'external' ? file.external.url : file.file.url;
+    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('gallery', page.id);
   }
 
   const tags =
@@ -223,7 +235,7 @@ function pageToWork(page: PageObjectResponse): WorkItem {
   let imageUrl: string | null = null;
   if (props.Image?.type === 'files' && props.Image.files.length > 0) {
     const file = props.Image.files[0];
-    imageUrl = file.type === 'external' ? file.external.url : file.file.url;
+    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('works', page.id);
   }
 
   const tags =
