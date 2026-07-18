@@ -29,8 +29,9 @@ const hasImage = Boolean(item.imageUrl);
         ]}
       />
       {item.nsfw && (
-        <span class="absolute inset-0 flex items-center justify-center bg-ink/35">
-          <span class="rounded-full bg-ink/85 px-3 py-1 font-mono text-xs uppercase tracking-widest text-paper">
+        // 画像の上に重ねる固定の暗幕バッジなので、ページのテーマに関わらず black/white で統一する
+        <span class="absolute inset-0 flex items-center justify-center bg-black/35">
+          <span class="rounded-full bg-black/85 px-3 py-1 font-mono text-xs uppercase tracking-widest text-white">
             NSFW
           </span>
         </span>
@@ -50,7 +51,7 @@ const hasImage = Boolean(item.imageUrl);
       {item.tags.length > 0 && (
         <ul class="flex flex-wrap gap-1.5">
           {item.tags.map((tag) => (
-            <li class="rounded-full border border-ink/10 bg-white/40 px-2.5 py-0.5 font-mono text-[11px] text-ink/70 backdrop-blur-sm">
+            <li class="rounded-full border border-ink/30 px-2.5 py-0.5 font-mono text-[11px] text-ink/80">
               {tag}
             </li>
           ))}

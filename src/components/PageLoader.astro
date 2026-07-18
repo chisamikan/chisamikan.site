@@ -30,8 +30,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    background-color: #faf7f0;
-    background-image: radial-gradient(circle at 1px 1px, rgba(34, 31, 27, 0.055) 1px, transparent 0);
+    background-color: rgb(var(--color-paper));
+    background-image: radial-gradient(circle at 1px 1px, rgb(var(--color-ink) / 0.055) 1px, transparent 0);
     background-size: 22px 22px;
     transition: opacity 420ms ease, visibility 420ms ease;
   }
@@ -59,7 +59,7 @@
     font-size: 0.7rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: rgba(34, 31, 27, 0.55);
+    color: rgb(var(--color-ink) / 0.55);
   }
 
   @keyframes page-loader-spin {

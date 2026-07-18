@@ -16,6 +16,15 @@ const pageTitle = title ? `${title} | ${site.title}` : site.title;
 <!doctype html>
 <html lang="ja" class="no-js">
   <head>
+    <script is:inline>
+      // 初回描画前にテーマを確定させ、ちらつき(FOUC)を防ぐ。
+      // 明示的な保存済み設定(localStorage)があればそれを優先し、無ければ端末の設定(prefers-color-scheme)に従う。
+      (function () {
+        var stored = localStorage.getItem('theme');
+        var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', isDark);
+      })();
+    </script>
     <script>
       document.documentElement.classList.remove('no-js');
     </script>

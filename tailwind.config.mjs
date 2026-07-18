@@ -1,23 +1,35 @@
 /** @type {import('tailwindcss').Config} */
+
+// paper/ink/graphite はライト/ダークで値が入れ替わるCSS変数(--color-*)経由にし、
+// コンポーネント側のクラス(bg-paper, text-ink 等)を書き換えずにテーマ切替できるようにする。
+// アクセントカラーはどちらのテーマでも視認性が保てるため固定値のまま。
+function withOpacity(variableName) {
+  return ({ opacityValue }) =>
+    opacityValue === undefined
+      ? `rgb(var(${variableName}))`
+      : `rgb(var(${variableName}) / ${opacityValue})`;
+}
+
 export default {
+  darkMode: 'class',
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
       colors: {
         paper: {
-          DEFAULT: '#FAF7F0',
-          dim: '#F1ECE0',
+          DEFAULT: withOpacity('--color-paper'),
+          dim: withOpacity('--color-paper-dim'),
         },
         ink: {
-          DEFAULT: '#221F1B',
-          soft: '#453F37',
+          DEFAULT: withOpacity('--color-ink'),
+          soft: withOpacity('--color-ink-soft'),
         },
         accent: {
           DEFAULT: '#0099FF',
           dark: '#0077CC',
           light: '#4DB8FF',
         },
-        graphite: '#8C8578',
+        graphite: withOpacity('--color-graphite'),
       },
       fontFamily: {
         display: ['"Oswald"', '"Zen Kaku Gothic New"', 'sans-serif'],
