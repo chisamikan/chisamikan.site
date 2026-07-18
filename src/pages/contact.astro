@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+
+<BaseLayout title="Contact" description="お仕事のご依頼・ご質問はこちらのフォームからお送りください。">
+  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="Contact" title="お問い合わせ" level={1} />
+
+    <div class="request-content font-mono text-sm leading-relaxed text-ink">
+      <h2>ご依頼について</h2>
+
+      <h3>できること</h3>
+      <ul>
+        <li>イラストの制作</li>
+        <li>印刷物・グッズ・ロゴデザイン：主にBtoB企業での採用実績多数</li>
+        <li>
+          ウェブサイトの制作
+          <ul>
+            <li>ワイヤーフレーム（構成）～デザイン～コーディングまでトータルで製作可能です。</li>
+            <li>商品・サービスLPと企業・小売店ウェブサイトの経験多数。</li>
+            <li>個人開発のため、数ページ程度の小規模サイトのみ受け付けとなります。</li>
+          </ul>
+        </li>
+        <li>ライティング：大手ECサイトでの制作経験あり</li>
+      </ul>
+
+      <h3>できないこと</h3>
+      <ul>
+        <li>無償のご依頼</li>
+        <li>R18、R18Gに該当する作品の制作</li>
+        <li>ページ数の多い漫画の執筆（基本的に1～4p程度のみ可）</li>
+        <li>当方の作風とあまりにも異なるテイストの案件（予めpixiv等で作風をご確認いただいてからのご依頼をお願いします）</li>
+        <li>会員機能などの複雑な機能が含まれたり、ページ数の多いウェブサイトの制作（詳しくはお問い合わせフォームよりご相談ください）</li>
+      </ul>
+
+      <h3>イラスト・グラフィックデザインのご依頼について</h3>
+      <p>
+        個人・同人サークルの方は<a href="https://mitsumotto.com/u/chisamikan" target="_blank" rel="noopener noreferrer">こちら</a>からお見積りいただけます。<br>
+        企業・団体の方は、恐れ入りますがページ下部のお問い合わせフォームより直接ご相談ください。
+      </p>
+      <p>現在のスケジュールは以下の通りです。</p>
+      <div class="schedule-embed">
+        <iframe
+          src="https://mitsumotto.com/embed/chisamikan?months=6"
+          width="310"
+          height="115"
+          scrolling="no"
+          style="border:none; background:transparent;"
+          loading="lazy"
+          title="現在の受付スケジュール"
+        ></iframe>
+      </div>
+
+      <h3>ウェブサイト制作のご依頼について</h3>
+      <p>
+        現在は企業・団体様からのご依頼のみ受け付けております（個人・同人サークル不可）。<br>
+        ページ下部のお問い合わせフォームよりご相談ください。
+      </p>
+    </div>
+
+    <div class="mx-auto max-w-3xl text-center mt-16">
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .request-content h2 {
+    @apply mt-10 mb-4 border-l-4 border-accent pl-3 text-lg font-semibold first:mt-0;
+  }
+
+  .request-content h3 {
+    @apply mt-8 mb-3 font-semibold text-ink;
+  }
+
+  .request-content p {
+    @apply mb-4 text-graphite;
+  }
+
+  .request-content ul {
+    @apply mb-4 list-disc space-y-1.5 pl-6 text-graphite;
+  }
+
+  .request-content ul ul {
+    @apply mb-0 mt-1.5;
+  }
+
+  .request-content a {
+    @apply text-accent underline underline-offset-4 transition-colors hover:text-ink;
+  }
+
+  .schedule-embed {
+    @apply mb-4 flex justify-start;
+  }
+
+  .schedule-embed iframe {
+    @apply overflow-hidden bg-transparent;
+  }
+</style>

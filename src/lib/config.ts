@@ -10,7 +10,7 @@ export const nav = [
   { href: '/gallery', label: 'Gallery' },
   { href: '/#profile', label: 'Profile' },
   { href: '/works', label: 'Works' },
-  { href: '/#contact', label: 'Contact' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export const snsLinks = [

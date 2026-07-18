@@ -6,7 +6,6 @@ import WorkItemCard from '../components/WorkItemCard.astro';
 import NewsItem from '../components/NewsItem.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import SnsLinks from '../components/SnsLinks.astro';
-import ContactForm from '../components/ContactForm.astro';
 import Lightbox from '../components/Lightbox.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
 import { getGalleryItems, getWorkHistory } from '../lib/notion';
@@ -127,18 +126,6 @@ const heroImages =
       <a href="/works" class="btn-glass btn-glass-accent">
         仕事履歴をすべて見る &rarr;
       </a>
-    </div>
-  </section>
-
-  <!-- お問い合わせ -->
-  <section id="contact" class="mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Contact" title="お問い合わせ" />
-    <div class="mx-auto max-w-2xl text-center">
-      <p class="mb-10 text-sm leading-relaxed text-ink/70">
-        お仕事のご依頼・ご質問はこちらのフォームからお送りください。<br>
-		内容を確認のうえ、折り返しご連絡いたします。
-      </p>
-      <ContactForm />
     </div>
   </section>
 
