@@ -4,8 +4,10 @@ import WorkThumbnail from './WorkThumbnail.astro';
 
 interface Props {
   item: WorkItem;
+  headingLevel?: 2 | 3;
 }
-const { item } = Astro.props;
+const { item, headingLevel = 3 } = Astro.props;
+const Tag = `h${headingLevel}` as 'h2' | 'h3';
 
 function formatPeriod(start: string | null, end: string | null) {
   const fmt = (d: string) =>
@@ -23,7 +25,7 @@ function formatPeriod(start: string | null, end: string | null) {
 
     <div class="min-w-0 flex-1">
       <p class="font-mono text-xs text-graphite">{formatPeriod(item.periodStart, item.periodEnd)}</p>
-      <h3 class="mt-1 font-display text-xl font-semibold text-ink">{item.client}</h3>
+      <Tag class="mt-1 font-display text-xl font-semibold text-ink">{item.client}</Tag>
       {item.role && <p class="mt-0.5 text-sm font-medium text-indigo">{item.role}</p>}
 
       {item.tags.length > 0 && (

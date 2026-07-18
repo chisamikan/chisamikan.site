@@ -10,6 +10,7 @@ import ContactForm from '../components/ContactForm.astro';
 import Lightbox from '../components/Lightbox.astro';
 import { getGalleryItems, getWorkHistory } from '../lib/notion';
 import { getNewsItems } from '../lib/rss';
+import { site } from '../lib/config';
 
 const [gallery, works, news] = await Promise.all([
   getGalleryItems(),
@@ -28,6 +29,9 @@ const heroImage =
 ---
 
 <BaseLayout>
+  <!-- ページ全体のh1: 視覚的には非表示だが、ページの主題(サイト/作者)を検索エンジンとスクリーンリーダーに伝える -->
+  <h1 class="sr-only">{site.description}</h1>
+
   <!-- ファーストビュー: 全画面イラスト -->
   <section class="relative h-[100svh] w-full overflow-hidden">
     <img
@@ -41,10 +45,10 @@ const heroImage =
       <p class="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-paper/80">
         Latest News
       </p>
-      <h1 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
+      <h2 class="marker-heading relative inline-block font-display text-4xl font-semibold leading-[1.15] tracking-tight text-paper sm:text-6xl">
         お知らせ
         <MarkerUnderline class="!-bottom-3 !h-4" />
-      </h1>
+      </h2>
       {news.length > 0 ? (
         <ul class="mt-8 max-w-xl">
           {news.slice(0, 3).map((item) => (

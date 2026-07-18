@@ -4,8 +4,10 @@ import type { ArtworkItem } from '../lib/notion';
 interface Props {
   item: ArtworkItem;
   tilt?: '1.5' | '-1.5' | '2.5' | '-2.5' | '0';
+  headingLevel?: 2 | 3;
 }
-const { item, tilt = '0' } = Astro.props;
+const { item, tilt = '0', headingLevel = 3 } = Astro.props;
+const Tag = `h${headingLevel}` as 'h2' | 'h3';
 const tiltClass =
   tilt === '0'
     ? ''
@@ -50,7 +52,7 @@ const hasImage = Boolean(item.imageUrl);
     </div>
   )}
   <figcaption class="border-t border-ink/10 p-4">
-    <h3 class="font-display text-lg font-medium leading-snug text-ink">{item.title}</h3>
+    <Tag class="font-display text-lg font-medium leading-snug text-ink">{item.title}</Tag>
     {item.description && (
       <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>
     )}

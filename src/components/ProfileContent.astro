@@ -22,12 +22,17 @@ const headingSizeClass: Record<1 | 2 | 3, string> = {
   2: 'text-2xl sm:text-3xl',
   3: 'text-xl sm:text-2xl',
 };
+
+// このコンポーネントはページ側の h2(プロフィール)の下にネストされるため、
+// Notionの見出しレベルをそのままH1/H2として出力すると見出し階層が崩れる。
+// H1→H3, H2→H4, H3→H5 にずらして親のh2に対する子見出しとして扱う。
+const headingTagLevel: Record<1 | 2 | 3, 3 | 4 | 5> = { 1: 3, 2: 4, 3: 5 };
 ---
 
 <div class="prose-custom space-y-6">
   {grouped.map((block) => {
     if (block.type === 'heading') {
-      const Tag = `h${block.level}` as 'h1' | 'h2' | 'h3';
+      const Tag = `h${headingTagLevel[block.level]}` as 'h3' | 'h4' | 'h5';
       return (
         <Tag
           class:list={[

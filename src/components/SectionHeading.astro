@@ -5,16 +5,18 @@ interface Props {
   eyebrow?: string;
   title: string;
   color?: 'marker' | 'indigo';
+  level?: 1 | 2;
 }
-const { eyebrow, title, color = 'marker' } = Astro.props;
+const { eyebrow, title, color = 'marker', level = 2 } = Astro.props;
+const Tag = `h${level}` as 'h1' | 'h2';
 ---
 
 <div class="mb-10">
   {eyebrow && (
     <p class="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-graphite">{eyebrow}</p>
   )}
-  <h2 class="marker-heading text-3xl font-semibold sm:text-4xl">
+  <Tag class="marker-heading text-3xl font-semibold sm:text-4xl">
     {title}
     <MarkerUnderline color={color} />
-  </h2>
+  </Tag>
 </div>
