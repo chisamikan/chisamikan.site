@@ -27,8 +27,12 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     )}
 
     <div id="gallery-grid" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <div class="h-full" data-tags={item.tags.join('|')}>
+      {items.map((item, index) => (
+        <div
+          class="reveal h-full"
+          data-tags={item.tags.join('|')}
+          style={`transition-delay: ${(index % 3) * 100}ms`}
+        >
           <ArtworkCard item={item} headingLevel={2} />
         </div>
       ))}

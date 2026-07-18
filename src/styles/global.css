@@ -79,4 +79,30 @@
       transform: none !important;
     }
   }
+
+  /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる。JS(IntersectionObserver)が
+     .is-visible を付与するまでは非表示にしておくが、JS未対応環境では .no-js で常に表示する */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1), transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .no-js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
 }
