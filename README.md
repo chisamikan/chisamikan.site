@@ -19,4 +19,4 @@
 　　　　　　。　　　　　　　　　　　　　　　　　ﾟ　　　.　　　　　　　　　　　。  
 　,　.　　　　　　　　.　　　　　　　　　　　,　　　　　　　.  
  
-© 2021 Chisamikan
+© 2026 Chisamikan
