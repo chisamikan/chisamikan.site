@@ -3,13 +3,8 @@
 // paper/ink/graphite はライト/ダークで値が入れ替わるCSS変数(--color-*)経由にし、
 // コンポーネント側のクラス(bg-paper, text-ink 等)を書き換えずにテーマ切替できるようにする。
 // アクセントカラーはどちらのテーマでも視認性が保てるため固定値のまま。
-function withOpacity(variableName) {
-  return ({ opacityValue }) =>
-    opacityValue === undefined
-      ? `rgb(var(${variableName}))`
-      : `rgb(var(${variableName}) / ${opacityValue})`;
-}
-
+// Tailwind v4 の @config 互換レイヤーは関数値を解決できないため、
+// <alpha-value> プレースホルダを使った文字列形式で定義する。
 export default {
   darkMode: 'class',
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
@@ -17,19 +12,19 @@ export default {
     extend: {
       colors: {
         paper: {
-          DEFAULT: withOpacity('--color-paper'),
-          dim: withOpacity('--color-paper-dim'),
+          DEFAULT: 'rgb(var(--color-paper) / <alpha-value>)',
+          dim: 'rgb(var(--color-paper-dim) / <alpha-value>)',
         },
         ink: {
-          DEFAULT: withOpacity('--color-ink'),
-          soft: withOpacity('--color-ink-soft'),
+          DEFAULT: 'rgb(var(--color-ink) / <alpha-value>)',
+          soft: 'rgb(var(--color-ink-soft) / <alpha-value>)',
         },
         accent: {
           DEFAULT: '#0099FF',
           dark: '#0077CC',
           light: '#4DB8FF',
         },
-        graphite: withOpacity('--color-graphite'),
+        graphite: 'rgb(var(--color-graphite) / <alpha-value>)',
       },
       fontFamily: {
         display: ['"Oswald"', '"Zen Kaku Gothic New"', 'sans-serif'],

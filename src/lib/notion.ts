@@ -8,7 +8,7 @@ import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoint
 // ---------------------------------------------------------------------------
 const token = import.meta.env.NOTION_TOKEN;
 
-export const notion = token ? new Client({ auth: token }) : null;
+export const notion = token ? new Client({ auth: token, fetch: fetch.bind(globalThis) }) : null;
 
 function warnMissingToken(context: string) {
   console.warn(
@@ -220,7 +220,7 @@ export async function createContactEntry(
     );
   }
 
-  const client = new Client({ auth: runtimeToken });
+  const client = new Client({ auth: runtimeToken, fetch: fetch.bind(globalThis) });
 
   await client.pages.create({
     parent: { database_id: dbId },
