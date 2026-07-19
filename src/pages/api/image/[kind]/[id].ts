@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     return new Response('Notion is not configured', { status: 500 });
   }
 
-  const notion = new Client({ auth: token });
+  const notion = new Client({ auth: token, fetch: fetch.bind(globalThis) });
 
   try {
     let url: string | null = null;

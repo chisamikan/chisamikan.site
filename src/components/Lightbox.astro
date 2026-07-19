@@ -18,6 +18,11 @@
     border: none;
     background: transparent;
     overflow: visible;
+    /* Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
+       打ち消してしまうため、中央寄せを明示的に指定し直す */
+    position: fixed;
+    inset: 0;
+    margin: auto;
   }
 
   .lightbox-dialog::backdrop {

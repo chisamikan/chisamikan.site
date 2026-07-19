@@ -60,8 +60,16 @@ function isActive(href: string) {
           aria-pressed="false"
           class="flex h-9 w-9 shrink-0 items-center justify-center rounded text-ink/70 transition-colors hover:text-accent"
         >
-          <i class="fa-regular fa-moon dark:hidden" aria-hidden="true"></i>
-          <i class="fa-regular fa-sun hidden dark:inline" aria-hidden="true"></i>
+          <!--
+            FontAwesomeのCSSはTailwindのcascade layerの外側で読み込まれるため、
+            レイヤーに属さないスタイルは常にレイヤー内のユーティリティより優先されてしまう
+            (詳細: https://developer.mozilla.org/docs/Web/CSS/@layer)。
+            .fa-regular が display: inline-block を無条件に指定してくるため、
+            dark: の display 切り替えが効かず両方のアイコンが表示され続ける問題があった。
+            important修飾子(末尾の!)で明示的に優先させる。
+          -->
+          <i class="fa-regular fa-moon dark:hidden!" aria-hidden="true"></i>
+          <i class="fa-regular fa-sun hidden! dark:inline!" aria-hidden="true"></i>
         </button>
       </div>
     </div>
