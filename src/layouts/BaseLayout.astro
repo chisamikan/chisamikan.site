@@ -69,6 +69,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toStri
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+      dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-XZSD8BQ5DE');
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE"></script>
+	
   </head>
   <body>
     <PageLoader />
