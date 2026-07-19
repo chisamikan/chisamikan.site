@@ -1,0 +1,20 @@
+name: Notion更新の定期反映
+
+# Notion/RSSの内容はビルド時にしか取得されないため、
+# Cloudflare Workers BuildsのDeploy Hookを定期的に叩いて再ビルドをトリガーする。
+# (Deploy Hookの作成方法: Cloudflare Dashboard → Workers & Pages → 対象Worker →
+#  Settings → Builds → Deploy Hooks。発行されたURLをリポジトリのSecret
+#  `CF_DEPLOY_HOOK_URL` に登録しておくこと)
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloudflare Deploy Hookを叩いて再ビルドをトリガー
+        run: curl -sS -X POST -f "$CF_DEPLOY_HOOK_URL"
+        env:
+          CF_DEPLOY_HOOK_URL: ${{ secrets.CF_DEPLOY_HOOK_URL }}
