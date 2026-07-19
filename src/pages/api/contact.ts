@@ -180,9 +180,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    // 実際の原因(トークン未設定/DB未共有/プロパティ名不一致など)を調査しやすいよう、
-    // レスポンスボディにも詳細を含める(値そのものは含めず、存在有無のみを診断情報として返す)。
-    // 原因が判明し安定稼働したら、この detail/diagnostics は削除して問題ありません。
+    // 実際の原因(トークン未設定/DB未共有/プロパティ名不一致など)はサーバーログにのみ記録し、
+    // クライアントへは詳細を含めない(スタックトレース等の内部情報を露出させないため)。
     const detail = err instanceof Error ? err.message : String(err);
     const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })?.runtime?.env;
     const diagnostics = {
@@ -194,7 +193,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       buildTimeHasContactDbId: Boolean(import.meta.env.NOTION_CONTACT_DB_ID),
     };
     console.error('[api/contact] Notionへの書き込みに失敗しました:', detail, diagnostics);
-    return new Response(JSON.stringify({ error: 'server_error', detail, diagnostics }), {
+    return new Response(JSON.stringify({ error: 'server_error' }), {
       status: 500,
     });
   }
