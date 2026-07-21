@@ -5,7 +5,6 @@ import ArtworkCard from '../components/ArtworkCard.astro';
 import WorkItemCard from '../components/WorkItemCard.astro';
 import NewsTicker from '../components/NewsTicker.astro';
 import ProfileContent from '../components/ProfileContent.astro';
-import SnsLinks from '../components/SnsLinks.astro';
 import Lightbox from '../components/Lightbox.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
 import { getGalleryItems, getWorkHistory } from '../lib/notion';
@@ -117,7 +116,6 @@ const heroImages =
     <SectionHeading eyebrow="Profile" title="プロフィール" />
     <div class="mx-auto max-w-2xl text-center">
       <ProfileContent />
-      <SnsLinks />
     </div>
   </section>
 

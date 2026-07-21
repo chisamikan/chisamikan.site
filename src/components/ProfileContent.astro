@@ -1,6 +1,28 @@
 ---
 // プロフィールの内容はGit管理するためコード上に直接記述する
 // (以前はNotionページから取得していたが、変更履歴をGitで追えるようにするため廃止)
+import SnsLinks from './SnsLinks.astro';
+
+const skills = [
+  {
+    label: 'Softwares',
+    items: [
+      'CLIP STUDIO PAINT',
+      'Adobe Photoshop',
+      'Adobe Illustrator',
+      'Adobe Premiere',
+	  'Adobe InDesign',
+      'Adobe XD',
+      'Figma',
+      'Affinity',
+      'Visual Studio Code',
+    ],
+  },
+  {
+    label: 'Skills',
+    items: ['HTML', 'CSS', 'JavaScript', 'Git', 'Node.js', 'React', 'Vue.js', 'Astro', 'PHP'],
+  },
+];
 ---
 
 <div class="prose-custom space-y-6">
@@ -21,4 +43,19 @@
     インターネット絵とデザインと文マン。要するに器用貧乏。<br>
 	同人サークル『Pt.Spoon』・『Satellite Galaxy』主催。
   </p>
+  <SnsLinks />
+  <div class="space-y-4">
+    {skills.map((group) => (
+      <div>
+        <p class="text-center font-bold text-white">{group.label}</p>
+        <ul class="mt-1.5 flex flex-wrap justify-center gap-1.5">
+          {group.items.map((item) => (
+            <li class="rounded-full border border-ink/30 px-2.5 py-0.5 font-mono text-[11px] text-ink/80">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
 </div>
