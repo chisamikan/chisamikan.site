@@ -17,3 +17,8 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # @astrojs/check が TypeScript 7 系に対応するまでメジャー更新を保留
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
