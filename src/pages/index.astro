@@ -67,7 +67,7 @@ const heroImages =
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
-              class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+              class="no-external-icon group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
             >
               {item.date && (
                 <span class="shrink-0 font-mono text-xs text-graphite">
@@ -76,6 +76,7 @@ const heroImages =
               )}
               <span class="text-ink transition-colors group-hover:text-accent">
                 {item.title}
+                <i class="fa-solid fa-arrow-up-right-from-square ml-0.5 text-[0.8em]" aria-hidden="true"></i>
               </span>
             </a>
           </li>
