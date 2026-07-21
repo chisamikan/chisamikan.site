@@ -9,14 +9,18 @@ import ContactForm from '../components/ContactForm.astro';
     <SectionHeading eyebrow="Contact" title="お問い合わせ" level={1} />
 
     <div class="request-content font-mono text-sm leading-relaxed text-ink">
-      <h2>ご依頼について</h2>
+      <p>お問い合わせの前に、以下の内容をご一読ください。</p>
+
+      <details class="accordion-item">
+      <summary class="accordion-trigger"><h2><i class="fa-solid fa-paintbrush" aria-hidden="true"></i>ご依頼に関するお問い合わせ</h2></summary>
+      <div class="accordion-body">
 
       <h3>できること</h3>
       <ul>
         <li>イラストの制作</li>
         <li>印刷物・グッズ・ロゴデザイン：主にBtoB企業での採用実績多数</li>
         <li>
-          ウェブサイトの制作
+          ウェブサイトの制作（企業・団体様からのご依頼のみ）
           <ul>
             <li>ワイヤーフレーム（構成）～デザイン～コーディングまでトータルで製作可能です。</li>
             <li>商品・サービスLPと企業・小売店ウェブサイトの経験多数。</li>
@@ -28,36 +32,81 @@ import ContactForm from '../components/ContactForm.astro';
 
       <h3>できないこと</h3>
       <ul>
-        <li>無償のご依頼</li>
+        <li>無償でのご依頼</li>
         <li>R18、R18Gに該当する作品の制作</li>
         <li>ページ数の多い漫画の執筆（基本的に1～4p程度のみ可）</li>
         <li>当方の作風とあまりにも異なるテイストの案件（予め<a href="/gallery">ギャラリー</a>等で、作風をご確認いただいてからのご依頼をお願いします）</li>
         <li>会員機能などの複雑な機能が含まれたり、ページ数の多いウェブサイトの制作（詳しくはお問い合わせフォームよりご相談ください）</li>
       </ul>
 
-      <h3>イラスト・グラフィックデザインのご依頼について</h3>
-      <p>
-        個人・同人サークルの方は<a href="https://mitsumotto.com/u/chisamikan" target="_blank" rel="noopener noreferrer">こちら</a>からお見積りいただけます。<br>
-        企業・団体の方は、恐れ入りますがページ下部のお問い合わせフォームより直接ご相談ください。
-      </p>
-      <p>現在のスケジュールは以下の通りです。</p>
-      <div class="schedule-embed">
-        <iframe
-          src="https://mitsumotto.com/embed/chisamikan?months=6"
-          width="320"
-          height="115"
-          scrolling="no"
-          style="border:none; background:transparent;"
-          loading="lazy"
-          title="現在の受付スケジュール"
-        ></iframe>
-      </div>
+      <h3>個人・同人サークルの方</h3>
 
-      <h3>ウェブサイト制作のご依頼について</h3>
+      <h4>やり取り不要で構わないので、最安値で依頼したい</h4>
       <p>
-        現在は企業・団体様からのご依頼のみ受け付けております（個人・同人サークル不可）。<br>
-        ページ下部のお問い合わせフォームよりご相談ください。
+        <a href="https://skeb.jp/@chisamikan" target="_blank" rel="noopener noreferrer">Skeb</a>または<a href="https://www.pixiv.net/users/263417/request" target="_blank" rel="noopener noreferrer">pixivリクエスト</a>から直接ご依頼ください。
       </p>
+      <p>また、上記のサービスを初めて利用される方は、以下のガイドラインを予めご一読ください。</p>
+      <ul>
+        <li><a href="https://lp.skeb.jp/client" target="_blank" rel="noopener noreferrer">クライアントガイドライン | Skeb</a></li>
+      </ul>
+
+      <h5>Skeb・pixivリクエストに関するお問い合わせ</h5>
+      <p>
+        サービス側の規約により、お問い合わせをいただいても一切お答えすることができません。<br>
+        「〇〇は描けますか？」「〇〇に使いたいです」といった内容は、実際にSkeb・pixivリクエストからご依頼いただく際の依頼内容にご記入いただきますようお願いします。<br>
+        ラフ確認や修正、綿密なやり取りを希望される方は、お手数ですが<a href="https://tsunagu.cloud/products/117360" target="_blank" rel="noopener noreferrer">つなぐ</a>またはページ下部のお問い合わせフォームからご依頼ください。
+      </p>
+
+      <h4>多少高くなっても構わないので、ラフ確認や修正もお願いしたい</h4>
+      <h5>イラスト制作</h5>
+      <p>
+        <a href="https://tsunagu.cloud/products/117360" target="_blank" rel="noopener noreferrer">つなぐ</a>、またはページ下部のお問い合わせフォームからご依頼ください。<br>
+        個人・同人サークルの方は<a href="https://mitsumotto.com/u/chisamikan" target="_blank" rel="noopener noreferrer">こちら</a>からお見積りいただけます。
+      </p>
+
+      <h5>印刷物・グッズ・ロゴデザイン、ライティング</h5>
+      <p>ページ下部のお問い合わせフォームよりご相談ください。</p>
+
+	  <h5>For Overseas users</h5>
+      <p>
+        We sincerely apologize, but we only accept requests from overseas users via <a href="https://skeb.jp/@chisamikan" target="_blank" rel="noopener noreferrer">Skeb</a> and <a href="https://www.pixiv.net/users/263417/request" target="_blank" rel="noopener noreferrer">pixiv Request</a>.
+      </p>
+
+      <h3>企業・団体の方へ</h3>
+      <p>ページ下部のお問い合わせフォームよりご相談ください。</p>
+
+      </div>
+      </details>
+
+      <details class="accordion-item">
+      <summary class="accordion-trigger"><h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>BOOTH通販に関するお問い合わせ</h2></summary>
+      <div class="accordion-body">
+
+      <h3>BOOTHの自家通販（BOOTH倉庫及びpixivファクトリーから発送される商品を除く）に関するお問い合わせ</h3>
+      <p>
+        お手数ですがDiscordからではなく、BOOTHのお問い合わせフォームからお願いします。<br>
+        <a href="https://ptspoon.booth.pm/" target="_blank" rel="noopener noreferrer">こちら</a>のページ上部にございますメールアイコン✉️からお問い合わせフォームにアクセスできます。
+      </p>
+
+      <h3>BOOTH倉庫及びpixivファクトリーから発送される商品の発送に関するお問い合わせ</h3>
+      <p>
+        <a href="https://booth.pm/support" target="_blank" rel="noopener noreferrer">BOOTH事務局</a>へお問い合わせください。<br>
+        こちらは発送作業をBOOTH側に一任しており、私にお問い合わせいただいても出来ることがなく、返答いたしかねます。
+      </p>
+
+      </div>
+      </details>
+
+      <details class="accordion-item">
+      <summary class="accordion-trigger"><h2><i class="fa-solid fa-circle-question" aria-hidden="true"></i>その他お問い合わせ</h2></summary>
+      <div class="accordion-body">
+
+      <ul>
+        <li>サービスのご提案や一斉送信と思われるメッセージなど、内容によっては返信できない場合がございますので、予めご了承ください。</li>
+      </ul>
+
+      </div>
+      </details>
     </div>
 
     <div class="mx-auto max-w-3xl text-center mt-16">
@@ -69,20 +118,68 @@ import ContactForm from '../components/ContactForm.astro';
 <style>
   @reference '../styles/global.css';
 
+  .accordion-item {
+    @apply mb-4 overflow-hidden rounded-2xl border border-white/40 bg-white/20 backdrop-blur-xl transition-all duration-300;
+  }
+
+  .accordion-trigger {
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 hover:bg-white/25;
+  }
+
+  .accordion-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-trigger::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.55em;
+    height: 0.55em;
+    border-right: 2px solid theme('colors.accent.DEFAULT');
+    border-bottom: 2px solid theme('colors.accent.DEFAULT');
+    transform: rotate(45deg);
+    transition: transform 300ms ease;
+  }
+
+  details[open] > .accordion-trigger::after {
+    transform: rotate(-135deg);
+  }
+
+  .accordion-body {
+    @apply px-5 pb-5;
+  }
+
   .request-content h2 {
-    @apply mt-10 mb-4 border-l-4 border-accent pl-3 text-lg font-semibold first:mt-0;
+    @apply m-0 flex items-center gap-2.5 border-0 pl-0 text-base font-semibold sm:text-lg;
+  }
+
+  .request-content h2 i {
+    @apply text-accent;
   }
 
   .request-content h3 {
-    @apply mt-8 mb-3 font-semibold text-ink;
+    @apply mt-10 mb-4 border-l-4 border-accent pl-3 text-lg font-semibold first:mt-0;
+  }
+
+  .request-content h4 {
+    @apply mt-6 mb-3 flex items-center gap-2 text-base font-bold text-ink;
+  }
+
+  .request-content h4::before {
+    content: '';
+    @apply h-2 w-2 shrink-0 rounded-full bg-accent;
+  }
+
+  .request-content h5 {
+    @apply mt-4 mb-2 font-bold text-ink;
   }
 
   .request-content p {
-    @apply mb-4 text-graphite;
+    @apply mb-4 text-ink-soft;
   }
 
   .request-content ul {
-    @apply mb-4 list-disc space-y-1.5 pl-6 text-graphite;
+    @apply mb-4 list-disc space-y-1.5 pl-6 text-ink-soft;
   }
 
   .request-content ul ul {
@@ -91,13 +188,5 @@ import ContactForm from '../components/ContactForm.astro';
 
   .request-content a {
     @apply text-accent underline underline-offset-4 transition-colors hover:text-ink;
-  }
-
-  .schedule-embed {
-    @apply mb-4 flex justify-start;
-  }
-
-  .schedule-embed iframe {
-    @apply overflow-hidden bg-transparent;
   }
 </style>
