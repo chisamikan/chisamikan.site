@@ -36,11 +36,11 @@ const heroImages =
   <h1 class="sr-only">{site.description}</h1>
 
   <!-- ファーストビュー: 全画面イラスト -->
-  <section class="relative h-[100svh] w-full overflow-hidden">
+  <section class="relative h-svh w-full overflow-hidden">
     <HeroSlideshow images={heroImages} />
     <!-- ここから先はイラスト写真の上に重ねる常時ダークな覆い(スクリム)なので、
          ページのテーマ(paper/ink)ではなく固定の black/white を使い、ダークモードでも見た目を変えない -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/5"></div>
+    <div class="absolute inset-0 bg-linear-to-t from-black/85 via-black/25 to-black/5"></div>
 
     <div class="relative z-10 flex h-full flex-col justify-end px-6 pb-6 pt-16 sm:px-10 sm:pb-10">
       <div class="max-w-md rounded-xl border border-white/20 bg-white/10 p-5 text-left shadow-lg backdrop-blur-md sm:p-6">

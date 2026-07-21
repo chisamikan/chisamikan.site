@@ -428,7 +428,7 @@
 @layer utilities {
   /* 見出しの左右に配置する飾り線。border色は before:border-* / after:border-* で呼び出し側から指定する */
   .heading-lines {
-    @apply relative inline-block px-[55px] before:absolute before:top-1/2 before:left-0 before:h-[2px] before:w-[45px] before:border-y before:content-[''] after:absolute after:top-1/2 after:right-0 after:h-[2px] after:w-[45px] after:border-y after:content-[''];
+    @apply relative inline-block px-13.75 before:absolute before:top-1/2 before:left-0 before:h-0.5 before:w-11.25 before:border-y before:content-[''] after:absolute after:top-1/2 after:right-0 after:h-0.5 after:w-11.25 after:border-y after:content-[''];
   }
 
   /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動 */
