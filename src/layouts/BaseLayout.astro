@@ -70,15 +70,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toStri
     />
 
     <script>
+      declare global {
+        interface Window {
+          dataLayer: unknown[];
+        }
+      }
+
       window.dataLayer = window.dataLayer || [];
 
-      function gtag() {
-      dataLayer.push(arguments);
+      function gtag(...args: unknown[]) {
+        window.dataLayer.push(args);
       }
       gtag('js', new Date());
       gtag('config', 'G-XZSD8BQ5DE');
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE"></script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE"></script>
 	
   </head>
   <body>

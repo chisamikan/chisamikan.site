@@ -89,7 +89,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 </form>
 
 {turnstileSiteKey && (
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 )}
 
 <script>
@@ -158,7 +158,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
         form.reset();
         if (loadedAtInput) loadedAtInput.value = String(Date.now());
       } else {
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
         if (body.error === 'turnstile_missing' || body.error === 'turnstile_failed') {
           showError('認証に失敗しました。もう一度お試しください。');
         } else if (body.error === 'invalid_email') {
