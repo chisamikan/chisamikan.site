@@ -124,4 +124,17 @@
       transition: none;
     }
   }
+
+  /* 外部サイトへのリンク(href が絶対URL = http/https始まり)には、手動でアイコンを
+     追加しなくても自動で末尾に外部リンクアイコンを表示する。サイト内リンクは
+     ルート相対パス(例: /contact)で書く運用のため href^="http" だけで判別できる。
+     アイコン単体のボタン等、表示したくない場合は .no-external-icon を付与して除外する */
+  a[href^="http://"]:not(.no-external-icon)::after,
+  a[href^="https://"]:not(.no-external-icon)::after {
+    font: 900 0.8em 'Font Awesome 7 Free';
+    content: '\f08e';
+    display: inline-block;
+    margin-left: 0.3em;
+    vertical-align: 0.02em;
+  }
 }
