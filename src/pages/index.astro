@@ -15,7 +15,7 @@ import { site } from '../lib/config';
 const [gallery, works, news] = await Promise.all([
   getGalleryItems(),
   getWorkHistory(),
-  getNewsItems(1),
+  getNewsItems(3),
 ]);
 
 const featuredGallery = gallery.slice(0, 3);
@@ -57,8 +57,49 @@ const heroImages =
     </div>
   </section>
 
+  <!-- お知らせ(RSSフィードの最新3件) -->
+  <section id="news" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
+    <SectionHeading eyebrow="News" title="お知らせ" />
+    {news.length > 0 ? (
+      <ul class="mx-auto max-w-2xl divide-y divide-ink/10">
+        {news.slice(0, 3).map((item) => (
+          <li class="py-4 first:pt-0 last:pb-0">
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+            >
+              {item.date && (
+                <span class="shrink-0 font-mono text-xs text-graphite">
+                  {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                </span>
+              )}
+              <span class="text-ink transition-colors group-hover:text-accent">
+                {item.title}
+                <span class="ml-1 text-graphite">&#8599;</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-center font-mono text-sm text-graphite">お知らせはまだありません。</p>
+    )}
+    <div class="mt-10 text-center">
+      <a
+        href="https://note.com/chisamikan"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-glass btn-glass-accent md:w-1/3 w-full"
+      >
+        <i class="fa-solid fa-circle-chevron-right pr-1"></i>お知らせをもっと見る
+      </a>
+    </div>
+  </section>
+
   <!-- ギャラリー抜粋 -->
-  <section id="gallery" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
+  <section id="gallery" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" />
     <div class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item) => (
