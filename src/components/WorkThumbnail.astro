@@ -34,7 +34,18 @@ const frameClass = bare
     />
   </button>
 ) : (
-  <div class:list={['relative aspect-square overflow-hidden', frameClass, className]} aria-hidden="true">
+  <div
+    class:list={['thumbnail-placeholder relative aspect-square overflow-hidden', frameClass, className]}
+    aria-hidden="true"
+  >
     <img src={src} alt="" loading="lazy" class="h-full w-full object-cover" />
   </div>
 )}
+
+<style>
+  /* .glass-card の cursor: pointer (global.css) を打ち消すため、
+     scoped styleのdata属性でスコープ限定+plainクラス以上の詳細度を確保 */
+  .thumbnail-placeholder {
+    cursor: default;
+  }
+</style>
