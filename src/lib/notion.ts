@@ -1,4 +1,4 @@
-import { Client, isFullPage } from '@notionhq/client';
+import { Client, isFullDatabase, isFullPage } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
 // ---------------------------------------------------------------------------
@@ -55,6 +55,24 @@ function richTextToPlain(richText: { plain_text: string }[]): string {
   return richText.map((t) => t.plain_text).join('');
 }
 
+// ---------------------------------------------------------------------------
+// Notion API はデータベースを直接クエリする方式を廃止し、データベース配下の
+// データソースをクエリする方式(dataSources.query)に変更された。
+// そのためデータベースIDからまずデータソースIDを取得してからクエリする。
+// ---------------------------------------------------------------------------
+async function queryPublishedDatabase(dbId: string, sortProperty: string) {
+  const db = await notion!.databases.retrieve({ database_id: dbId });
+  if (!isFullDatabase(db) || db.data_sources.length === 0) {
+    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
+  }
+
+  return notion!.dataSources.query({
+    data_source_id: db.data_sources[0].id,
+    filter: { property: 'Published', checkbox: { equals: true } },
+    sorts: [{ property: sortProperty, direction: 'descending' }],
+  });
+}
+
 // --- ギャラリー ---------------------------------------------------------------
 
 /**
@@ -70,11 +88,7 @@ export async function getGalleryItems(): Promise<ArtworkItem[]> {
     return sampleGallery;
   }
 
-  const res = await notion.databases.query({
-    database_id: dbId,
-    filter: { property: 'Published', checkbox: { equals: true } },
-    sorts: [{ property: 'Date', direction: 'descending' }],
-  });
+  const res = await queryPublishedDatabase(dbId, 'Date');
 
   return res.results.filter(isFullPage).map(pageToArtwork);
 }
@@ -135,11 +149,7 @@ export async function getWorkHistory(): Promise<WorkItem[]> {
     return sampleWorks;
   }
 
-  const res = await notion.databases.query({
-    database_id: dbId,
-    filter: { property: 'Published', checkbox: { equals: true } },
-    sorts: [{ property: 'Period', direction: 'descending' }],
-  });
+  const res = await queryPublishedDatabase(dbId, 'Period');
 
   return res.results.filter(isFullPage).map(pageToWork);
 }
