@@ -1,4 +1,4 @@
-import { Client, isFullDatabase, isFullPage } from '@notionhq/client';
+import { Client, isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
 // ---------------------------------------------------------------------------
@@ -59,18 +59,30 @@ function richTextToPlain(richText: { plain_text: string }[]): string {
 // Notion API はデータベースを直接クエリする方式を廃止し、データベース配下の
 // データソースをクエリする方式(dataSources.query)に変更された。
 // そのためデータベースIDからまずデータソースIDを取得してからクエリする。
+// クエリ結果は1回のリクエストにつき最大100件までしか返らないため、
+// iteratePaginatedAPIで全ページを辿って全件取得する。
 // ---------------------------------------------------------------------------
-async function queryPublishedDatabase(dbId: string, sortProperty: string) {
+async function queryPublishedDatabase(
+  dbId: string,
+  sortProperty: string
+): Promise<PageObjectResponse[]> {
   const db = await notion!.databases.retrieve({ database_id: dbId });
   if (!isFullDatabase(db) || db.data_sources.length === 0) {
     throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
   }
 
-  return notion!.dataSources.query({
+  const results: PageObjectResponse[] = [];
+  for await (const page of iteratePaginatedAPI(notion!.dataSources.query, {
     data_source_id: db.data_sources[0].id,
     filter: { property: 'Published', checkbox: { equals: true } },
     sorts: [{ property: sortProperty, direction: 'descending' }],
-  });
+  })) {
+    if (isFullPage(page)) {
+      results.push(page);
+    }
+  }
+
+  return results;
 }
 
 // --- ギャラリー ---------------------------------------------------------------
@@ -88,9 +100,9 @@ export async function getGalleryItems(): Promise<ArtworkItem[]> {
     return sampleGallery;
   }
 
-  const res = await queryPublishedDatabase(dbId, 'Date');
+  const pages = await queryPublishedDatabase(dbId, 'Date');
 
-  return res.results.filter(isFullPage).map(pageToArtwork);
+  return pages.map(pageToArtwork);
 }
 
 function pageToArtwork(page: PageObjectResponse): ArtworkItem {
@@ -149,9 +161,9 @@ export async function getWorkHistory(): Promise<WorkItem[]> {
     return sampleWorks;
   }
 
-  const res = await queryPublishedDatabase(dbId, 'Period');
+  const pages = await queryPublishedDatabase(dbId, 'Period');
 
-  return res.results.filter(isFullPage).map(pageToWork);
+  return pages.map(pageToWork);
 }
 
 function pageToWork(page: PageObjectResponse): WorkItem {
