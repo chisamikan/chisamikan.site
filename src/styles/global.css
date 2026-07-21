@@ -2,23 +2,74 @@
 @config '../../tailwind.config.mjs';
 
 @layer base {
+  /* 配色は CodePen "Liquid Glass UI kit" のトークンに準拠。
+     ライト = kit の [data-theme="light"]、ダーク = kit の :root(既定値)を移植し、
+     paper/ink/graphite/accent という変数名・呼び出し側のクラス名は変えずに中身だけ差し替える */
   :root {
-    --color-paper: 250 247 240;
-    --color-paper-dim: 241 236 224;
-    --color-ink: 34 31 27;
-    --color-ink-soft: 69 63 55;
-    --color-graphite: 140 133 120;
+    --color-paper: 232 240 250;
+    --color-paper-dim: 219 229 242;
+    --color-ink: 15 23 42;
+    --color-ink-soft: 106 114 129;
+    --color-graphite: 150 158 171;
+    --color-accent: 8 145 178;
+    --color-accent-2: 37 99 235;
+    --color-accent-violet: 109 40 217;
+    --color-accent-rose: 190 24 93;
+    --color-accent-amber: 180 83 9;
+    --color-accent-lime: 21 128 61;
+
+    --glass-white: rgba(255, 255, 255, 0.62);
+    --glass-white-md: rgba(255, 255, 255, 0.78);
+    --glass-white-lg: rgba(255, 255, 255, 0.9);
+    --glass-dark: rgba(0, 0, 0, 0.06);
+    --glass-dark-md: rgba(15, 23, 42, 0.08);
+    --glass-border: rgba(15, 23, 42, 0.14);
+    --glass-border-subtle: rgba(15, 23, 42, 0.09);
+    --glass-border-bright: rgba(15, 23, 42, 0.22);
+
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --shadow-float: 0 20px 60px rgba(0, 0, 0, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
+    --reflection-top: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 50%);
+    --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    --shadow-glass-accent: 0 4px 24px rgba(8, 145, 178, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    --shadow-glass-accent-lg: 0 8px 36px rgba(8, 145, 178, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 40px rgba(8, 145, 178, 0.25);
+
     color-scheme: light;
   }
 
   /* 端末のダーク設定 or ヘッダーのトグルで <html> に付与される。
-     paper/ink/graphite の明暗を入れ替えるだけで、これらを参照する全クラスが追従する */
+     paper/ink/graphite/accent とガラス面トークンを入れ替えるだけで、これらを参照する全クラスが追従する */
   .dark {
-    --color-paper: 27 24 21;
-    --color-paper-dim: 37 33 25;
-    --color-ink: 237 231 220;
-    --color-ink-soft: 199 191 176;
-    --color-graphite: 156 148 132;
+    --color-paper: 11 14 26;
+    --color-paper-dim: 20 24 40;
+    --color-ink: 255 255 255;
+    --color-ink-soft: 145 147 152;
+    --color-graphite: 96 98 106;
+    --color-accent: 94 231 223;
+    --color-accent-2: 59 130 246;
+    --color-accent-violet: 180 144 245;
+    --color-accent-rose: 247 168 196;
+    --color-accent-amber: 255 210 127;
+    --color-accent-lime: 168 240 138;
+
+    --glass-white: rgba(255, 255, 255, 0.12);
+    --glass-white-md: rgba(255, 255, 255, 0.2);
+    --glass-white-lg: rgba(255, 255, 255, 0.3);
+    --glass-dark: rgba(0, 0, 0, 0.18);
+    --glass-dark-md: rgba(0, 0, 0, 0.28);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-border-subtle: rgba(255, 255, 255, 0.12);
+    --glass-border-bright: rgba(255, 255, 255, 0.5);
+
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    --shadow-float: 0 20px 60px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);
+    --reflection-top: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%);
+    --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    --shadow-glass-accent: 0 4px 24px rgba(94, 231, 223, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    --shadow-glass-accent-lg: 0 8px 36px rgba(94, 231, 223, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 40px rgba(120, 200, 255, 0.35);
+
     color-scheme: dark;
   }
 
@@ -28,11 +79,12 @@
 
   body {
     @apply bg-paper text-ink font-body antialiased transition-colors duration-300;
-    /* ガラス面が光を透かして見えるよう、固定位置のソフトなカラーブロブを紙のドット柄の奥に敷く(アクセントカラーと同系の青で統一) */
+    /* ガラス面が光を透かして見えるよう、固定位置のソフトなカラーブロブを紙のドット柄の奥に敷く。
+       CodePen "Liquid Glass UI kit" の .scene__blob に倣い aqua/violet/amber のマルチアクセントで構成する */
     background-image:
-      radial-gradient(ellipse 60% 45% at 12% -8%, rgba(0, 153, 255, 0.18), transparent 100%),
-      radial-gradient(ellipse 55% 42% at 100% 12%, rgba(77, 184, 255, 0.16), transparent 100%),
-      radial-gradient(ellipse 60% 48% at 45% 100%, rgba(0, 119, 204, 0.14), transparent 100%),
+      radial-gradient(ellipse 60% 45% at 12% -8%, rgb(var(--color-accent) / 0.18), transparent 100%),
+      radial-gradient(ellipse 55% 42% at 100% 12%, rgb(var(--color-accent-violet) / 0.14), transparent 100%),
+      radial-gradient(ellipse 60% 48% at 45% 100%, rgb(var(--color-accent-amber) / 0.12), transparent 100%),
       radial-gradient(circle at 1px 1px, rgb(var(--color-ink) / 0.05) 1px, transparent 0);
     background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
     background-repeat: no-repeat, no-repeat, no-repeat, repeat;
@@ -55,22 +107,321 @@
 }
 
 @layer components {
-  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
+  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する。
+     a要素だけでなくbutton要素にも使われるため cursor-pointer を明示する */
   .btn-glass {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-white/40 bg-white/25 px-5 py-2.5 font-mono text-sm text-ink shadow-glass backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/40 hover:shadow-glass-lg;
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-mono text-sm text-ink shadow-glass backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-glass-border-bright hover:bg-glass-md hover:shadow-glass-lg;
   }
 
   .btn-glass-sm {
     @apply px-3.5 py-1.5 text-xs;
   }
 
+  /* Liquid Glass UI Kit の Primary ボタン(.glass-btn--primary)に準拠。
+     単色塗りではなく accent → accent-2 の斜めグラデーション + 上面のガラス反射(::before)で構成する */
   .btn-glass-accent {
-    @apply border-accent/30 bg-accent/80 text-white shadow-glass-accent hover:border-accent/50 hover:bg-accent hover:text-white;
+    position: relative;
+    background-image: linear-gradient(135deg, rgb(var(--color-accent) / 0.5) 0%, rgb(var(--color-accent-2) / 0.5) 100%);
+    @apply border-accent/45 text-white shadow-glass-accent active:scale-95 hover:shadow-glass-accent-lg;
+  }
+
+  .btn-glass-accent:hover {
+    background-image: linear-gradient(135deg, rgb(var(--color-accent) / 0.7) 0%, rgb(var(--color-accent-2) / 0.7) 100%);
+  }
+
+  .btn-glass-accent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--reflection-top);
+    pointer-events: none;
   }
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
   .btn-glass-ghost {
-    @apply rounded-full border border-white/40 bg-white/20 px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:bg-white/35 hover:text-accent;
+    @apply cursor-pointer rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:bg-glass-md hover:text-accent;
+  }
+
+  /* --------------------------------------------------------------------------
+     以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント。
+     現時点で未使用のものも含め、同じガラストークン(glass-*, shadow-glass 等)で
+     将来のUI追加にすぐ使えるように揃えておく。
+     -------------------------------------------------------------------------- */
+
+  /* タグ・バッジ: ArtworkCard/WorkItemCard/WorkItem/ProfileContent のスキルタグに使用 */
+  .glass-tag {
+    @apply inline-flex items-center rounded-full border border-glass-border-subtle bg-glass px-2.5 py-0.5 font-mono text-[11px] text-ink/80 backdrop-blur-sm transition-colors duration-300;
+  }
+
+  .glass-badge {
+    @apply inline-flex items-center gap-1 rounded-full border border-glass-border bg-glass-md px-2 py-0.5 text-xs font-medium text-ink backdrop-blur-sm;
+  }
+
+  .glass-badge-accent {
+    @apply border-accent/30 bg-accent/15 text-accent;
+  }
+
+  /* フォーム部品 */
+  .glass-input,
+  .glass-textarea {
+    @apply w-full rounded-md border border-glass-border-subtle bg-glass px-3.5 py-2.5 text-ink outline-none backdrop-blur-sm transition-colors duration-300 placeholder:text-ink/40 focus:border-accent;
+  }
+
+  .glass-textarea {
+    @apply resize-y;
+  }
+
+  .glass-checkbox,
+  .glass-radio {
+    accent-color: rgb(var(--color-accent));
+    @apply mt-1 h-4 w-4 shrink-0 rounded-xs border border-glass-border bg-glass backdrop-blur-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-accent;
+  }
+
+  .glass-radio {
+    @apply rounded-full;
+  }
+
+  .glass-switch {
+    @apply relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-glass-border bg-glass-dark-md backdrop-blur-sm transition-colors duration-300;
+  }
+
+  .glass-switch[aria-checked='true'] {
+    @apply border-accent/40 bg-accent/70;
+  }
+
+  .glass-switch__thumb {
+    @apply h-4 w-4 translate-x-1 rounded-full bg-white shadow transition-transform duration-300;
+  }
+
+  .glass-switch[aria-checked='true'] .glass-switch__thumb {
+    @apply translate-x-6;
+  }
+
+  /* タブ */
+  .glass-tab-list {
+    @apply inline-flex items-center gap-1 overflow-x-auto rounded-full border border-glass-border-subtle bg-glass p-1 backdrop-blur-md;
+  }
+
+  .glass-tab {
+    @apply cursor-pointer whitespace-nowrap rounded-full px-5 py-2 font-mono text-sm text-ink/65 transition-all duration-200 hover:bg-glass hover:text-ink;
+  }
+
+  .glass-tab[aria-selected='true'] {
+    @apply border border-glass-border bg-glass-md text-ink shadow-glass-accent;
+  }
+
+  .glass-tab-panel {
+    @apply hidden;
+  }
+
+  .glass-tab-panel.is-active {
+    @apply block;
+  }
+
+  /* アコーディオン: <details class="glass-accordion-item"><summary class="glass-accordion-trigger">
+     のようにネイティブ要素で組む想定(JS不要)。contact.astro のFAQで使用 */
+  .glass-accordion {
+    @apply flex flex-col gap-2;
+  }
+
+  .glass-accordion-item {
+    @apply overflow-hidden rounded-lg border border-glass-border-subtle bg-glass backdrop-blur-md transition-shadow duration-300;
+  }
+
+  .glass-accordion-trigger {
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-body text-sm font-medium text-ink transition-colors duration-300 hover:bg-glass-md;
+  }
+
+  .glass-accordion-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .glass-accordion-icon {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-glass-border bg-glass text-xs transition-transform duration-300;
+  }
+
+  .glass-accordion-item[open] .glass-accordion-icon {
+    @apply rotate-180 border-accent/50 bg-accent/20;
+  }
+
+  .glass-accordion-content {
+    @apply px-5 pb-4 text-sm leading-relaxed text-ink/75;
+  }
+
+  /* モーダル */
+  .glass-modal-backdrop {
+    @apply pointer-events-none fixed inset-0 z-50 grid place-items-center bg-ink/50 p-4 opacity-0 backdrop-blur-md transition-opacity duration-300;
+  }
+
+  .glass-modal-backdrop.is-open {
+    @apply pointer-events-auto opacity-100;
+  }
+
+  .glass-modal {
+    @apply relative w-full max-w-lg origin-center translate-y-6 scale-95 overflow-hidden rounded-2xl border border-glass-border bg-glass-lg opacity-0 shadow-glass-lg backdrop-blur-lg transition-all duration-300;
+  }
+
+  .glass-modal-backdrop.is-open .glass-modal {
+    @apply translate-y-0 scale-100 opacity-100;
+  }
+
+  .glass-modal::before {
+    content: '';
+    background: linear-gradient(90deg, rgb(var(--color-accent)) 0%, rgb(var(--color-accent-violet)) 50%, rgb(var(--color-accent-rose)) 100%);
+    @apply absolute inset-x-0 top-0 z-10 h-0.5;
+  }
+
+  .glass-modal__header {
+    @apply border-b border-glass-border-subtle bg-glass px-6 pb-4 pt-6;
+  }
+
+  .glass-modal__body {
+    @apply px-6 py-4;
+  }
+
+  .glass-modal__footer {
+    @apply flex gap-2.5 px-6 pb-6 pt-2;
+  }
+
+  .glass-modal__close {
+    @apply absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-glass-border bg-glass text-ink/70 transition-all duration-300 hover:rotate-90 hover:bg-glass-md hover:text-ink;
+  }
+
+  /* トースト通知 */
+  .glass-toast-region {
+    @apply fixed bottom-6 right-6 z-70 flex w-full max-w-sm flex-col gap-2.5;
+  }
+
+  .glass-toast {
+    @apply flex items-start gap-3 rounded-lg border border-glass-border bg-glass-lg px-4 py-3 text-sm text-ink shadow-glass-lg backdrop-blur-lg;
+  }
+
+  .glass-toast-accent {
+    @apply border-accent/40;
+  }
+
+  /* ツールチップ: 親要素に group を付けて hover させるか、JSで .is-visible を付与する */
+  .glass-tooltip {
+    @apply pointer-events-none absolute z-90 rounded-sm border border-glass-border bg-glass-lg px-2.5 py-1.5 text-xs text-ink opacity-0 shadow-glass backdrop-blur-md transition-opacity duration-200;
+  }
+
+  .group:hover .glass-tooltip,
+  .glass-tooltip.is-visible {
+    @apply opacity-100;
+  }
+
+  /* ドロップダウン */
+  .glass-dropdown {
+    @apply absolute z-60 mt-2 min-w-40 overflow-hidden rounded-md border border-glass-border bg-glass-lg py-1.5 shadow-glass-lg backdrop-blur-lg;
+  }
+
+  .glass-dropdown-item {
+    @apply block cursor-pointer px-4 py-2 text-sm text-ink/80 transition-colors duration-200 hover:bg-glass-md hover:text-ink;
+  }
+
+  /* チップ */
+  .glass-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-glass-border bg-glass px-3 py-1 text-xs text-ink backdrop-blur-sm transition-colors duration-300;
+  }
+
+  .glass-chip__remove {
+    @apply -mr-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-ink/50 transition-colors hover:text-accent;
+  }
+
+  /* アバター */
+  .glass-avatar {
+    @apply flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-glass-border bg-glass-md text-xs font-medium text-ink backdrop-blur-sm;
+  }
+
+  .glass-avatar-group {
+    @apply flex -space-x-3;
+  }
+
+  .glass-avatar-group .glass-avatar {
+    @apply ring-2 ring-paper;
+  }
+
+  /* パンくずリスト */
+  .glass-breadcrumb {
+    @apply inline-flex items-center gap-2 rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-sm;
+  }
+
+  .glass-breadcrumb a {
+    @apply transition-colors hover:text-accent;
+  }
+
+  .glass-breadcrumb-sep {
+    @apply text-ink/30;
+  }
+
+  /* スケルトンローダー */
+  .glass-skeleton {
+    @apply relative overflow-hidden rounded-md bg-glass;
+  }
+
+  .glass-skeleton::after {
+    content: '';
+    background: linear-gradient(90deg, transparent, rgb(var(--color-ink) / 0.06), transparent);
+    animation: glass-skeleton-shimmer 1.6s ease-in-out infinite;
+    @apply absolute inset-0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-skeleton::after {
+      animation: none;
+    }
+  }
+
+  /* ステッパー */
+  .glass-stepper {
+    @apply flex items-center gap-2;
+  }
+
+  .glass-stepper-step {
+    @apply flex h-8 w-8 items-center justify-center rounded-full border border-glass-border bg-glass text-xs font-medium text-ink/60 backdrop-blur-sm transition-colors duration-300;
+  }
+
+  .glass-stepper-step.is-active {
+    @apply border-accent/50 bg-accent/20 text-accent;
+  }
+
+  .glass-stepper-step.is-complete {
+    @apply border-accent/40 bg-accent text-white;
+  }
+
+  .glass-stepper-line {
+    @apply h-px flex-1 bg-glass-border;
+  }
+
+  /* データテーブル */
+  .glass-table {
+    @apply w-full overflow-hidden rounded-lg border border-glass-border-subtle bg-glass backdrop-blur-md;
+  }
+
+  .glass-table th {
+    @apply border-b border-glass-border bg-glass-md px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-ink/70;
+  }
+
+  .glass-table td {
+    @apply border-b border-glass-border-subtle px-4 py-3 text-sm text-ink/85;
+  }
+
+  .glass-table tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .glass-table tr:hover td {
+    @apply bg-glass-md;
+  }
+}
+
+@keyframes glass-skeleton-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 
@@ -82,6 +433,7 @@
 
   /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動 */
   .glass-card {
+    cursor: pointer;
     transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease, border-color 300ms ease;
   }
 
@@ -89,11 +441,18 @@
     transform: translateY(-6px);
   }
 
+  /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素はデフォルトで
+     ポインタカーソルにならないため明示的に指定する */
+  .lightbox-trigger {
+    @apply cursor-pointer;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .glass-card,
     .glass-card:hover,
     .btn-glass,
-    .btn-glass:hover {
+    .btn-glass:hover,
+    .btn-glass-accent:active {
       transition: none !important;
       transform: none !important;
     }

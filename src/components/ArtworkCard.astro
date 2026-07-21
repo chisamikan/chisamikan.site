@@ -10,7 +10,7 @@ const Tag = `h${headingLevel}` as 'h2' | 'h3';
 const hasImage = Boolean(item.imageUrl);
 ---
 
-<figure class="glass-card group flex h-full flex-col overflow-hidden rounded-2xl border border-white/40 bg-white/25 shadow-glass backdrop-blur-xl hover:border-white/60 hover:shadow-glass-lg">
+<figure class="glass-card group flex h-full flex-col overflow-hidden rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg">
   {hasImage ? (
     <button
       type="button"
@@ -42,7 +42,7 @@ const hasImage = Boolean(item.imageUrl);
       <span class="font-mono text-xs">No Image</span>
     </div>
   )}
-  <figcaption class="flex flex-1 flex-col border-t border-white/30 p-4">
+  <figcaption class="flex flex-1 flex-col border-t border-glass-border-subtle p-4">
     <Tag class="font-display text-lg font-medium leading-snug text-ink">{item.title}</Tag>
     {item.description && (
       <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>
@@ -51,7 +51,7 @@ const hasImage = Boolean(item.imageUrl);
       {item.tags.length > 0 && (
         <ul class="flex flex-wrap gap-1.5">
           {item.tags.map((tag) => (
-            <li class="rounded-full border border-ink/30 px-2.5 py-0.5 font-mono text-[11px] text-ink/80">
+            <li class="glass-tag">
               {tag}
             </li>
           ))}

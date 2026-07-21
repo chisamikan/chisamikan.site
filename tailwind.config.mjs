@@ -19,12 +19,30 @@ export default {
           DEFAULT: 'rgb(var(--color-ink) / <alpha-value>)',
           soft: 'rgb(var(--color-ink-soft) / <alpha-value>)',
         },
+        // アクセントは CSS変数(--color-accent-*)経由。ライト/ダークで色そのものが
+        // 入れ替わる(CodePen "Liquid Glass" kit のトークン設計を踏襲)ため、
+        // bg-accent 等の呼び出し側は変更せずテーマ追従する。
         accent: {
-          DEFAULT: '#0099FF',
-          dark: '#0077CC',
-          light: '#4DB8FF',
+          DEFAULT: 'rgb(var(--color-accent) / <alpha-value>)',
+          violet: 'rgb(var(--color-accent-violet) / <alpha-value>)',
+          rose: 'rgb(var(--color-accent-rose) / <alpha-value>)',
+          amber: 'rgb(var(--color-accent-amber) / <alpha-value>)',
+          lime: 'rgb(var(--color-accent-lime) / <alpha-value>)',
         },
         graphite: 'rgb(var(--color-graphite) / <alpha-value>)',
+        // すりガラス面の下地色・境界線色。ライト/ダークで不透明度ごと入れ替わる。
+        glass: {
+          DEFAULT: 'var(--glass-white)',
+          md: 'var(--glass-white-md)',
+          lg: 'var(--glass-white-lg)',
+          dark: 'var(--glass-dark)',
+          'dark-md': 'var(--glass-dark-md)',
+        },
+        'glass-border': {
+          DEFAULT: 'var(--glass-border)',
+          subtle: 'var(--glass-border-subtle)',
+          bright: 'var(--glass-border-bright)',
+        },
       },
       fontFamily: {
         display: ['"Oswald"', '"Zen Kaku Gothic New"', 'sans-serif'],
@@ -39,9 +57,28 @@ export default {
       },
       boxShadow: {
         pin: '0 6px 16px -4px rgba(34, 31, 27, 0.25)',
-        glass: '0 8px 32px -8px rgba(34, 31, 27, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.5)',
-        'glass-lg': '0 20px 48px -12px rgba(34, 31, 27, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.6)',
-        'glass-accent': '0 8px 28px -6px rgba(0, 153, 255, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.35)',
+        // ガラス面の陰影も CSS変数経由(--shadow-*)にし、ライト/ダークで濃さが入れ替わるようにする。
+        glass: 'var(--shadow-glass)',
+        'glass-lg': 'var(--shadow-float)',
+        'glass-accent': 'var(--shadow-glass-accent)',
+        'glass-accent-lg': 'var(--shadow-glass-accent-lg)',
+        float: 'var(--shadow-float)',
+        glow: 'var(--shadow-glow)',
+      },
+      // CodePen "Liquid Glass UI kit" の radius / blur スケールに合わせる。
+      borderRadius: {
+        xs: '6px',
+        sm: '10px',
+        md: '14px',
+        lg: '20px',
+        xl: '24px',
+        '2xl': '32px',
+      },
+      backdropBlur: {
+        sm: '8px',
+        md: '18px',
+        lg: '32px',
+        xl: '60px',
       },
     },
   },

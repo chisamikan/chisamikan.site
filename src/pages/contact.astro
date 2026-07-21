@@ -11,9 +11,9 @@ import ContactForm from '../components/ContactForm.astro';
     <div class="request-content font-mono text-sm leading-relaxed text-ink">
       <p>お問い合わせの前に、以下の内容をご一読ください。</p>
 
-      <details class="accordion-item">
-      <summary class="accordion-trigger"><h2><i class="fa-solid fa-paintbrush" aria-hidden="true"></i>ご依頼に関するお問い合わせ</h2></summary>
-      <div class="accordion-body">
+      <details class="glass-accordion-item mb-4">
+      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-paintbrush" aria-hidden="true"></i>ご依頼に関するお問い合わせ</h2></summary>
+      <div class="glass-accordion-content">
 
       <h3>できること</h3>
       <ul>
@@ -70,9 +70,9 @@ import ContactForm from '../components/ContactForm.astro';
       </div>
       </details>
 
-      <details class="accordion-item">
-      <summary class="accordion-trigger"><h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>BOOTH通販に関するお問い合わせ</h2></summary>
-      <div class="accordion-body">
+      <details class="glass-accordion-item mb-4">
+      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>BOOTH通販に関するお問い合わせ</h2></summary>
+      <div class="glass-accordion-content">
 
       <h3>BOOTHの自家通販（BOOTH倉庫及びpixivファクトリーから発送される商品を除く）に関するお問い合わせ</h3>
       <p>
@@ -89,9 +89,9 @@ import ContactForm from '../components/ContactForm.astro';
       </div>
       </details>
 
-      <details class="accordion-item">
-      <summary class="accordion-trigger"><h2><i class="fa-solid fa-circle-question" aria-hidden="true"></i>その他お問い合わせ</h2></summary>
-      <div class="accordion-body">
+      <details class="glass-accordion-item mb-4">
+      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-circle-question" aria-hidden="true"></i>その他お問い合わせ</h2></summary>
+      <div class="glass-accordion-content">
 
       <ul>
         <li>サービスのご提案や一斉送信と思われるメッセージなど、内容によっては返信できない場合がございますので、予めご了承ください。</li>
@@ -110,19 +110,9 @@ import ContactForm from '../components/ContactForm.astro';
 <style>
   @reference '../styles/global.css';
 
-  .accordion-item {
-    @apply mb-4 overflow-hidden rounded-2xl border border-white/40 bg-white/20 backdrop-blur-xl transition-all duration-300;
-  }
-
-  .accordion-trigger {
-    @apply flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 transition-colors duration-300 hover:bg-white/25;
-  }
-
-  .accordion-trigger::-webkit-details-marker {
-    display: none;
-  }
-
-  .accordion-trigger::after {
+  /* ガラス面・パディング等は global.css の .glass-accordion-* を流用し、
+     ここでは矢印アイコンの開閉アニメーションだけを追加する */
+  .glass-accordion-trigger::after {
     content: '';
     flex-shrink: 0;
     width: 0.55em;
@@ -133,12 +123,8 @@ import ContactForm from '../components/ContactForm.astro';
     transition: transform 300ms ease;
   }
 
-  details[open] > .accordion-trigger::after {
+  details[open] > .glass-accordion-trigger::after {
     transform: rotate(-135deg);
-  }
-
-  .accordion-body {
-    @apply px-5 pb-5;
   }
 
   .request-content h2 {
