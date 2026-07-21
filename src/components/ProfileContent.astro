@@ -7,20 +7,30 @@ const skills = [
   {
     label: 'Softwares',
     items: [
-      'CLIP STUDIO PAINT',
-      'Adobe Photoshop',
-      'Adobe Illustrator',
-      'Adobe Premiere',
-	  'Adobe InDesign',
-      'Adobe XD',
-      'Figma',
-      'Affinity',
-      'Visual Studio Code',
+      { name: 'CLIP STUDIO PAINT', icon: 'fa-solid fa-palette' },
+      { name: 'Adobe Photoshop', icon: 'fa-solid fa-camera' },
+      { name: 'Adobe Illustrator', icon: 'fa-solid fa-paintbrush' },
+      { name: 'Adobe InDesign', icon: 'fa-solid fa-book-open' },
+	  { name: 'Adobe Premiere', icon: 'fa-solid fa-clapperboard' },
+      { name: 'Adobe XD', icon: 'fa-solid fa-globe' },
+      { name: 'Figma', icon: 'fa-brands fa-figma' },
+      { name: 'Affinity', icon: 'fa-solid fa-paintbrush' },
+      { name: 'Visual Studio Code', icon: 'fa-brands fa-visual-studio' },
     ],
   },
   {
     label: 'Skills',
-    items: ['HTML', 'CSS', 'JavaScript', 'Git', 'Node.js', 'React', 'Vue.js', 'Astro', 'PHP'],
+    items: [
+      { name: 'HTML', icon: 'fa-brands fa-html5' },
+      { name: 'CSS', icon: 'fa-brands fa-css3' },
+      { name: 'JavaScript', icon: 'fa-brands fa-js' },
+      { name: 'Git', icon: 'fa-brands fa-git' },
+      { name: 'Node.js', icon: 'fa-brands fa-node-js' },
+      { name: 'React', icon: 'fa-brands fa-react' },
+      { name: 'Vue.js', icon: 'fa-brands fa-vuejs' },
+      { name: 'Astro', icon: 'fa-solid fa-globe' },
+      { name: 'PHP', icon: 'fa-brands fa-php' },
+    ],
   },
 ];
 ---
@@ -44,14 +54,15 @@ const skills = [
 	同人サークル『Pt.Spoon』・『Satellite Galaxy』主催。
   </p>
   <SnsLinks />
-  <div class="space-y-4">
+  <div class="space-y-8">
     {skills.map((group) => (
       <div>
         <p class="text-center font-bold text-ink">{group.label}</p>
-        <ul class="mt-1.5 flex flex-wrap justify-center gap-1.5">
+        <ul class="mt-3 flex flex-wrap justify-center gap-1.5">
           {group.items.map((item) => (
-            <li class="glass-tag">
-              {item}
+            <li class="glass-tag text-xs">
+              {item.icon && <i class:list={[item.icon, 'mr-1']} aria-hidden="true"></i>}
+              {item.name}
             </li>
           ))}
         </ul>
