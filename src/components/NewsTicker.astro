@@ -1,0 +1,80 @@
+---
+import type { NewsItem } from '../lib/rss';
+
+interface Props {
+  item: NewsItem;
+}
+const { item } = Astro.props;
+
+const formattedDate = item.date
+  ? new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  : null;
+
+// 文字数に関わらず流れる速さ(px/秒)が揃って見えるよう、日付+タイトルの長さから再生時間を概算する
+const duration = Math.min(30, Math.max(10, (item.title.length + (formattedDate?.length ?? 0)) * 0.35));
+---
+
+<div class="news-ticker relative flex items-center gap-2">
+  <i class="fa-solid fa-bullhorn shrink-0 text-white/80" aria-hidden="true"></i>
+  <div class="news-ticker-viewport min-w-0 flex-1 overflow-hidden">
+    <div class="news-ticker-track flex w-max" style={`animation-duration: ${duration}s;`}>
+      <a
+        href={item.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="news-ticker-copy shrink-0 whitespace-nowrap pr-16 font-mono text-sm text-white/90 transition-colors hover:text-accent"
+      >
+        {formattedDate && <span class="mr-2 text-white/60">{formattedDate}</span>}
+        {item.title}
+        <span class="ml-1 text-white/60">&#8599;</span>
+      </a>
+      <a
+        href={item.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-hidden="true"
+        tabindex="-1"
+        class="news-ticker-copy shrink-0 whitespace-nowrap pr-16 font-mono text-sm text-white/90 transition-colors hover:text-accent"
+      >
+        {formattedDate && <span class="mr-2 text-white/60">{formattedDate}</span>}
+        {item.title}
+        <span class="ml-1 text-white/60">&#8599;</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* タイトルを2つ並べて配置し、自身の50%(=コピー1個分)だけ動かすことで
+     継ぎ目のない無限ループに見せる(電光掲示板と同じ仕組み) */
+  .news-ticker-track {
+    animation-name: news-ticker-scroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  /* ホバー中は読めるよう一時停止する */
+  .news-ticker:hover .news-ticker-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes news-ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .news-ticker-track {
+      animation: none;
+      transform: none;
+    }
+
+    .news-ticker-copy:nth-child(2) {
+      display: none;
+    }
+  }
+</style>

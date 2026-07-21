@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ArtworkCard from '../components/ArtworkCard.astro';
 import WorkItemCard from '../components/WorkItemCard.astro';
-import NewsItem from '../components/NewsItem.astro';
+import NewsTicker from '../components/NewsTicker.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import SnsLinks from '../components/SnsLinks.astro';
 import Lightbox from '../components/Lightbox.astro';
@@ -15,7 +15,7 @@ import { site } from '../lib/config';
 const [gallery, works, news] = await Promise.all([
   getGalleryItems(),
   getWorkHistory(),
-  getNewsItems(5),
+  getNewsItems(1),
 ]);
 
 const featuredGallery = gallery.slice(0, 3);
@@ -45,44 +45,14 @@ const heroImages =
 
     <div class="relative z-10 flex h-full flex-col justify-end px-6 pb-20 pt-16 sm:px-10 sm:pb-24">
       <div class="max-w-md rounded-xl border border-white/20 bg-white/10 p-5 text-left shadow-lg backdrop-blur-md sm:p-6">
-        <h2 class="mb-4 font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
-          お知らせ<span class="font-mono text-xs uppercase tracking-[0.25em] text-white/80 pl-2">Latest News</span>
-        </h2>
         {news.length > 0 ? (
-          <ul>
-            {news.slice(0, 3).map((item) => (
-              <li class="border-b border-white/20 py-3 first:pt-0 last:border-b-0">
-                <a
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
-                >
-                  {item.date && (
-                    <span class="shrink-0 font-mono text-xs text-white/60">
-                      {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-                    </span>
-                  )}
-                  <span class="text-white/90 transition-colors group-hover:text-accent">
-                    {item.title}
-                    <span class="ml-1 text-white/60">&#8599;</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
+          <NewsTicker item={news[0]} />
         ) : (
-          <p class="text-sm leading-relaxed text-white/85">お知らせはまだありません。</p>
+          <p class="flex items-center gap-2 text-sm leading-relaxed text-white/85">
+            <i class="fa-solid fa-bullhorn shrink-0 text-white/80" aria-hidden="true"></i>
+            お知らせはまだありません。
+          </p>
         )}
-        <div class="mt-6 text-right">
-          <a
-            href="https://note.com/chisamikan"
-            class="font-mono text-sm text-white/90 underline underline-offset-4 transition-colors hover:text-accent"
-			target="_blank"
-          >
-            お知らせをもっと見る &rarr;
-          </a>
-        </div>
       </div>
     </div>
 
