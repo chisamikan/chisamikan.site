@@ -18,7 +18,8 @@ updates:
           - "minor"
           - "patch"
     ignore:
-      # @astrojs/check が TypeScript 7 系に対応するまでメジャー更新を保留
+      # TypeScript 7系(tsgo)はLanguage Service APIが未安定で、
+      # Astroの言語サーバー(@astrojs/language-server 等)が対応するまでメジャー更新を保留
       - dependency-name: "typescript"
         update-types:
           - "version-update:semver-major"
