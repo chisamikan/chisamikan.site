@@ -16,7 +16,6 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
     "@astrojs/cloudflare": "^14.1.4",
     "@notionhq/client": "^5.23.2",
     "@tailwindcss/vite": "^4.0.0",
