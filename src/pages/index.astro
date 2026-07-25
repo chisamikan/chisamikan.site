@@ -31,7 +31,7 @@ const slideshowImages = gallery
 const heroImages =
   slideshowImages.length > 0
     ? slideshowImages
-    : [gallery.find((item) => !item.nsfw && item.imageUrl)?.imageUrl ?? '/images/hero-illustration.svg'];
+    : [gallery.find((item) => !item.nsfw && item.imageUrl)?.imageUrl ?? '/images/work-placeholder.svg'];
 ---
 
 <BaseLayout>
