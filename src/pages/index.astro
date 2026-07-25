@@ -3,18 +3,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ArtworkCard from '../components/ArtworkCard.astro';
 import WorkItemCard from '../components/WorkItemCard.astro';
+import ShopItemCard from '../components/ShopItemCard.astro';
 import NewsTicker from '../components/NewsTicker.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import Lightbox from '../components/Lightbox.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
 import { getGalleryItems, getWorkHistory } from '../lib/notion';
 import { getNewsItems } from '../lib/rss';
+import { getBoothItems } from '../lib/booth';
 import { site } from '../lib/config';
 
-const [gallery, works, news] = await Promise.all([
+const [gallery, works, news, shopItems] = await Promise.all([
   getGalleryItems(),
   getWorkHistory(),
   getNewsItems(3),
+  getBoothItems(3),
 ]);
 
 const featuredGallery = gallery.slice(0, 3);
@@ -133,6 +136,28 @@ const heroImages =
     <div class="mt-10 text-center">
       <a href="/works" class="btn-glass btn-glass-accent md:w-1/3 w-full">
         <i class="fa-solid fa-circle-chevron-right pr-1"></i>仕事履歴をすべて見る
+      </a>
+    </div>
+  </section>
+
+  <!-- BOOTHショップ(最新9件) -->
+  <section id="shop" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="Shop" title="ショップ" />
+    {shopItems.length > 0 ? (
+      <div class="grid gap-8 sm:grid-cols-3">
+        {shopItems.map((item) => <ShopItemCard item={item} />)}
+      </div>
+    ) : (
+      <p class="font-mono text-sm text-graphite">まだ商品が登録されていません。</p>
+    )}
+    <div class="mt-10 text-center">
+      <a
+        href={import.meta.env.BOOTH_SHOP_URL || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-glass btn-glass-accent md:w-1/3 w-full"
+      >
+        <i class="fa-solid fa-circle-chevron-right pr-1"></i>BOOTHショップを見る
       </a>
     </div>
   </section>
