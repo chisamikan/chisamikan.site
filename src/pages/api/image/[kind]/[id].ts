@@ -72,6 +72,26 @@ export const GET: APIRoute = async ({ params, locals }) => {
       return new Response('Image Not Found', { status: 404 });
     }
 
+    // おみくじのアバターはSNSシェア用画像生成時にcanvas上で読み込むため、
+    // 302リダイレクトのままだと最終的な画像応答がNotion側(別オリジン)のものになり、
+    // そちら側のCORS設定次第でcanvasから読み取れずシェア画像がフォールバック表示に
+    // なってしまう。そのためこのkindだけはこちらで画像バイトを取得して中継し、
+    // ブラウザからは常に同一オリジンの応答として扱えるようにする。
+    if (kind === 'omikuji') {
+      const upstream = await fetch(url);
+      if (!upstream.ok || !upstream.body) {
+        return new Response('Image Not Found', { status: 404 });
+      }
+
+      return new Response(upstream.body, {
+        status: 200,
+        headers: {
+          'Content-Type': upstream.headers.get('content-type') || 'image/jpeg',
+          'Cache-Control': `public, max-age=${CACHE_SECONDS}`,
+        },
+      });
+    }
+
     return new Response(null, {
       status: 302,
       headers: {
