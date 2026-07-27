@@ -12,7 +12,7 @@ export const prerender = false;
 // ブラウザ/CDNに失効済みURLへのリダイレクトがキャッシュされたまま残るのを防ぐ。
 const CACHE_SECONDS = 3000;
 
-type Kind = 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels';
+type Kind = 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels' | 'omikuji';
 
 function isKind(value: string | undefined): value is Kind {
   return (
@@ -20,9 +20,20 @@ function isKind(value: string | undefined): value is Kind {
     value === 'works' ||
     value === 'profile' ||
     value === 'toolbox' ||
-    value === 'novels'
+    value === 'novels' ||
+    value === 'omikuji'
   );
 }
+
+// kind === 'profile' はブロック直下のimageのため対象外。他のkindはページの
+// プロパティ名がDBごとに異なる(おみくじDBのみ日本語プロパティ名)ため、ここで対応させる。
+const IMAGE_PROPERTY_NAME: Record<Exclude<Kind, 'profile'>, string> = {
+  gallery: 'Image',
+  works: 'Image',
+  toolbox: 'Image',
+  novels: 'Image',
+  omikuji: '画像',
+};
 
 export const GET: APIRoute = async ({ params, locals }) => {
   const { kind, id } = params;
@@ -49,7 +60,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     } else {
       const page = await notion.pages.retrieve({ page_id: id });
       if (isFullPage(page)) {
-        const prop = page.properties.Image;
+        const prop = page.properties[IMAGE_PROPERTY_NAME[kind]];
         if (prop?.type === 'files' && prop.files.length > 0) {
           const file = prop.files[0];
           url = file.type === 'external' ? file.external.url : file.file.url;

@@ -23,7 +23,10 @@ function warnMissingToken(context: string) {
 // 取得し直す /api/image/[kind]/[id] 経由のパスに差し替える。
 // (外部URL(file.type === 'external')は失効しないためそのまま使用する)
 // ---------------------------------------------------------------------------
-function imageProxyUrl(kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels', id: string): string {
+function imageProxyUrl(
+  kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels' | 'omikuji',
+  id: string
+): string {
   return `/api/image/${kind}/${id}`;
 }
 
@@ -72,6 +75,11 @@ export interface WorkItem {
 
 function richTextToPlain(richText: { plain_text: string }[]): string {
   return richText.map((t) => t.plain_text).join('');
+}
+
+function richTextProp(props: PageObjectResponse['properties'], key: string): string {
+  const prop = props[key];
+  return prop?.type === 'rich_text' ? richTextToPlain(prop.rich_text) : '';
 }
 
 // ---------------------------------------------------------------------------
@@ -411,3 +419,178 @@ export async function createContactEntry(
     },
   });
 }
+
+// --- おみくじ -----------------------------------------------------------------
+
+export interface OmikujiItem {
+  id: string;
+  fortune: string;
+  overall: string;
+  wish: string;
+  waitingPerson: string;
+  lostItem: string;
+  travel: string;
+  business: string;
+  study: string;
+  love: string;
+  moving: string;
+  illness: string;
+  direction: string;
+}
+
+/**
+ * おみくじ用データベースを取得します(404ページで使用)。
+ * Notion側のプロパティ名(想定): 運勢(title) / 全体運・願望・待人・失物・旅行・
+ * 商売・学問・恋愛・転居・病気・方位(いずれもrich_text)
+ * (件数が少なく全件をその都度ランダム抽選したいため、Published等のフィルタは設けず全件取得する)
+ */
+export async function getOmikujiItems(): Promise<OmikujiItem[]> {
+  const dbId = import.meta.env.NOTION_OMIKUJI_DB_ID;
+  if (!notion || !dbId) {
+    warnMissingToken('おみくじ');
+    return sampleOmikuji;
+  }
+
+  const db = await notion.databases.retrieve({ database_id: dbId });
+  if (!isFullDatabase(db) || db.data_sources.length === 0) {
+    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
+  }
+
+  const pages: PageObjectResponse[] = [];
+  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
+    data_source_id: db.data_sources[0].id,
+  })) {
+    if (isFullPage(page)) {
+      pages.push(page);
+    }
+  }
+
+  return pages.map(pageToOmikuji);
+}
+
+function pageToOmikuji(page: PageObjectResponse): OmikujiItem {
+  const props = page.properties;
+
+  const fortune =
+    props['運勢']?.type === 'title' ? richTextToPlain(props['運勢'].title) : '(無題)';
+
+  return {
+    id: page.id,
+    fortune,
+    overall: richTextProp(props, '全体運'),
+    wish: richTextProp(props, '願望'),
+    waitingPerson: richTextProp(props, '待人'),
+    lostItem: richTextProp(props, '失物'),
+    travel: richTextProp(props, '旅行'),
+    business: richTextProp(props, '商売'),
+    study: richTextProp(props, '学問'),
+    love: richTextProp(props, '恋愛'),
+    moving: richTextProp(props, '転居'),
+    illness: richTextProp(props, '病気'),
+    direction: richTextProp(props, '方位'),
+  };
+}
+
+const sampleOmikuji: OmikujiItem[] = [
+  {
+    id: 'sample-omikuji-1',
+    fortune: '大吉',
+    overall: '(サンプル) NOTION_OMIKUJI_DB_ID を設定するとNotionのおみくじ結果が抽選されます。',
+    wish: '叶うでしょう',
+    waitingPerson: '来るでしょう',
+    lostItem: '出るでしょう',
+    travel: '良し',
+    business: '繁栄する',
+    study: '励めば成る',
+    love: '良縁あり',
+    moving: '吉',
+    illness: '治る',
+    direction: '東',
+  },
+  {
+    id: 'sample-omikuji-2',
+    fortune: '中吉',
+    overall: '(サンプル) NOTION_OMIKUJI_DB_ID を設定するとNotionのおみくじ結果が抽選されます。',
+    wish: '叶うでしょう',
+    waitingPerson: '来るでしょう',
+    lostItem: '出るでしょう',
+    travel: '良し',
+    business: '繁栄する',
+    study: '励めば成る',
+    love: '良縁あり',
+    moving: '吉',
+    illness: '治る',
+    direction: '南',
+  },
+];
+
+// --- おみくじメッセージ(運勢ごとの一言・LINE風表示用) -----------------------------
+
+export interface OmikujiMessageItem {
+  id: string;
+  fortune: string;
+  imageUrl: string | null;
+  message: string;
+}
+
+/**
+ * おみくじの運勢ごとの一言メッセージ用データベースを取得します(404ページで使用)。
+ * Notion側のプロパティ名(想定): 運勢(title) / 画像(files) / メッセージ(rich_text)
+ * 抽選したおみくじ(getOmikujiItems)の fortune と、この運勢の文字列を完全一致させて
+ * 対応するメッセージを1件引き当てる想定(件数は大吉～凶の数種類のみのため全件取得)。
+ */
+export async function getOmikujiMessageItems(): Promise<OmikujiMessageItem[]> {
+  const dbId = import.meta.env.NOTION_OMIKUJI_MESSAGE_DB_ID;
+  if (!notion || !dbId) {
+    warnMissingToken('おみくじメッセージ');
+    return sampleOmikujiMessages;
+  }
+
+  const db = await notion.databases.retrieve({ database_id: dbId });
+  if (!isFullDatabase(db) || db.data_sources.length === 0) {
+    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
+  }
+
+  const pages: PageObjectResponse[] = [];
+  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
+    data_source_id: db.data_sources[0].id,
+  })) {
+    if (isFullPage(page)) {
+      pages.push(page);
+    }
+  }
+
+  return pages.map(pageToOmikujiMessage);
+}
+
+function pageToOmikujiMessage(page: PageObjectResponse): OmikujiMessageItem {
+  const props = page.properties;
+
+  const fortune =
+    props['運勢']?.type === 'title' ? richTextToPlain(props['運勢'].title) : '(無題)';
+
+  let imageUrl: string | null = null;
+  if (props['画像']?.type === 'files' && props['画像'].files.length > 0) {
+    const file = props['画像'].files[0];
+    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('omikuji', page.id);
+  }
+
+  const message = richTextProp(props, 'メッセージ');
+
+  return { id: page.id, fortune, imageUrl, message };
+}
+
+const sampleOmikujiMessages: OmikujiMessageItem[] = [
+  {
+    id: 'sample-omikuji-message-1',
+    fortune: '大吉',
+    imageUrl: null,
+    message: '(サンプル) NOTION_OMIKUJI_MESSAGE_DB_ID を設定すると運勢ごとのメッセージが表示されます。',
+  },
+  {
+    id: 'sample-omikuji-message-2',
+    fortune: '中吉',
+    imageUrl: null,
+    message: '(サンプル) NOTION_OMIKUJI_MESSAGE_DB_ID を設定すると運勢ごとのメッセージが表示されます。',
+  },
+];
