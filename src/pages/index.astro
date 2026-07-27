@@ -3,22 +3,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ArtworkCard from '../components/ArtworkCard.astro';
 import NovelCard from '../components/NovelCard.astro';
-import WorkItemCard from '../components/WorkItemCard.astro';
 import ShopItemCard from '../components/ShopItemCard.astro';
 import ToolboxItemCard from '../components/ToolboxItemCard.astro';
 import NewsTicker from '../components/NewsTicker.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import Lightbox from '../components/Lightbox.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
-import { getGalleryItems, getNovelItems, getWorkHistory, getToolboxItems } from '../lib/notion';
+import { getGalleryItems, getNovelItems, getToolboxItems } from '../lib/notion';
 import { getNewsItems } from '../lib/rss';
 import { getBoothItems } from '../lib/booth';
 import { site } from '../lib/config';
 
-const [gallery, novels, works, toolbox, news, shopItems] = await Promise.all([
+const [gallery, novels, toolbox, news, shopItems] = await Promise.all([
   getGalleryItems(),
   getNovelItems(),
-  getWorkHistory(),
   getToolboxItems(),
   getNewsItems(3),
   getBoothItems(3),
@@ -26,7 +24,6 @@ const [gallery, novels, works, toolbox, news, shopItems] = await Promise.all([
 
 const featuredGallery = gallery.slice(0, 3);
 const featuredNovels = novels.slice(0, 3);
-const latestWorks = works.slice(0, 3);
 const featuredToolbox = toolbox.slice(0, 3);
 
 // ファーストビューの全画面イラスト: ギャラリーで「slideshow」がオンの作品(NSFWは除外)を
@@ -106,6 +103,19 @@ const heroImages =
     </div>
   </section>
 
+  <!-- プロフィール -->
+  <section id="profile" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
+    <SectionHeading eyebrow="Profile" title="プロフィール" />
+    <div class="mx-auto max-w-2xl text-center">
+      <ProfileContent showSkills={false} />
+    </div>
+    <div class="mt-10 text-center">
+      <a href="/profile" class="btn-glass btn-glass-accent md:w-1/3 w-full">
+        <i class="fa-solid fa-circle-chevron-right pr-1"></i>プロフィールをもっと見る
+      </a>
+    </div>
+  </section>
+
   <!-- ギャラリー抜粋 -->
   <section id="gallery" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" />
@@ -136,36 +146,6 @@ const heroImages =
     <div class="mt-10 text-center">
       <a href="/novels" class="btn-glass btn-glass-accent md:w-1/3 w-full">
         <i class="fa-solid fa-circle-chevron-right pr-1"></i>すべての小説を見る
-      </a>
-    </div>
-  </section>
-
-  <!-- プロフィール -->
-  <section id="profile" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Profile" title="プロフィール" />
-    <div class="mx-auto max-w-2xl text-center">
-      <ProfileContent showSkills={false} />
-    </div>
-    <div class="mt-10 text-center">
-      <a href="/profile" class="btn-glass btn-glass-accent md:w-1/3 w-full">
-        <i class="fa-solid fa-circle-chevron-right pr-1"></i>プロフィールをもっと見る
-      </a>
-    </div>
-  </section>
-
-  <!-- 仕事履歴(最新3件・PCでは3カラム表示) -->
-  <section id="works" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Works" title="仕事履歴" />
-    {latestWorks.length > 0 ? (
-      <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-        {latestWorks.map((item) => <WorkItemCard item={item} />)}
-      </div>
-    ) : (
-      <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
-    )}
-    <div class="mt-10 text-center">
-      <a href="/works" class="btn-glass btn-glass-accent md:w-1/3 w-full">
-        <i class="fa-solid fa-circle-chevron-right pr-1"></i>仕事履歴をすべて見る
       </a>
     </div>
   </section>

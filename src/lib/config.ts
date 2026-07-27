@@ -7,10 +7,9 @@ export const site = {
 export const nav = [
   { href: '/', label: 'Top' },
   { href: '/#news', label: 'News' },
+  { href: '/profile', label: 'Profile' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/novels', label: 'Novels' },
-  { href: '/profile', label: 'Profile' },
-  { href: '/works', label: 'Works' },
   { href: '/toolbox', label: 'ToolBox' },
   { href: '/#shop', label: 'Shop' },
   { href: '/contact', label: 'Contact' },
