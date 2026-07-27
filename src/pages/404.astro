@@ -46,7 +46,7 @@ const omikujiFields = [
                   {!introMessage.imageUrl && '🔮'}
                 </div>
                 <div class="line-mock-bubble">
-                  <span>{introText}</span>
+                  <span id="omikuji-intro-message">{introText}</span>
                 </div>
               </div>
             </div>
@@ -63,11 +63,11 @@ const omikujiFields = [
 
         <div id="omikuji-result" class="hidden mt-6 text-left">
           <div class="mb-6 text-center">
-            <p id="omikuji-fortune" class="text-4xl font-bold text-accent"></p>
-            <p id="omikuji-overall" class="mx-auto mt-2 max-w-md font-mono text-sm leading-relaxed text-ink-soft"></p>
+            <p id="omikuji-fortune" class="omikuji-reveal-item text-4xl font-bold text-accent"></p>
+            <p id="omikuji-overall" class="omikuji-reveal-item mx-auto mt-2 max-w-md font-mono text-sm leading-relaxed text-ink-soft"></p>
           </div>
 
-          <div id="omikuji-line" class="mb-6 hidden">
+          <div id="omikuji-line" class="omikuji-reveal-item mb-6 hidden">
             <div class="line-mock-body">
               <div class="line-mock-row">
                 <div id="omikuji-line-avatar" class="line-mock-avatar"></div>
@@ -80,7 +80,7 @@ const omikujiFields = [
 
           <dl id="omikuji-detail" class="font-mono text-sm text-ink-soft"></dl>
 
-          <div class="mt-6 flex flex-col items-center gap-3">
+          <div class="omikuji-reveal-item mt-6 flex flex-col items-center gap-3">
             <button id="omikuji-share" type="button" class="btn-glass btn-glass-accent w-full md:max-w-1/2">
               <i class="fa-solid fa-share-nodes pr-1" aria-hidden="true"></i>結果をシェアする
             </button>
@@ -116,9 +116,42 @@ const omikujiFields = [
     const shareButton = document.getElementById('omikuji-share');
     const redrawButton = document.getElementById('omikuji-redraw');
     const titleEl = document.getElementById('omikuji-title');
+    const introMessageEl = document.getElementById('omikuji-intro-message');
 
     let drawnItem = null;
     let drawnMatch = null;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // メッセージ吹き出し(.line-mock-bubble)のテキストを1文字ずつ表示するタイピング風アニメーション。
+    // 同じ要素で連打(再抽選)された場合に前のタイマーが残って文字が混ざらないよう、
+    // 要素自身にタイマーIDを持たせて必ず先にクリアする。
+    function typeText(el, text, speed = 32) {
+      if (el._typingTimer) {
+        clearInterval(el._typingTimer);
+        el._typingTimer = null;
+      }
+
+      if (prefersReducedMotion || !text) {
+        el.textContent = text || '';
+        return;
+      }
+
+      el.textContent = '';
+      let i = 0;
+      el._typingTimer = setInterval(() => {
+        el.textContent += text[i];
+        i += 1;
+        if (i >= text.length) {
+          clearInterval(el._typingTimer);
+          el._typingTimer = null;
+        }
+      }, speed);
+    }
+
+    if (introMessageEl) {
+      typeText(introMessageEl, introMessageEl.textContent, 32);
+    }
 
     function wrapCanvasText(ctx, text, maxWidth) {
       const lines = [];
@@ -382,7 +415,7 @@ const omikujiFields = [
       detailEl.innerHTML = fields
         .map(({ key, label }) => {
           const value = item[key] || '—';
-          return `<div class="omikuji-detail-row"><dt>${label}</dt><dd>${value}</dd></div>`;
+          return `<div class="omikuji-detail-row omikuji-reveal-item"><dt>${label}</dt><dd>${value}</dd></div>`;
         })
         .join('');
 
@@ -396,7 +429,7 @@ const omikujiFields = [
           lineAvatar.style.backgroundImage = 'none';
           lineAvatar.textContent = '🔮';
         }
-        lineMessage.textContent = match.message;
+        lineMessage.textContent = '';
         lineBox.classList.remove('hidden');
       } else {
         lineBox.classList.add('hidden');
@@ -406,6 +439,26 @@ const omikujiFields = [
       heading.classList.remove('hidden');
       result.classList.remove('hidden');
       button.classList.add('hidden');
+
+      playRevealAnimation();
+    }
+
+    function playRevealAnimation() {
+      const revealItems = result.querySelectorAll('.omikuji-reveal-item');
+      revealItems.forEach((el) => el.classList.remove('is-visible'));
+
+      // is-visible を外した直後の非表示状態を1フレーム描画させてから付け直すことで、
+      // 再抽選のたびにも毎回フェードインが再生されるようにする
+      requestAnimationFrame(() => {
+        revealItems.forEach((el, i) => {
+          setTimeout(() => {
+            el.classList.add('is-visible');
+            if (el.id === 'omikuji-line' && drawnMatch) {
+              typeText(lineMessage, drawnMatch.message, 32);
+            }
+          }, i * 150);
+        });
+      });
     }
 
     button?.addEventListener('click', drawOmikuji);

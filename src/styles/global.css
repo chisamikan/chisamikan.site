@@ -273,6 +273,28 @@
     scroll-margin-top: calc(var(--mobile-header-h, 4.5rem) + 1rem);
   }
 
+  /* おみくじ結果の各項目を時間差でフェードインアップさせる。既存の .reveal は
+     ページ全体のスクロール連動(IntersectionObserver)専用のため、名前を分けて
+     JS側(404.astro)から抽選ごとに is-visible を付け直せるようにする */
+  .omikuji-reveal-item {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .omikuji-reveal-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .omikuji-reveal-item {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
   /* LINEのトーク画面を模したモックアップ(404ページのおみくじ結果に使用)。
      吹き出し(.line-mock-bubble)の見た目のみでLINE感を出し、周囲の背景色や
      幅は持たせず他の項目(.omikuji-detail-row等)と横幅を揃える */
