@@ -8,6 +8,7 @@ function isActive(href: string) {
 }
 ---
 
+<div id="mobile-menu-root" class="contents">
 <header class="sticky top-0 z-40 border-b border-glass-border bg-paper/70 shadow-glass backdrop-blur-xl">
   <div class="mx-auto max-w-5xl px-6 py-4">
     <input type="checkbox" id="nav-toggle" class="peer hidden" />
@@ -73,42 +74,62 @@ function isActive(href: string) {
         </button>
       </div>
     </div>
-
-    <nav aria-label="サイト内ナビゲーション（モバイル）" class="hidden peer-checked:block sm:hidden">
-      <ul class="mt-4 flex flex-col items-start gap-1 font-mono text-xs uppercase tracking-wider">
-        {nav.map((item) => (
-          <li class="w-full">
-            <a
-              href={item.href}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-              class:list={[
-                'relative block rounded px-2.5 py-2 transition-colors hover:text-accent',
-                isActive(item.href) ? 'text-accent' : 'text-ink/70',
-              ]}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-        <li class="w-full">
-          <button
-            type="button"
-            aria-label="Dark Mode"
-            aria-pressed="false"
-            class="theme-toggle-btn flex w-full items-center gap-2 rounded px-2.5 py-2 uppercase text-ink/70 transition-colors hover:text-accent"
-          >
-            <i class="fa-regular fa-moon dark:hidden!" aria-hidden="true"></i>
-            <i class="fa-regular fa-sun hidden! dark:inline!" aria-hidden="true"></i>
-            <span class="dark:hidden">Dark Mode</span>
-            <span class="hidden dark:inline">Light Mode</span>
-          </button>
-        </li>
-      </ul>
-    </nav>
   </div>
 </header>
 
+<nav
+  aria-label="サイト内ナビゲーション（モバイル）"
+  class="mobile-nav-overlay pointer-events-none fixed inset-0 z-30 flex -translate-y-4 flex-col items-center justify-center gap-1 overflow-y-auto bg-paper/70 px-6 py-24 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out sm:hidden"
+>
+  <ul class="flex flex-col items-center gap-2 font-mono text-xs uppercase tracking-wider">
+    {nav.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+          class:list={[
+            'relative inline-block rounded px-3 py-2 transition-colors hover:text-accent',
+            isActive(item.href) ? 'text-accent' : 'text-ink/70',
+          ]}
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+    <li>
+      <button
+        type="button"
+        aria-label="Dark Mode"
+        aria-pressed="false"
+        class="theme-toggle-btn inline-flex items-center gap-2 rounded px-3 py-2 uppercase text-ink/70 transition-colors hover:text-accent"
+      >
+        <i class="fa-regular fa-moon dark:hidden!" aria-hidden="true"></i>
+        <i class="fa-regular fa-sun hidden! dark:inline!" aria-hidden="true"></i>
+        <span class="dark:hidden">Dark Mode</span>
+        <span class="hidden dark:inline">Light Mode</span>
+      </button>
+    </li>
+  </ul>
+</nav>
+</div>
+
 <style>
+  :global(body:has(#nav-toggle:checked)) {
+    overflow: hidden;
+  }
+
+  /* #nav-toggle and .mobile-nav-overlay are siblings of <header>, not of
+     each other (the overlay must sit outside header's backdrop-filter,
+     which otherwise clips a fixed-position descendant's containing block
+     to header's own small box instead of the viewport). peer-checked
+     can't reach across that gap, so :has() on the shared wrapper does it
+     instead. */
+  #mobile-menu-root:has(#nav-toggle:checked) .mobile-nav-overlay {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .nav-icon-bars {
     position: relative;
     display: block;
@@ -194,5 +215,20 @@ function isActive(href: string) {
   media.addEventListener('change', (event) => {
     if (localStorage.getItem('theme')) return;
     applyState(event.matches);
+  });
+
+  // ページ内アンカー(例: /#news)はページ遷移が起きず全画面メニューが開いたままになるため、
+  // タップ時に明示的にメニューを閉じる。別ページへのリンクはページ遷移がそのまま状態をリセットするので対象外。
+  const navToggle = document.getElementById('nav-toggle') as HTMLInputElement | null;
+  const mobileNavLinks = document.querySelectorAll<HTMLAnchorElement>('.mobile-nav-overlay a');
+  const currentPath = window.location.pathname;
+
+  mobileNavLinks.forEach((link) => {
+    const isSamePageAnchor = link.pathname === currentPath && link.hash !== '';
+    if (!isSamePageAnchor) return;
+
+    link.addEventListener('click', () => {
+      if (navToggle) navToggle.checked = false;
+    });
   });
 </script>
