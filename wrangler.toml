@@ -8,6 +8,11 @@ directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
 
+# アクセスカウンターの集計値を保存するKV namespace
+[[kv_namespaces]]
+binding = "COUNTER_KV"
+id = "cd4e79834fdf48aca8f7d84620519502"
+
 # 本番の環境変数(NOTION_TOKEN など)は Cloudflare Pages の
 # ダッシュボード > Settings > Environment variables で設定してください。
 # ローカル開発では .env ファイルを使用します(.env.example 参照)。

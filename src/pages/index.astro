@@ -6,6 +6,7 @@ import NovelCard from '../components/NovelCard.astro';
 import ShopItemCard from '../components/ShopItemCard.astro';
 import ToolboxItemCard from '../components/ToolboxItemCard.astro';
 import NewsTicker from '../components/NewsTicker.astro';
+import AccessCounter from '../components/AccessCounter.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import Lightbox from '../components/Lightbox.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
@@ -201,6 +202,11 @@ const heroImages =
         </a>
       </div>
     </div>
+  </section>
+
+  <!-- アクセスカウンター -->
+  <section class="reveal mx-auto max-w-5xl px-6 pb-16">
+    <AccessCounter />
   </section>
   <Lightbox />
 </BaseLayout>

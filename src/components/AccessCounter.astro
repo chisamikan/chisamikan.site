@@ -1,0 +1,47 @@
+---
+// トップページ最下部に置くアクセスカウンター。
+// ページはSSGのため、表示数は /api/counter (Cloudflare KV) をクライアント側から呼んで取得する。
+const DIGITS = 6;
+---
+
+<div class="flex flex-col items-center gap-2 font-mono text-graphite" data-access-counter>
+  <p class="text-[11px] uppercase tracking-[0.2em]">Access Counter</p>
+  <div class="flex gap-1" data-access-counter-digits aria-live="polite">
+    {Array.from({ length: DIGITS }).map(() => (
+      <span class="inline-flex h-8 w-6 items-center justify-center rounded-md border border-glass-border bg-glass text-sm text-ink/40 shadow-glass backdrop-blur-sm sm:h-9 sm:w-7 sm:text-base">
+        -
+      </span>
+    ))}
+  </div>
+</div>
+
+<script>
+  (async () => {
+    const root = document.querySelector<HTMLElement>('[data-access-counter]');
+    const digitsEl = root?.querySelector<HTMLElement>('[data-access-counter-digits]');
+    if (!digitsEl) return;
+
+    const digitClass =
+      'inline-flex h-8 w-6 items-center justify-center rounded-md border border-glass-border bg-glass text-sm text-ink shadow-glass backdrop-blur-sm sm:h-9 sm:w-7 sm:text-base';
+
+    const renderDigits = (text: string) => {
+      digitsEl.innerHTML = '';
+      for (const char of text) {
+        const span = document.createElement('span');
+        span.className = digitClass;
+        span.textContent = char;
+        digitsEl.appendChild(span);
+      }
+    };
+
+    try {
+      const res = await fetch('/api/counter');
+      if (!res.ok) throw new Error(`unexpected status: ${res.status}`);
+      const data = (await res.json()) as { count: number };
+      renderDigits(String(data.count).padStart(digitsEl.childElementCount || 6, '0'));
+    } catch (err) {
+      console.error('[AccessCounter] カウンターの取得に失敗しました:', err);
+      root?.remove();
+    }
+  })();
+</script>

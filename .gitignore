@@ -12,6 +12,7 @@ node_modules/
 # cloudflare
 .wrangler/
 .dev.vars
+worker-configuration.d.ts
 
 # editor / os
 .DS_Store
