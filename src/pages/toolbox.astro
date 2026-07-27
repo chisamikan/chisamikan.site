@@ -12,6 +12,10 @@ const items = await getToolboxItems();
   <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
     <SectionHeading eyebrow="Tool Box" title="ツールボックス" level={1} />
 
+    <p class="-mt-6 mb-10 text-center font-mono text-sm text-graphite">
+      これまで作ったスクリプトや素材を配布しています。
+    </p>
+
     {items.length > 0 ? (
       <div id="toolbox-list">
         {items.map((item, index) => (
