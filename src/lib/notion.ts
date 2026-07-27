@@ -23,7 +23,7 @@ function warnMissingToken(context: string) {
 // 取得し直す /api/image/[kind]/[id] 経由のパスに差し替える。
 // (外部URL(file.type === 'external')は失効しないためそのまま使用する)
 // ---------------------------------------------------------------------------
-function imageProxyUrl(kind: 'gallery' | 'works' | 'profile', id: string): string {
+function imageProxyUrl(kind: 'gallery' | 'works' | 'profile' | 'toolbox', id: string): string {
   return `/api/image/${kind}/${id}`;
 }
 
@@ -38,6 +38,14 @@ export interface ArtworkItem {
   date: string | null;
   nsfw: boolean;
   slideshow: boolean;
+}
+
+export interface ToolboxItem {
+  id: string;
+  title: string;
+  url: string | null;
+  imageUrl: string | null;
+  description: string;
 }
 
 export interface WorkItem {
@@ -209,6 +217,69 @@ const sampleWorks: WorkItem[] = [
     url: null,
     imageUrl: null,
     tags: ['装画', '書籍'],
+  },
+];
+
+// --- ツールボックス -------------------------------------------------------------
+
+/**
+ * ツールボックス用データベースを取得します。
+ * Notion側のプロパティ名(想定):
+ *   Name(title) / URL(url) / Image(files) / Description(rich_text)
+ * (他のデータベースと異なり Published プロパティは前提にせず、作成日時の新しい順に全件取得する)
+ */
+export async function getToolboxItems(): Promise<ToolboxItem[]> {
+  const dbId = import.meta.env.NOTION_TOOLBOX_DB_ID;
+  if (!notion || !dbId) {
+    warnMissingToken('ツールボックス');
+    return sampleToolbox;
+  }
+
+  const db = await notion.databases.retrieve({ database_id: dbId });
+  if (!isFullDatabase(db) || db.data_sources.length === 0) {
+    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
+  }
+
+  const pages: PageObjectResponse[] = [];
+  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
+    data_source_id: db.data_sources[0].id,
+    sorts: [{ timestamp: 'created_time', direction: 'descending' }],
+  })) {
+    if (isFullPage(page)) {
+      pages.push(page);
+    }
+  }
+
+  return pages.map(pageToToolbox);
+}
+
+function pageToToolbox(page: PageObjectResponse): ToolboxItem {
+  const props = page.properties;
+
+  const title =
+    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
+
+  const url = props.URL?.type === 'url' ? props.URL.url : null;
+
+  let imageUrl: string | null = null;
+  if (props.Image?.type === 'files' && props.Image.files.length > 0) {
+    const file = props.Image.files[0];
+    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('toolbox', page.id);
+  }
+
+  const description =
+    props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
+
+  return { id: page.id, title, url, imageUrl, description };
+}
+
+const sampleToolbox: ToolboxItem[] = [
+  {
+    id: 'sample-toolbox-1',
+    title: '(サンプル) おすすめツール',
+    url: null,
+    imageUrl: null,
+    description: 'NOTION_TOOLBOX_DB_ID を設定するとNotionのツールがここに並びます。',
   },
 ];
 

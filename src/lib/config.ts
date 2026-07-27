@@ -10,6 +10,7 @@ export const nav = [
   { href: '/gallery', label: 'Gallery' },
   { href: '/#profile', label: 'Profile' },
   { href: '/works', label: 'Works' },
+  { href: '/toolbox', label: 'Tool Box' },
   { href: '/#shop', label: 'Shop' },
   { href: '/contact', label: 'Contact' },
 ];

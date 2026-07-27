@@ -1,0 +1,51 @@
+---
+import type { ToolboxItem } from '../lib/notion';
+
+interface Props {
+  item: ToolboxItem;
+  class?: string;
+  /** true の場合、外側のカードが枠を持つため縁取り・影・背景を付けない */
+  bare?: boolean;
+}
+const { item, class: className = '', bare = false } = Astro.props;
+
+const PLACEHOLDER = '/images/work-placeholder.svg';
+const hasImage = Boolean(item.imageUrl);
+const src = item.imageUrl ?? PLACEHOLDER;
+
+const frameClass = bare
+  ? ''
+  : 'glass-card rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg';
+---
+
+{hasImage ? (
+  <button
+    type="button"
+    class:list={['lightbox-trigger group relative block aspect-square overflow-hidden', frameClass, className]}
+    data-full={src}
+    data-alt={`${item.title}の画像`}
+    aria-label={`${item.title}の画像を拡大表示`}
+  >
+    <img
+      src={src}
+      alt=""
+      loading="lazy"
+      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+    />
+  </button>
+) : (
+  <div
+    class:list={['thumbnail-placeholder relative aspect-square overflow-hidden', frameClass, className]}
+    aria-hidden="true"
+  >
+    <img src={src} alt="" loading="lazy" class="h-full w-full object-cover" />
+  </div>
+)}
+
+<style>
+  /* .glass-card の cursor: pointer (global.css) を打ち消すため、
+     scoped styleのdata属性でスコープ限定+plainクラス以上の詳細度を確保 */
+  .thumbnail-placeholder {
+    cursor: default;
+  }
+</style>

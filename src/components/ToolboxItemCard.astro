@@ -1,0 +1,59 @@
+---
+import type { ToolboxItem } from '../lib/notion';
+
+interface Props {
+  item: ToolboxItem;
+  headingLevel?: 2 | 3;
+}
+const { item, headingLevel = 3 } = Astro.props;
+const Tag = `h${headingLevel}` as 'h2' | 'h3';
+const PLACEHOLDER = '/images/work-placeholder.svg';
+const hasImage = Boolean(item.imageUrl);
+const hasUrl = Boolean(item.url);
+const src = item.imageUrl ?? PLACEHOLDER;
+---
+
+<figure class="glass-card group flex h-full flex-col overflow-hidden rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg">
+  {hasUrl ? (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="no-external-icon relative block aspect-square w-full overflow-hidden bg-paper-dim"
+      aria-label={`${item.title}を開く`}
+    >
+      <img
+        src={src}
+        alt={hasImage ? item.title : ''}
+        loading="lazy"
+        class:list={[
+          'h-full w-full object-cover',
+          hasImage && 'transition-transform duration-500 group-hover:scale-105',
+        ]}
+      />
+    </a>
+  ) : (
+    <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
+      <img src={src} alt="" loading="lazy" class="h-full w-full object-cover" />
+    </div>
+  )}
+  <figcaption class="flex flex-1 flex-col border-t border-glass-border-subtle p-4">
+    <Tag class="font-display text-lg font-medium leading-snug text-ink">
+      {hasUrl ? (
+        <a
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="no-external-icon transition-colors hover:text-accent"
+        >
+          {item.title}
+        </a>
+      ) : (
+        item.title
+      )}
+    </Tag>
+    {item.description && (
+      <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>
+    )}
+  </figcaption>
+</figure>

@@ -7,6 +7,7 @@ interface Props {
 }
 const { item, headingLevel = 3 } = Astro.props;
 const Tag = `h${headingLevel}` as 'h2' | 'h3';
+const PLACEHOLDER = '/images/work-placeholder.svg';
 ---
 
 <article class="glass-card group flex h-full flex-col overflow-hidden rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg">
@@ -25,9 +26,7 @@ const Tag = `h${headingLevel}` as 'h2' | 'h3';
         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
     ) : (
-      <div class="flex h-full w-full items-center justify-center text-graphite" aria-hidden="true">
-        <span class="font-mono text-xs">No Image</span>
-      </div>
+      <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
     )}
   </a>
   <div class="flex flex-1 flex-col border-t border-glass-border-subtle p-4">

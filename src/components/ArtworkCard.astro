@@ -7,6 +7,7 @@ interface Props {
 }
 const { item, headingLevel = 3 } = Astro.props;
 const Tag = `h${headingLevel}` as 'h2' | 'h3';
+const PLACEHOLDER = '/images/work-placeholder.svg';
 const hasImage = Boolean(item.imageUrl);
 ---
 
@@ -38,8 +39,8 @@ const hasImage = Boolean(item.imageUrl);
       )}
     </button>
   ) : (
-    <div class="flex aspect-square w-full cursor-default items-center justify-center bg-paper-dim text-graphite" aria-hidden="true">
-      <span class="font-mono text-xs">No Image</span>
+    <div class="flex aspect-square w-full cursor-default items-center justify-center bg-paper-dim" aria-hidden="true">
+      <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
     </div>
   )}
   <figcaption class="flex flex-1 flex-col border-t border-glass-border-subtle p-4">
