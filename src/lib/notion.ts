@@ -23,7 +23,7 @@ function warnMissingToken(context: string) {
 // 取得し直す /api/image/[kind]/[id] 経由のパスに差し替える。
 // (外部URL(file.type === 'external')は失効しないためそのまま使用する)
 // ---------------------------------------------------------------------------
-function imageProxyUrl(kind: 'gallery' | 'works' | 'profile' | 'toolbox', id: string): string {
+function imageProxyUrl(kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels', id: string): string {
   return `/api/image/${kind}/${id}`;
 }
 
@@ -46,6 +46,17 @@ export interface ToolboxItem {
   url: string | null;
   imageUrl: string | null;
   description: string;
+}
+
+export interface NovelItem {
+  id: string;
+  title: string;
+  imageUrl: string | null;
+  tags: string[];
+  description: string;
+  kakuyomuUrl: string | null;
+  pixivUrl: string | null;
+  shopUrl: string | null;
 }
 
 export interface WorkItem {
@@ -151,6 +162,80 @@ const sampleGallery: ArtworkItem[] = [
     date: '2026-01-01',
     nsfw: false,
     slideshow: true,
+  },
+];
+
+// --- 小説 ---------------------------------------------------------------------
+
+/**
+ * 小説用データベースを取得します。
+ * Notion側のプロパティ名(想定):
+ *   Name(title) / Image(files) / Description(rich_text) / Tags(multi_select) /
+ *   kakuyomu(url, 未入力なら非表示) / pixiv(url, 未入力なら非表示) / shop(url, 未入力なら非表示)
+ * (他のデータベースと異なり Published プロパティは前提にせず、作成日時の新しい順に全件取得する)
+ */
+export async function getNovelItems(): Promise<NovelItem[]> {
+  const dbId = import.meta.env.NOTION_NOVELS_DB_ID;
+  if (!notion || !dbId) {
+    warnMissingToken('小説');
+    return sampleNovels;
+  }
+
+  const db = await notion.databases.retrieve({ database_id: dbId });
+  if (!isFullDatabase(db) || db.data_sources.length === 0) {
+    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
+  }
+
+  const pages: PageObjectResponse[] = [];
+  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
+    data_source_id: db.data_sources[0].id,
+    sorts: [{ timestamp: 'created_time', direction: 'descending' }],
+  })) {
+    if (isFullPage(page)) {
+      pages.push(page);
+    }
+  }
+
+  return pages.map(pageToNovel);
+}
+
+function pageToNovel(page: PageObjectResponse): NovelItem {
+  const props = page.properties;
+
+  const title =
+    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
+
+  let imageUrl: string | null = null;
+  if (props.Image?.type === 'files' && props.Image.files.length > 0) {
+    const file = props.Image.files[0];
+    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('novels', page.id);
+  }
+
+  const tags =
+    props.Tags?.type === 'multi_select' ? props.Tags.multi_select.map((t) => t.name) : [];
+
+  const description =
+    props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
+
+  const kakuyomuUrl = props.kakuyomu?.type === 'url' ? props.kakuyomu.url : null;
+
+  const pixivUrl = props.pixiv?.type === 'url' ? props.pixiv.url : null;
+
+  const shopUrl = props.shop?.type === 'url' ? props.shop.url : null;
+
+  return { id: page.id, title, imageUrl, tags, description, kakuyomuUrl, pixivUrl, shopUrl };
+}
+
+const sampleNovels: NovelItem[] = [
+  {
+    id: 'sample-novel-1',
+    title: '(サンプル) 星の欠片',
+    imageUrl: null,
+    tags: ['ファンタジー'],
+    description: 'NOTION_NOVELS_DB_ID を設定するとNotionの小説作品がここに並びます。',
+    kakuyomuUrl: null,
+    pixivUrl: null,
+    shopUrl: null,
   },
 ];
 

@@ -12,10 +12,16 @@ export const prerender = false;
 // ブラウザ/CDNに失効済みURLへのリダイレクトがキャッシュされたまま残るのを防ぐ。
 const CACHE_SECONDS = 3000;
 
-type Kind = 'gallery' | 'works' | 'profile' | 'toolbox';
+type Kind = 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels';
 
 function isKind(value: string | undefined): value is Kind {
-  return value === 'gallery' || value === 'works' || value === 'profile' || value === 'toolbox';
+  return (
+    value === 'gallery' ||
+    value === 'works' ||
+    value === 'profile' ||
+    value === 'toolbox' ||
+    value === 'novels'
+  );
 }
 
 export const GET: APIRoute = async ({ params, locals }) => {

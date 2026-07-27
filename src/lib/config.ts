@@ -8,6 +8,7 @@ export const nav = [
   { href: '/', label: 'Top' },
   { href: '/#news', label: 'News' },
   { href: '/gallery', label: 'Gallery' },
+  { href: '/novels', label: 'Novels' },
   { href: '/profile', label: 'Profile' },
   { href: '/works', label: 'Works' },
   { href: '/toolbox', label: 'ToolBox' },
