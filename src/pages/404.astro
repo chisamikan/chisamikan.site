@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+---
+
+<BaseLayout title="404 Not Found" description="お探しのページが見つかりませんでした。">
+  <section class="mx-auto max-w-3xl px-6 py-24 sm:py-32 text-center">
+    <SectionHeading eyebrow="404" title="ページが見つかりません" level={1} />
+
+    <p class="mb-10 font-mono text-sm leading-relaxed text-ink-soft">
+      お探しのページは移動または削除された可能性があります。<br />
+      URLが正しいかご確認いただくか、下記のリンクからサイトトップへお戻りください。
+    </p>
+
+    <div class="mx-auto max-w-xs">
+      <a href="/" class="btn-glass w-full">
+        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      </a>
+    </div>
+  </section>
+</BaseLayout>
