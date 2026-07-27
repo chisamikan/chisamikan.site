@@ -80,7 +80,7 @@ function isActive(href: string) {
   aria-label="サイト内ナビゲーション（モバイル）"
   class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/70 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 lg:hidden"
 >
-  <ul class="absolute left-1/2 top-1/2 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 px-6 font-mono text-xs uppercase tracking-wider">
+  <ul class="mobile-nav-list absolute left-1/2 top-1/2 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 px-6 font-mono text-xs uppercase tracking-wider">
     {nav.map((item) => (
       <li>
         <a
@@ -120,6 +120,20 @@ function isActive(href: string) {
   .mobile-nav-overlay {
     top: var(--mobile-header-h, 4.5rem);
     height: calc(100dvh - var(--mobile-header-h, 4.5rem));
+  }
+
+  /* iPhone SE等、横向きだと縦の表示領域が非常に狭い端末では、1列に9項目を
+     縦積みすると画面に収まりきらない。画面が低いときだけ横並び+折り返しにして
+     2〜3行にまとめ、全項目がスクロールなしで見えるようにする。 */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .mobile-nav-list {
+      max-width: 92vw;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 0.5rem;
+      column-gap: 1.5rem;
+    }
   }
 
   .nav-icon-bars {
