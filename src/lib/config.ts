@@ -8,9 +8,9 @@ export const nav = [
   { href: '/', label: 'Top' },
   { href: '/#news', label: 'News' },
   { href: '/gallery', label: 'Gallery' },
-  { href: '/#profile', label: 'Profile' },
+  { href: '/profile', label: 'Profile' },
   { href: '/works', label: 'Works' },
-  { href: '/toolbox', label: 'Tool Box' },
+  { href: '/toolbox', label: 'ToolBox' },
   { href: '/#shop', label: 'Shop' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -24,3 +24,27 @@ export const snsLinks = [
   { label: 'Discord', href: 'https://discord.com/invite/KhYNuGStvj', icon: 'fa-brands fa-discord' },
   { label: 'GitHub', href: 'https://github.com/chisamikan', icon: 'fa-brands fa-github' },
 ];
+
+export const supportLinks = [
+  {
+    label: 'FANBOX',
+    href: 'https://chisamikan.fanbox.cc/',
+    icon: 'fa-solid fa-heart',
+    description: 'サブスク形式で支援したい方はこちら',
+  },
+  {
+    label: 'note',
+    href: 'https://note.com/chisamikan',
+    icon: 'fa-solid fa-pen-nib',
+    description: '会員限定記事を単品購入したい方はこちら',
+  },
+  {
+    label: 'Amazonほしい物リスト',
+    href: 'https://www.amazon.co.jp/registry/wishlist/2NJTPLW0NSHNA/',
+    icon: 'fa-brands fa-amazon',
+    description: 'プレゼントはこちら',
+  },
+];
+
+// プロフィールページの「技術文書」セクションで表示するZennの記事フィード
+export const zennFeedUrl = 'https://zenn.dev/chisamikan/feed';

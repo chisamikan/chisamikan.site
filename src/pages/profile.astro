@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ProfileContent from '../components/ProfileContent.astro';
+import { getFeedItems } from '../lib/rss';
+import { supportLinks, zennFeedUrl } from '../lib/config';
+
+const techDocs = await getFeedItems(zennFeedUrl, 3);
+---
+
+<BaseLayout title="Profile" description="千紗みかんのプロフィールページです。">
+  <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="Profile" title="プロフィール" level={1} />
+
+    <div class="mx-auto max-w-2xl text-center">
+      <ProfileContent />
+    </div>
+
+    <!-- 技術文書(Zennの記事フィード) -->
+    <div class="mx-auto mt-16 max-w-2xl">
+      <h2 class="profile-section-heading">技術文書</h2>
+	  <p class="leading-relaxed text-ink/80">ZennでLLMに関する技術文書を投稿しています。</p>
+      {techDocs.length > 0 ? (
+        <ul class="mx-auto mt-6 divide-y divide-ink/10 text-left">
+          {techDocs.map((item) => (
+            <li class="py-4 first:pt-0 last:pb-0">
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="no-external-icon group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+              >
+                {item.date && (
+                  <span class="shrink-0 font-mono text-xs text-graphite">
+                    {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                  </span>
+                )}
+                <span class="text-ink transition-colors group-hover:text-accent">
+                  {item.title}
+                  <i class="fa-solid fa-arrow-up-right-from-square ml-0.5 text-[0.8em]" aria-hidden="true"></i>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-6 font-mono text-sm text-graphite">記事はまだありません。</p>
+      )}
+    </div>
+    <div class="mt-8 text-center">
+      <a
+        href="https://zenn.dev/chisamikan"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-glass btn-glass-accent md:w-1/3 w-full"
+      >
+        <i class="fa-solid fa-circle-chevron-right pr-1"></i>技術文書をもっと見る
+      </a>
+    </div>
+
+	<!-- 支援先 -->
+    <div class="mx-auto mt-16 max-w-2xl">
+      <h2 class="profile-section-heading">支援先</h2>
+      <ul class="mx-auto mt-6 divide-y divide-ink/10 text-left">
+        {supportLinks.map((link) => (
+          <li class="py-4 first:pt-0 last:pb-0">
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="no-external-icon group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+            >
+              <span class="flex shrink-0 items-center gap-2 text-ink transition-colors group-hover:text-accent">
+                <i class:list={[link.icon]} aria-hidden="true"></i>
+                {link.label}
+                <i class="fa-solid fa-arrow-up-right-from-square text-[0.8em]" aria-hidden="true"></i>
+              </span>
+              <span class="text-sm text-graphite">{link.description}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="mt-16 text-center">
+      <a href="/" class="btn-glass btn-glass-accent md:w-1/3 w-full">
+        <i class="fa-solid fa-circle-chevron-left pr-1"></i>トップページへ戻る
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  @reference '../styles/global.css';
+
+  .profile-section-heading {
+    @apply mb-4 border-l-4 border-accent pl-3 text-lg font-semibold text-ink;
+  }
+</style>

@@ -3,6 +3,12 @@
 // (以前はNotionページから取得していたが、変更履歴をGitで追えるようにするため廃止)
 import SnsLinks from './SnsLinks.astro';
 
+interface Props {
+  // トップページでは抜粋表示のため、Softwares/Skillsセクションを省略できるようにする
+  showSkills?: boolean;
+}
+const { showSkills = true } = Astro.props;
+
 const skills = [
   {
     label: 'Softwares',
@@ -54,19 +60,21 @@ const skills = [
 	同人サークル『Pt.Spoon』・『Satellite Galaxy』主催。
   </p>
   <SnsLinks />
-  <div class="space-y-8">
-    {skills.map((group) => (
-      <div>
-        <p class="text-center font-bold text-ink">{group.label}</p>
-        <ul class="mt-3 flex flex-wrap justify-center gap-1.5">
-          {group.items.map((item) => (
-            <li class="glass-tag text-xs">
-              {item.icon && <i class:list={[item.icon, 'mr-1']} aria-hidden="true"></i>}
-              {item.name}
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
-  </div>
+  {showSkills && (
+    <div class="space-y-8">
+      {skills.map((group) => (
+        <div>
+          <p class="text-center font-bold text-ink">{group.label}</p>
+          <ul class="mt-3 flex flex-wrap justify-center gap-1.5">
+            {group.items.map((item) => (
+              <li class="glass-tag text-xs">
+                {item.icon && <i class:list={[item.icon, 'mr-1']} aria-hidden="true"></i>}
+                {item.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )}
 </div>
