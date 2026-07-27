@@ -32,14 +32,8 @@ const omikujiFields = [
       URLが正しいかご確認いただくか、下記のリンクからサイトトップへお戻りください。
     </p>
 
-    <div class="mx-auto max-w-xs mb-16">
-      <a href="/" class="btn-glass w-full">
-        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
-      </a>
-    </div>
-
     {omikujiItems.length > 0 && (
-      <div class="omikuji-box mx-auto max-w-xl rounded-2xl border border-glass-border-subtle bg-glass p-6 backdrop-blur-xl sm:p-8">
+      <div class="omikuji-box mx-auto max-w-xl rounded-2xl border border-glass-border-subtle bg-glass p-6 backdrop-blur-xl sm:p-8 mb-16">
         <h2 class="mb-4 text-xl font-bold text-ink sm:text-2xl"><i class="fa-solid fa-torii-gate"></i>蛇川神社 おみくじ</h2>
         {introMessage && (
           <div id="omikuji-intro" class="mb-6">
@@ -97,6 +91,12 @@ const omikujiFields = [
         </div>
       </div>
     )}
+
+	<div class="mx-auto max-w-xs">
+      <a href="/" class="btn-glass w-full">
+        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      </a>
+    </div>
   </section>
 
   <script
