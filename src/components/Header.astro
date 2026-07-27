@@ -8,11 +8,10 @@ function isActive(href: string) {
 }
 ---
 
-<div id="mobile-menu-root" class="contents">
-<header class="sticky top-0 z-40 border-b border-glass-border bg-paper/70 shadow-glass backdrop-blur-xl">
-  <div class="mx-auto max-w-5xl px-6 py-4">
-    <input type="checkbox" id="nav-toggle" class="peer hidden" />
+<input type="checkbox" id="nav-toggle" class="peer hidden" />
 
+<header id="site-header" class="sticky top-0 z-40 border-b border-glass-border bg-paper/70 shadow-glass backdrop-blur-xl">
+  <div class="mx-auto max-w-5xl px-6 py-4">
     <div class="flex items-center justify-between">
       <a href="/" class="flex items-center gap-2 font-display text-xl font-semibold tracking-tight text-ink">
         <img src="/favicon.svg" alt="" width="24" height="24" class="h-6 w-6 rounded" />
@@ -79,9 +78,9 @@ function isActive(href: string) {
 
 <nav
   aria-label="サイト内ナビゲーション（モバイル）"
-  class="mobile-nav-overlay pointer-events-none fixed inset-0 z-30 flex -translate-y-4 flex-col items-center justify-center gap-1 overflow-y-auto bg-paper/70 px-6 py-24 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out sm:hidden"
+  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/70 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 sm:hidden"
 >
-  <ul class="flex flex-col items-center gap-2 font-mono text-xs uppercase tracking-wider">
+  <ul class="absolute left-1/2 top-1/2 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 px-6 font-mono text-xs uppercase tracking-wider">
     {nav.map((item) => (
       <li>
         <a
@@ -111,23 +110,16 @@ function isActive(href: string) {
     </li>
   </ul>
 </nav>
-</div>
 
 <style>
-  :global(body:has(#nav-toggle:checked)) {
-    overflow: hidden;
-  }
-
-  /* #nav-toggle and .mobile-nav-overlay are siblings of <header>, not of
-     each other (the overlay must sit outside header's backdrop-filter,
-     which otherwise clips a fixed-position descendant's containing block
-     to header's own small box instead of the viewport). peer-checked
-     can't reach across that gap, so :has() on the shared wrapper does it
-     instead. */
-  #mobile-menu-root:has(#nav-toggle:checked) .mobile-nav-overlay {
-    pointer-events: auto;
-    opacity: 1;
-    transform: translateY(0);
+  /* ヘッダーはオーバーレイの手前(z-40 > z-30)に重なって表示されるだけで、
+     オーバーレイ自身の高さは top-0 のまま画面全体に及んでいた。そのため
+     「展開エリアの中央」がヘッダーの裏に隠れた分だけ上にズレて見えていた。
+     JSで実測したヘッダーの高さぶんだけ top を下げ、見えている範囲だけを
+     基準に高さと中央揃えが計算されるようにする。 */
+  .mobile-nav-overlay {
+    top: var(--mobile-header-h, 4.5rem);
+    height: calc(100dvh - var(--mobile-header-h, 4.5rem));
   }
 
   .nav-icon-bars {
@@ -167,22 +159,22 @@ function isActive(href: string) {
     top: 14px;
   }
 
-  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(1) {
+  #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(1) {
     top: 7px;
     width: 0;
     left: 50%;
   }
 
-  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(2) {
+  #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(2) {
     transform: rotate(45deg);
   }
 
-  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(3) {
+  #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(3) {
     opacity: 1;
     transform: rotate(-45deg);
   }
 
-  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(4) {
+  #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(4) {
     top: 7px;
     width: 0;
     left: 50%;
@@ -190,6 +182,19 @@ function isActive(href: string) {
 </style>
 
 <script>
+  // モバイルの全画面メニューは、ヘッダーの裏に隠れた分を除いた「見えている範囲」を
+  // 基準に高さ・中央揃えを計算したいので、ヘッダーの実測高さをCSS変数として公開する。
+  // フォント読み込みや端末回転でヘッダーの高さが変わっても追従できるようResizeObserverで監視する。
+  const siteHeader = document.getElementById('site-header');
+
+  if (siteHeader && 'ResizeObserver' in window) {
+    const updateHeaderHeight = () => {
+      document.documentElement.style.setProperty('--mobile-header-h', `${siteHeader.offsetHeight}px`);
+    };
+    updateHeaderHeight();
+    new ResizeObserver(updateHeaderHeight).observe(siteHeader);
+  }
+
   const toggles = document.querySelectorAll<HTMLButtonElement>('.theme-toggle-btn');
   const media = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -217,9 +222,36 @@ function isActive(href: string) {
     applyState(event.matches);
   });
 
+  // 全画面メニュー表示中は背景をスクロールさせない。body { overflow: hidden } だと
+  // iOSのSafariでツールバーの表示/非表示に伴う可視ビューポート高さの再計算が崩れ、
+  // 固定オーバーレイの高さが画面全体を覆わなくなることがあるため、
+  // スクロール位置を保持しつつ body ごと固定するiOS向けの定番手法を使う。
+  const navToggle = document.getElementById('nav-toggle') as HTMLInputElement | null;
+  let savedScrollY = 0;
+
+  function setMenuOpen(isOpen: boolean) {
+    if (!navToggle) return;
+    navToggle.checked = isOpen;
+
+    if (isOpen) {
+      savedScrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${savedScrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+    } else {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, savedScrollY);
+    }
+  }
+
+  navToggle?.addEventListener('change', () => setMenuOpen(navToggle.checked));
+
   // ページ内アンカー(例: /#news)はページ遷移が起きず全画面メニューが開いたままになるため、
   // タップ時に明示的にメニューを閉じる。別ページへのリンクはページ遷移がそのまま状態をリセットするので対象外。
-  const navToggle = document.getElementById('nav-toggle') as HTMLInputElement | null;
   const mobileNavLinks = document.querySelectorAll<HTMLAnchorElement>('.mobile-nav-overlay a');
   const currentPath = window.location.pathname;
 
@@ -227,8 +259,6 @@ function isActive(href: string) {
     const isSamePageAnchor = link.pathname === currentPath && link.hash !== '';
     if (!isSamePageAnchor) return;
 
-    link.addEventListener('click', () => {
-      if (navToggle) navToggle.checked = false;
-    });
+    link.addEventListener('click', () => setMenuOpen(false));
   });
 </script>
