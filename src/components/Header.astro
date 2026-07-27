@@ -244,7 +244,10 @@ function isActive(href: string) {
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
-      window.scrollTo(0, savedScrollY);
+      // html { scroll-behavior: smooth } の影響を受けると、トップから元の位置まで
+      // アニメーションしながら戻ってしまい「再度スクロールされた」ように見えるため、
+      // ここでは明示的にアニメーションなしで復元する。
+      window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
     }
   }
 
