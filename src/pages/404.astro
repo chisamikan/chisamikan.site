@@ -63,7 +63,7 @@ const omikujiFields = [
           今日のあなたの運勢は……？
         </h3>
 
-        <button id="omikuji-draw" type="button" class="btn-glass btn-glass-accent">
+        <button id="omikuji-draw" type="button" class="btn-glass btn-glass-accent w-full md:max-w-1/2">
           <i class="fa-solid fa-scroll pr-1" aria-hidden="true"></i>おみくじを引く
         </button>
 
@@ -85,6 +85,15 @@ const omikujiFields = [
           </div>
 
           <dl id="omikuji-detail" class="font-mono text-sm text-ink-soft"></dl>
+
+          <div class="mt-6 flex flex-col items-center gap-3">
+            <button id="omikuji-share" type="button" class="btn-glass btn-glass-accent w-full md:max-w-1/2">
+              <i class="fa-solid fa-share-nodes pr-1" aria-hidden="true"></i>結果をシェアする
+            </button>
+            <button id="omikuji-redraw" type="button" class="btn-glass w-full md:max-w-1/2">
+              <i class="fa-solid fa-rotate-right pr-1" aria-hidden="true"></i>もう一度引く
+            </button>
+          </div>
         </div>
       </div>
     )}
@@ -104,9 +113,268 @@ const omikujiFields = [
     const lineBox = document.getElementById('omikuji-line');
     const lineAvatar = document.getElementById('omikuji-line-avatar');
     const lineMessage = document.getElementById('omikuji-line-message');
+    const shareButton = document.getElementById('omikuji-share');
+    const redrawButton = document.getElementById('omikuji-redraw');
 
-    button?.addEventListener('click', () => {
+    let drawnItem = null;
+    let drawnMatch = null;
+
+    function wrapCanvasText(ctx, text, maxWidth) {
+      const lines = [];
+      let line = '';
+      for (const ch of text || '') {
+        const test = line + ch;
+        if (line && ctx.measureText(test).width > maxWidth) {
+          lines.push(line);
+          line = ch;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function capLines(lines, max) {
+      if (lines.length <= max) return lines;
+      const capped = lines.slice(0, max);
+      capped[max - 1] = capped[max - 1].slice(0, -1) + '…';
+      return capped;
+    }
+
+    function loadImage(url) {
+      return new Promise((resolve) => {
+        if (!url) {
+          resolve(null);
+          return;
+        }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = url;
+      });
+    }
+
+    function drawImageCover(ctx, img, x, y, w, h) {
+      const imgRatio = img.width / img.height;
+      const boxRatio = w / h;
+      let sx, sy, sw, sh;
+      if (imgRatio > boxRatio) {
+        sh = img.height;
+        sw = sh * boxRatio;
+        sx = (img.width - sw) / 2;
+        sy = 0;
+      } else {
+        sw = img.width;
+        sh = sw / boxRatio;
+        sx = 0;
+        sy = (img.height - sh) / 2;
+      }
+      ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + w, y, x + w, y + h, radius);
+      ctx.arcTo(x + w, y + h, x, y + h, radius);
+      ctx.arcTo(x, y + h, x, y, radius);
+      ctx.arcTo(x, y, x + w, y, radius);
+      ctx.closePath();
+    }
+
+    async function buildShareImage(item, match, avatarImg) {
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+
+      const width = 1080;
+      const contentWidth = 780;
+      const contentX = (width - contentWidth) / 2;
+
+      // 実際のcanvasサイズを決める前に、可変長のテキストを仮のcontextで
+      // 折り返した行数から必要な高さを算出する(2パス方式でクリッピングを防ぐ)
+      const measureCanvas = document.createElement('canvas');
+      const mctx = measureCanvas.getContext('2d');
+
+      mctx.font = '400 30px "Zen Kaku Gothic New", sans-serif';
+      const overallLines = capLines(wrapCanvasText(mctx, item.overall, contentWidth), 3);
+
+      const avatarSize = 148;
+      const bubbleGap = 28;
+      const bubbleTextWidth = contentWidth - avatarSize - bubbleGap - 56;
+      let messageLines = [];
+      if (match) {
+        mctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
+        messageLines = capLines(wrapCanvasText(mctx, match.message, bubbleTextWidth), 4);
+      }
+
+      const detailRowHeight = 68;
+      const detailFields = fields.map(({ key, label }) => [label, item[key] || '—']);
+
+      const headerY = 96;
+      const fortuneY = headerY + 190;
+      const overallStartY = fortuneY + 90;
+      const overallLineHeight = 44;
+      const overallEndY = overallStartY + (overallLines.length - 1) * overallLineHeight;
+
+      const lineBlockY = overallEndY + 80;
+      const bubblePaddingY = 30;
+      const bubbleTextHeight = messageLines.length * 38;
+      const bubbleHeight = match ? Math.max(avatarSize, bubbleTextHeight + bubblePaddingY * 2) : 0;
+      const lineBlockHeight = match ? bubbleHeight : 0;
+
+      const detailStartY = lineBlockY + lineBlockHeight + (match ? 70 : 30);
+      const detailHeight = detailFields.length * detailRowHeight;
+
+      const footerY = detailStartY + detailHeight + 70;
+      const height = Math.round(footerY + 40);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0b0e1a';
+      ctx.fillRect(0, 0, width, height);
+
+      const glow = ctx.createRadialGradient(
+        width / 2, fortuneY, 40,
+        width / 2, fortuneY, 520
+      );
+      glow.addColorStop(0, 'rgba(94, 231, 223, 0.25)');
+      glow.addColorStop(1, 'rgba(94, 231, 223, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+      ctx.font = '600 26px "Zen Kaku Gothic New", sans-serif';
+      ctx.fillText('蛇川神社 おみくじ', width / 2, headerY);
+
+      ctx.fillStyle = '#5ee7df';
+      ctx.font = '700 150px "Zen Kaku Gothic New", sans-serif';
+      ctx.fillText(item.fortune, width / 2, fortuneY);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.font = '400 30px "Zen Kaku Gothic New", sans-serif';
+      overallLines.forEach((line, i) => {
+        ctx.fillText(line, width / 2, overallStartY + i * overallLineHeight);
+      });
+
+      if (match) {
+        const avatarX = contentX;
+        const avatarY = lineBlockY;
+        const bubbleX = avatarX + avatarSize + bubbleGap;
+        const bubbleY = avatarY + (avatarSize - bubbleHeight) / 2;
+        const bubbleWidth = contentWidth - avatarSize - bubbleGap;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        if (avatarImg) {
+          ctx.clip();
+          drawImageCover(ctx, avatarImg, avatarX, avatarY, avatarSize, avatarSize);
+        } else {
+          ctx.textAlign = 'center';
+          ctx.font = '400 64px sans-serif';
+          ctx.fillText('🔮', avatarX + avatarSize / 2, avatarY + avatarSize / 2 + 22);
+        }
+        ctx.restore();
+
+        ctx.fillStyle = '#ffffff';
+        drawRoundedRect(ctx, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 24);
+        ctx.fill();
+
+        ctx.fillStyle = '#111111';
+        ctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
+        ctx.textAlign = 'left';
+        const bubbleTextX = bubbleX + 28;
+        const bubbleTextStartY = bubbleY + bubblePaddingY + 24;
+        messageLines.forEach((line, i) => {
+          ctx.fillText(line, bubbleTextX, bubbleTextStartY + i * 38);
+        });
+      }
+
+      ctx.textAlign = 'left';
+      const labelWidth = 150;
+      detailFields.forEach(([label, value], i) => {
+        const rowY = detailStartY + i * detailRowHeight;
+
+        if (i > 0) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(contentX, rowY - detailRowHeight / 2);
+          ctx.lineTo(contentX + contentWidth, rowY - detailRowHeight / 2);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.font = '700 28px "Zen Kaku Gothic New", sans-serif';
+        ctx.fillText(label, contentX, rowY);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.font = '400 28px "Zen Kaku Gothic New", sans-serif';
+        ctx.fillText(value, contentX + labelWidth, rowY);
+      });
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '400 22px "Zen Kaku Gothic New", sans-serif';
+      ctx.fillText('chisamikan.site', width / 2, footerY);
+
+      return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    }
+
+    shareButton?.addEventListener('click', async () => {
+      if (!drawnItem) return;
+
+      shareButton.disabled = true;
+      const originalHTML = shareButton.innerHTML;
+      shareButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
+
+      try {
+        const avatarImg = drawnMatch ? await loadImage(drawnMatch.imageUrl) : null;
+        const blob = await buildShareImage(drawnItem, drawnMatch, avatarImg);
+        const fileName = `omikuji-${drawnItem.fortune}.png`;
+        const shareText = `【蛇川神社 おみくじ】今日の運勢は「${drawnItem.fortune}」でした`;
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: '蛇川神社 おみくじ', text: shareText });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+          const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+          window.open(intentUrl, '_blank', 'noopener,noreferrer');
+        }
+      } catch (err) {
+        if (err?.name !== 'AbortError') {
+          console.error('[omikuji] シェア画像の作成に失敗しました:', err);
+        }
+      } finally {
+        shareButton.disabled = false;
+        shareButton.innerHTML = originalHTML;
+      }
+    });
+
+    function drawOmikuji() {
       const item = items[Math.floor(Math.random() * items.length)];
+      drawnItem = item;
 
       fortuneEl.textContent = item.fortune;
       overallEl.textContent = item.overall;
@@ -118,6 +386,7 @@ const omikujiFields = [
         .join('');
 
       const match = messages.find((m) => m.fortune === item.fortune);
+      drawnMatch = match ?? null;
       if (match) {
         if (match.imageUrl) {
           lineAvatar.style.backgroundImage = `url(${match.imageUrl})`;
@@ -136,6 +405,9 @@ const omikujiFields = [
       heading.classList.remove('hidden');
       result.classList.remove('hidden');
       button.classList.add('hidden');
-    });
+    }
+
+    button?.addEventListener('click', drawOmikuji);
+    redrawButton?.addEventListener('click', drawOmikuji);
   </script>
 </BaseLayout>
