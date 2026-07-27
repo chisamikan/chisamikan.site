@@ -378,7 +378,7 @@ const omikujiFields = [
         const avatarImg = drawnMatch ? await loadImage(drawnMatch.imageUrl) : null;
         const blob = await buildShareImage(drawnItem, drawnMatch, avatarImg);
         const fileName = `omikuji-${drawnItem.fortune}.png`;
-        const shareText = `【蛇川神社 おみくじ】今日の運勢は「${drawnItem.fortune}」でした`;
+        const shareText = `【#蛇川神社おみくじ】今日の運勢は「${drawnItem.fortune}」でした。\nhttps://chisamikan.site/`;
         const file = new File([blob], fileName, { type: 'image/png' });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
