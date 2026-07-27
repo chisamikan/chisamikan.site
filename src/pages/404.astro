@@ -6,8 +6,8 @@ import { getOmikujiItems, getOmikujiMessageItems } from '../lib/notion';
 const omikujiItems = await getOmikujiItems();
 const omikujiMessages = await getOmikujiMessageItems();
 
-const introMessage = omikujiMessages.find((m) => m.fortune === '中吉') ?? null;
 const introText = 'せっかくこんなところへ来たんだし、俺の自作おみくじを引いていくか？';
+const fallbackAvatarUrl = '/images/omikuji-icon.png';
 
 const omikujiFields = [
   { key: 'wish', label: '願望' },
@@ -35,23 +35,16 @@ const omikujiFields = [
     {omikujiItems.length > 0 && (
       <div class="omikuji-box mx-auto max-w-xl rounded-2xl border border-glass-border-subtle bg-glass p-6 backdrop-blur-xl sm:p-8 mb-16">
         <h2 id="omikuji-title" class="mb-4 text-xl font-bold text-ink sm:text-2xl"><i class="fa-solid fa-torii-gate"></i>蛇川神社 おみくじ</h2>
-        {introMessage && (
-          <div id="omikuji-intro" class="mb-6">
-            <div class="line-mock-body">
-              <div class="line-mock-row">
-                <div
-                  class="line-mock-avatar"
-                  style={introMessage.imageUrl ? `background-image:url(${introMessage.imageUrl})` : undefined}
-                >
-                  {!introMessage.imageUrl && '🔮'}
-                </div>
-                <div class="line-mock-bubble">
-                  <span id="omikuji-intro-message">{introText}</span>
-                </div>
+        <div id="omikuji-intro" class="mb-6">
+          <div class="line-mock-body">
+            <div class="line-mock-row">
+              <div class="line-mock-avatar" style={`background-image:url(${fallbackAvatarUrl})`}></div>
+              <div class="line-mock-bubble">
+                <span id="omikuji-intro-message">{introText}</span>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         <h3 id="omikuji-heading" class="mb-6 hidden text-lg font-semibold text-ink italic">
           今日のあなたの運勢は……？
@@ -101,7 +94,7 @@ const omikujiFields = [
 
   <script
     is:inline
-    define:vars={{ items: omikujiItems, fields: omikujiFields, messages: omikujiMessages }}
+    define:vars={{ items: omikujiItems, fields: omikujiFields, messages: omikujiMessages, fallbackAvatarUrl }}
   >
     const intro = document.getElementById('omikuji-intro');
     const heading = document.getElementById('omikuji-heading');
@@ -315,10 +308,6 @@ const omikujiFields = [
         if (avatarImg) {
           ctx.clip();
           drawImageCover(ctx, avatarImg, avatarX, avatarY, avatarSize, avatarSize);
-        } else {
-          ctx.textAlign = 'center';
-          ctx.font = '400 64px sans-serif';
-          ctx.fillText('🔮', avatarX + avatarSize / 2, avatarY + avatarSize / 2 + 22);
         }
         ctx.restore();
 
@@ -375,7 +364,9 @@ const omikujiFields = [
       shareButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
 
       try {
-        const avatarImg = drawnMatch ? await loadImage(drawnMatch.imageUrl) : null;
+        const avatarImg = drawnMatch
+          ? (await loadImage(drawnMatch.imageUrl)) || (await loadImage(fallbackAvatarUrl))
+          : null;
         const blob = await buildShareImage(drawnItem, drawnMatch, avatarImg);
         const fileName = `omikuji-${drawnItem.fortune}.png`;
         const shareText = `【#蛇川神社おみくじ】今日の運勢は「${drawnItem.fortune}」でした。\nhttps://chisamikan.site/`;
@@ -422,13 +413,7 @@ const omikujiFields = [
       const match = messages.find((m) => m.fortune === item.fortune);
       drawnMatch = match ?? null;
       if (match) {
-        if (match.imageUrl) {
-          lineAvatar.style.backgroundImage = `url(${match.imageUrl})`;
-          lineAvatar.textContent = '';
-        } else {
-          lineAvatar.style.backgroundImage = 'none';
-          lineAvatar.textContent = '🔮';
-        }
+        lineAvatar.style.backgroundImage = `url(${match.imageUrl || fallbackAvatarUrl})`;
         lineMessage.textContent = '';
         lineBox.classList.remove('hidden');
       } else {
