@@ -43,14 +43,15 @@ function isActive(href: string) {
 
         <label
           for="nav-toggle"
-          class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-accent sm:hidden"
+          class="nav-icon-toggle flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-accent sm:hidden"
           aria-label="メニューを開閉する"
         >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
+          <span class="nav-icon-bars">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
         </label>
 
         <button
@@ -94,6 +95,66 @@ function isActive(href: string) {
     </nav>
   </div>
 </header>
+
+<style>
+  .nav-icon-bars {
+    position: relative;
+    display: block;
+    width: 20px;
+    height: 16px;
+  }
+
+  .nav-icon-bars span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: 0.25s ease-in-out;
+  }
+
+  .nav-icon-bars span:nth-child(1) {
+    top: 0;
+  }
+
+  .nav-icon-bars span:nth-child(2),
+  .nav-icon-bars span:nth-child(3) {
+    top: 7px;
+  }
+
+  /* span:nth-child(3) exactly overlaps span:nth-child(2); with the
+     semi-transparent ink color, showing both at once stacks the
+     alpha and makes the middle bar look darker than the others. */
+  .nav-icon-bars span:nth-child(3) {
+    opacity: 0;
+  }
+
+  .nav-icon-bars span:nth-child(4) {
+    top: 14px;
+  }
+
+  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(1) {
+    top: 7px;
+    width: 0;
+    left: 50%;
+  }
+
+  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(2) {
+    transform: rotate(45deg);
+  }
+
+  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(3) {
+    opacity: 1;
+    transform: rotate(-45deg);
+  }
+
+  #nav-toggle:checked ~ div .nav-icon-bars span:nth-child(4) {
+    top: 7px;
+    width: 0;
+    left: 50%;
+  }
+</style>
 
 <script>
   const toggle = document.getElementById('theme-toggle');
