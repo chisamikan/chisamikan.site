@@ -34,10 +34,36 @@ const DIGITS = 6;
       }
     };
 
+    // 同じ端末での再読み込みで無限に加算されないよう、直近でカウント済みなら
+    // 加算せず現在値の取得(GET)のみ行う。クールダウン期間はlocalStorageに記録した
+    // 最終カウント時刻をもとに判定する。
+    const STORAGE_KEY = 'chisamikan-access-counter-last-counted';
+    const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24時間
+
+    const isInCooldown = (): boolean => {
+      try {
+        const last = Number(localStorage.getItem(STORAGE_KEY));
+        return Boolean(last) && Date.now() - last < COOLDOWN_MS;
+      } catch {
+        return false;
+      }
+    };
+
+    const markCounted = (): void => {
+      try {
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
+      } catch {
+        // localStorageが使えない(プライベートブラウジング等)場合は毎回加算されるが、
+        // カウンター自体の表示は継続できるため無視する。
+      }
+    };
+
     try {
-      const res = await fetch('/api/counter');
+      const cooldown = isInCooldown();
+      const res = await fetch('/api/counter', { method: cooldown ? 'GET' : 'POST' });
       if (!res.ok) throw new Error(`unexpected status: ${res.status}`);
       const data = (await res.json()) as { count: number };
+      if (!cooldown) markCounted();
       renderDigits(String(data.count).padStart(digitsEl.childElementCount || 6, '0'));
     } catch (err) {
       console.error('[AccessCounter] カウンターの取得に失敗しました:', err);
