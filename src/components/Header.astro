@@ -19,7 +19,7 @@ function isActive(href: string) {
       </a>
 
       <div class="flex items-center gap-1 sm:gap-3">
-        <nav aria-label="サイト内ナビゲーション" class="hidden sm:block">
+        <nav aria-label="サイト内ナビゲーション" class="hidden lg:block">
           <ul class="flex items-center gap-1 font-mono text-xs uppercase tracking-wider sm:gap-2">
             {nav.map((item) => (
               <li>
@@ -43,7 +43,7 @@ function isActive(href: string) {
 
         <label
           for="nav-toggle"
-          class="nav-icon-toggle flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-accent sm:hidden"
+          class="nav-icon-toggle flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-accent lg:hidden"
           aria-label="メニューを開閉する"
         >
           <span class="nav-icon-bars">
@@ -58,7 +58,7 @@ function isActive(href: string) {
           type="button"
           aria-label="Dark Mode"
           aria-pressed="false"
-          class="theme-toggle-btn hidden h-9 w-9 shrink-0 items-center justify-center rounded text-ink/70 transition-colors hover:text-accent sm:flex"
+          class="theme-toggle-btn hidden h-9 w-9 shrink-0 items-center justify-center rounded text-ink/70 transition-colors hover:text-accent lg:flex"
         >
           <!--
             FontAwesomeのCSSはTailwindのcascade layerの外側で読み込まれるため、
@@ -78,7 +78,7 @@ function isActive(href: string) {
 
 <nav
   aria-label="サイト内ナビゲーション（モバイル）"
-  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/70 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 sm:hidden"
+  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/70 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 lg:hidden"
 >
   <ul class="absolute left-1/2 top-1/2 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 px-6 font-mono text-xs uppercase tracking-wider">
     {nav.map((item) => (
