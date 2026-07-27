@@ -34,7 +34,7 @@ const omikujiFields = [
 
     {omikujiItems.length > 0 && (
       <div class="omikuji-box mx-auto max-w-xl rounded-2xl border border-glass-border-subtle bg-glass p-6 backdrop-blur-xl sm:p-8 mb-16">
-        <h2 class="mb-4 text-xl font-bold text-ink sm:text-2xl"><i class="fa-solid fa-torii-gate"></i>蛇川神社 おみくじ</h2>
+        <h2 id="omikuji-title" class="mb-4 text-xl font-bold text-ink sm:text-2xl"><i class="fa-solid fa-torii-gate"></i>蛇川神社 おみくじ</h2>
         {introMessage && (
           <div id="omikuji-intro" class="mb-6">
             <div class="line-mock-body">
@@ -115,6 +115,7 @@ const omikujiFields = [
     const lineMessage = document.getElementById('omikuji-line-message');
     const shareButton = document.getElementById('omikuji-share');
     const redrawButton = document.getElementById('omikuji-redraw');
+    const titleEl = document.getElementById('omikuji-title');
 
     let drawnItem = null;
     let drawnMatch = null;
@@ -408,6 +409,9 @@ const omikujiFields = [
     }
 
     button?.addEventListener('click', drawOmikuji);
-    redrawButton?.addEventListener('click', drawOmikuji);
+    redrawButton?.addEventListener('click', () => {
+      drawOmikuji();
+      titleEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   </script>
 </BaseLayout>

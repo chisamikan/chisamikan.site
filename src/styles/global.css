@@ -265,6 +265,14 @@
     @apply flex-1;
   }
 
+  /* 「もう一度引く」クリック時にscrollIntoViewで見出しへ戻る際、sticky headerの
+     裏に隠れないようオフセットする。Header.astroがResizeObserverで実測して
+     常時更新している --mobile-header-h (名前はモバイルオーバーレイ用だが
+     ブレークポイントを問わずヘッダーの実高さを反映する)をそのまま再利用する */
+  #omikuji-title {
+    scroll-margin-top: calc(var(--mobile-header-h, 4.5rem) + 1rem);
+  }
+
   /* LINEのトーク画面を模したモックアップ(404ページのおみくじ結果に使用)。
      吹き出し(.line-mock-bubble)の見た目のみでLINE感を出し、周囲の背景色や
      幅は持たせず他の項目(.omikuji-detail-row等)と横幅を揃える */
