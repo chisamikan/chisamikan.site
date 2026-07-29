@@ -7,7 +7,7 @@ const omikujiItems = await getOmikujiItems();
 const omikujiMessages = await getOmikujiMessageItems();
 
 const introText = 'せっかくこんなところへ来たんだし、俺の自作おみくじを引いていくか？';
-const fallbackAvatarUrl = '/images/omikuji-icon.png';
+const omikujiAvatarBase = '/images/omikuji';
 
 const omikujiFields = [
   { key: 'wish', label: '願望' },
@@ -38,7 +38,7 @@ const omikujiFields = [
         <div id="omikuji-intro" class="mb-6">
           <div class="line-mock-body">
             <div class="line-mock-row">
-              <div class="line-mock-avatar" style={`background-image:url(${fallbackAvatarUrl})`}></div>
+              <div class="line-mock-avatar" style={`background-image:url(${omikujiAvatarBase}/normal.png)`}></div>
               <div class="line-mock-bubble">
                 <span id="omikuji-intro-message">{introText}</span>
               </div>
@@ -94,7 +94,7 @@ const omikujiFields = [
 
   <script
     is:inline
-    define:vars={{ items: omikujiItems, fields: omikujiFields, messages: omikujiMessages, fallbackAvatarUrl }}
+    define:vars={{ items: omikujiItems, fields: omikujiFields, messages: omikujiMessages, omikujiAvatarBase }}
   >
     const intro = document.getElementById('omikuji-intro');
     const heading = document.getElementById('omikuji-heading');
@@ -113,6 +113,16 @@ const omikujiFields = [
 
     let drawnItem = null;
     let drawnMatch = null;
+
+    // 運勢の吉凶に応じてアバター画像を3段階(good/normal/bad)で出し分ける
+    const GOOD_FORTUNES = ['大吉', '吉'];
+    const BAD_FORTUNES = ['末吉', '凶'];
+
+    function getAvatarUrl(fortune) {
+      if (GOOD_FORTUNES.includes(fortune)) return `${omikujiAvatarBase}/good.png`;
+      if (BAD_FORTUNES.includes(fortune)) return `${omikujiAvatarBase}/bad.png`;
+      return `${omikujiAvatarBase}/normal.png`;
+    }
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -364,9 +374,7 @@ const omikujiFields = [
       shareButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
 
       try {
-        const avatarImg = drawnMatch
-          ? (await loadImage(drawnMatch.imageUrl)) || (await loadImage(fallbackAvatarUrl))
-          : null;
+        const avatarImg = drawnMatch ? await loadImage(getAvatarUrl(drawnItem.fortune)) : null;
         const blob = await buildShareImage(drawnItem, drawnMatch, avatarImg);
         const fileName = `omikuji-${drawnItem.fortune}.png`;
         const shareText = `【#蛇川神社おみくじ】今日の運勢は「${drawnItem.fortune}」でした。\nhttps://chisamikan.site/`;
@@ -413,7 +421,7 @@ const omikujiFields = [
       const match = messages.find((m) => m.fortune === item.fortune);
       drawnMatch = match ?? null;
       if (match) {
-        lineAvatar.style.backgroundImage = `url(${match.imageUrl || fallbackAvatarUrl})`;
+        lineAvatar.style.backgroundImage = `url(${getAvatarUrl(item.fortune)})`;
         lineMessage.textContent = '';
         lineBox.classList.remove('hidden');
       } else {

@@ -24,7 +24,7 @@ function warnMissingToken(context: string) {
 // (外部URL(file.type === 'external')は失効しないためそのまま使用する)
 // ---------------------------------------------------------------------------
 function imageProxyUrl(
-  kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels' | 'omikuji',
+  kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels',
   id: string
 ): string {
   return `/api/image/${kind}/${id}`;
@@ -529,13 +529,14 @@ const sampleOmikuji: OmikujiItem[] = [
 export interface OmikujiMessageItem {
   id: string;
   fortune: string;
-  imageUrl: string | null;
   message: string;
 }
 
 /**
  * おみくじの運勢ごとの一言メッセージ用データベースを取得します(404ページで使用)。
- * Notion側のプロパティ名(想定): 運勢(title) / 画像(files) / メッセージ(rich_text)
+ * Notion側のプロパティ名(想定): 運勢(title) / メッセージ(rich_text)
+ * (アバター画像は運勢の吉凶(良し/普通/悪し)3段階で public/images/omikuji/ 配下の
+ * 静的な画像を出し分ける方式のため、Notion側の画像プロパティは使用しない)
  * 抽選したおみくじ(getOmikujiItems)の fortune と、この運勢の文字列を完全一致させて
  * 対応するメッセージを1件引き当てる想定(件数は大吉～凶の数種類のみのため全件取得)。
  */
@@ -569,28 +570,20 @@ function pageToOmikujiMessage(page: PageObjectResponse): OmikujiMessageItem {
   const fortune =
     props['運勢']?.type === 'title' ? richTextToPlain(props['運勢'].title) : '(無題)';
 
-  let imageUrl: string | null = null;
-  if (props['画像']?.type === 'files' && props['画像'].files.length > 0) {
-    const file = props['画像'].files[0];
-    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('omikuji', page.id);
-  }
-
   const message = richTextProp(props, 'メッセージ');
 
-  return { id: page.id, fortune, imageUrl, message };
+  return { id: page.id, fortune, message };
 }
 
 const sampleOmikujiMessages: OmikujiMessageItem[] = [
   {
     id: 'sample-omikuji-message-1',
     fortune: '大吉',
-    imageUrl: null,
     message: '(サンプル) NOTION_OMIKUJI_MESSAGE_DB_ID を設定すると運勢ごとのメッセージが表示されます。',
   },
   {
     id: 'sample-omikuji-message-2',
     fortune: '中吉',
-    imageUrl: null,
     message: '(サンプル) NOTION_OMIKUJI_MESSAGE_DB_ID を設定すると運勢ごとのメッセージが表示されます。',
   },
 ];

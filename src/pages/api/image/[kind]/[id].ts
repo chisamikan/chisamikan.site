@@ -12,7 +12,7 @@ export const prerender = false;
 // ブラウザ/CDNに失効済みURLへのリダイレクトがキャッシュされたまま残るのを防ぐ。
 const CACHE_SECONDS = 3000;
 
-type Kind = 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels' | 'omikuji';
+type Kind = 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels';
 
 function isKind(value: string | undefined): value is Kind {
   return (
@@ -20,19 +20,16 @@ function isKind(value: string | undefined): value is Kind {
     value === 'works' ||
     value === 'profile' ||
     value === 'toolbox' ||
-    value === 'novels' ||
-    value === 'omikuji'
+    value === 'novels'
   );
 }
 
-// kind === 'profile' はブロック直下のimageのため対象外。他のkindはページの
-// プロパティ名がDBごとに異なる(おみくじDBのみ日本語プロパティ名)ため、ここで対応させる。
+// kind === 'profile' はブロック直下のimageのため対象外。他のkindは共通で Image プロパティを使う。
 const IMAGE_PROPERTY_NAME: Record<Exclude<Kind, 'profile'>, string> = {
   gallery: 'Image',
   works: 'Image',
   toolbox: 'Image',
   novels: 'Image',
-  omikuji: '画像',
 };
 
 export const GET: APIRoute = async ({ params, locals }) => {
@@ -70,26 +67,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     if (!url) {
       return new Response('Image Not Found', { status: 404 });
-    }
-
-    // おみくじのアバターはSNSシェア用画像生成時にcanvas上で読み込むため、
-    // 302リダイレクトのままだと最終的な画像応答がNotion側(別オリジン)のものになり、
-    // そちら側のCORS設定次第でcanvasから読み取れずシェア画像がフォールバック表示に
-    // なってしまう。そのためこのkindだけはこちらで画像バイトを取得して中継し、
-    // ブラウザからは常に同一オリジンの応答として扱えるようにする。
-    if (kind === 'omikuji') {
-      const upstream = await fetch(url);
-      if (!upstream.ok || !upstream.body) {
-        return new Response('Image Not Found', { status: 404 });
-      }
-
-      return new Response(upstream.body, {
-        status: 200,
-        headers: {
-          'Content-Type': upstream.headers.get('content-type') || 'image/jpeg',
-          'Cache-Control': `public, max-age=${CACHE_SECONDS}`,
-        },
-      });
     }
 
     return new Response(null, {
