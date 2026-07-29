@@ -302,8 +302,11 @@
     @apply py-2;
   }
 
+  /* タイピング風アニメーション中に吹き出しの縦幅が伸び縮みしても、アバターと
+     三角(::before)の位置が動かないよう上詰めで固定する(縦幅自体はJS側で
+     全文表示時の高さをあらかじめ計測してmin-heightに固定している) */
   .line-mock-row {
-    @apply flex items-center gap-3;
+    @apply flex items-start gap-3;
   }
 
   .line-mock-avatar {
@@ -318,7 +321,7 @@
 
   .line-mock-bubble::before {
     content: '';
-    @apply absolute top-1/2 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
+    @apply absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
   }
 
   /* モーダル */

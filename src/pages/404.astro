@@ -130,9 +130,21 @@ const omikujiFields = [
         el._typingTimer = null;
       }
 
+      const bubble = el.closest('.line-mock-bubble');
+
       if (prefersReducedMotion || !text) {
         el.textContent = text || '';
+        if (bubble) bubble.style.minHeight = '';
         return;
+      }
+
+      // 先に全文を描画して吹き出しの最終的な高さを計測し、min-heightとして
+      // 固定してから改めて空にする。これによりタイピング中に文字が増えて
+      // 縦幅が変化しても、アバターや三角の位置が動かなくなる。
+      if (bubble) {
+        bubble.style.minHeight = '';
+        el.textContent = text;
+        bubble.style.minHeight = `${bubble.offsetHeight}px`;
       }
 
       el.textContent = '';
