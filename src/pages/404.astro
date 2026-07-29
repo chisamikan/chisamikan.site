@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
-import { getOmikujiItems, getOmikujiMessageItems } from '../lib/notion';
+import { getOmikujiItems } from '../lib/notion';
 
 const omikujiItems = await getOmikujiItems();
-const omikujiMessages = await getOmikujiMessageItems();
 
 const introText = 'せっかくこんなところへ来たんだし、俺の自作おみくじを引いていくか？';
 const omikujiAvatarBase = '/images/omikuji';
@@ -57,10 +56,9 @@ const omikujiFields = [
         <div id="omikuji-result" class="hidden mt-6 text-left">
           <div class="mb-6 text-center">
             <p id="omikuji-fortune" class="omikuji-reveal-item text-4xl font-bold text-accent"></p>
-            <p id="omikuji-overall" class="omikuji-reveal-item mx-auto mt-2 max-w-md font-mono text-sm leading-relaxed text-ink-soft"></p>
           </div>
 
-          <div id="omikuji-line" class="omikuji-reveal-item mb-6 hidden">
+          <div id="omikuji-line" class="omikuji-reveal-item mb-6">
             <div class="line-mock-body">
               <div class="line-mock-row">
                 <div id="omikuji-line-avatar" class="line-mock-avatar"></div>
@@ -94,16 +92,14 @@ const omikujiFields = [
 
   <script
     is:inline
-    define:vars={{ items: omikujiItems, fields: omikujiFields, messages: omikujiMessages, omikujiAvatarBase }}
+    define:vars={{ items: omikujiItems, fields: omikujiFields, omikujiAvatarBase }}
   >
     const intro = document.getElementById('omikuji-intro');
     const heading = document.getElementById('omikuji-heading');
     const button = document.getElementById('omikuji-draw');
     const result = document.getElementById('omikuji-result');
     const fortuneEl = document.getElementById('omikuji-fortune');
-    const overallEl = document.getElementById('omikuji-overall');
     const detailEl = document.getElementById('omikuji-detail');
-    const lineBox = document.getElementById('omikuji-line');
     const lineAvatar = document.getElementById('omikuji-line-avatar');
     const lineMessage = document.getElementById('omikuji-line-message');
     const shareButton = document.getElementById('omikuji-share');
@@ -112,7 +108,6 @@ const omikujiFields = [
     const introMessageEl = document.getElementById('omikuji-intro-message');
 
     let drawnItem = null;
-    let drawnMatch = null;
 
     // 運勢の吉凶に応じてアバター画像を3段階(good/normal/bad)で出し分ける
     const GOOD_FORTUNES = ['大吉', '吉'];
@@ -221,7 +216,7 @@ const omikujiFields = [
       ctx.closePath();
     }
 
-    async function buildShareImage(item, match, avatarImg) {
+    async function buildShareImage(item, avatarImg) {
       if (document.fonts?.ready) {
         await document.fonts.ready;
       }
@@ -235,34 +230,24 @@ const omikujiFields = [
       const measureCanvas = document.createElement('canvas');
       const mctx = measureCanvas.getContext('2d');
 
-      mctx.font = '400 30px "Zen Kaku Gothic New", sans-serif';
-      const overallLines = capLines(wrapCanvasText(mctx, item.overall, contentWidth), 3);
-
       const avatarSize = 148;
       const bubbleGap = 28;
       const bubbleTextWidth = contentWidth - avatarSize - bubbleGap - 56;
-      let messageLines = [];
-      if (match) {
-        mctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
-        messageLines = capLines(wrapCanvasText(mctx, match.message, bubbleTextWidth), 4);
-      }
+      mctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
+      const messageLines = capLines(wrapCanvasText(mctx, item.overall, bubbleTextWidth), 6);
 
       const detailRowHeight = 68;
       const detailFields = fields.map(({ key, label }) => [label, item[key] || '—']);
 
       const headerY = 96;
       const fortuneY = headerY + 190;
-      const overallStartY = fortuneY + 90;
-      const overallLineHeight = 44;
-      const overallEndY = overallStartY + (overallLines.length - 1) * overallLineHeight;
 
-      const lineBlockY = overallEndY + 80;
+      const lineBlockY = fortuneY + 90;
       const bubblePaddingY = 30;
       const bubbleTextHeight = messageLines.length * 38;
-      const bubbleHeight = match ? Math.max(avatarSize, bubbleTextHeight + bubblePaddingY * 2) : 0;
-      const lineBlockHeight = match ? bubbleHeight : 0;
+      const bubbleHeight = Math.max(avatarSize, bubbleTextHeight + bubblePaddingY * 2);
 
-      const detailStartY = lineBlockY + lineBlockHeight + (match ? 70 : 30);
+      const detailStartY = lineBlockY + bubbleHeight + 70;
       const detailHeight = detailFields.length * detailRowHeight;
 
       const footerY = detailStartY + detailHeight + 70;
@@ -296,44 +281,36 @@ const omikujiFields = [
       ctx.font = '700 150px "Zen Kaku Gothic New", sans-serif';
       ctx.fillText(item.fortune, width / 2, fortuneY);
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-      ctx.font = '400 30px "Zen Kaku Gothic New", sans-serif';
-      overallLines.forEach((line, i) => {
-        ctx.fillText(line, width / 2, overallStartY + i * overallLineHeight);
-      });
+      const avatarX = contentX;
+      const avatarY = lineBlockY;
+      const bubbleX = avatarX + avatarSize + bubbleGap;
+      const bubbleY = avatarY + (avatarSize - bubbleHeight) / 2;
+      const bubbleWidth = contentWidth - avatarSize - bubbleGap;
 
-      if (match) {
-        const avatarX = contentX;
-        const avatarY = lineBlockY;
-        const bubbleX = avatarX + avatarSize + bubbleGap;
-        const bubbleY = avatarY + (avatarSize - bubbleHeight) / 2;
-        const bubbleWidth = contentWidth - avatarSize - bubbleGap;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-        if (avatarImg) {
-          ctx.clip();
-          drawImageCover(ctx, avatarImg, avatarX, avatarY, avatarSize, avatarSize);
-        }
-        ctx.restore();
-
-        ctx.fillStyle = '#ffffff';
-        drawRoundedRect(ctx, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 24);
-        ctx.fill();
-
-        ctx.fillStyle = '#111111';
-        ctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
-        ctx.textAlign = 'left';
-        const bubbleTextX = bubbleX + 28;
-        const bubbleTextStartY = bubbleY + bubblePaddingY + 24;
-        messageLines.forEach((line, i) => {
-          ctx.fillText(line, bubbleTextX, bubbleTextStartY + i * 38);
-        });
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      if (avatarImg) {
+        ctx.clip();
+        drawImageCover(ctx, avatarImg, avatarX, avatarY, avatarSize, avatarSize);
       }
+      ctx.restore();
+
+      ctx.fillStyle = '#ffffff';
+      drawRoundedRect(ctx, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 24);
+      ctx.fill();
+
+      ctx.fillStyle = '#111111';
+      ctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
+      ctx.textAlign = 'left';
+      const bubbleTextX = bubbleX + 28;
+      const bubbleTextStartY = bubbleY + bubblePaddingY + 24;
+      messageLines.forEach((line, i) => {
+        ctx.fillText(line, bubbleTextX, bubbleTextStartY + i * 38);
+      });
 
       ctx.textAlign = 'left';
       const labelWidth = 150;
@@ -374,8 +351,8 @@ const omikujiFields = [
       shareButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
 
       try {
-        const avatarImg = drawnMatch ? await loadImage(getAvatarUrl(drawnItem.fortune)) : null;
-        const blob = await buildShareImage(drawnItem, drawnMatch, avatarImg);
+        const avatarImg = await loadImage(getAvatarUrl(drawnItem.fortune));
+        const blob = await buildShareImage(drawnItem, avatarImg);
         const fileName = `omikuji-${drawnItem.fortune}.png`;
         const shareText = `【#蛇川神社おみくじ】今日の運勢は「${drawnItem.fortune}」でした。\nhttps://chisamikan.site/`;
         const file = new File([blob], fileName, { type: 'image/png' });
@@ -410,7 +387,6 @@ const omikujiFields = [
       drawnItem = item;
 
       fortuneEl.textContent = item.fortune;
-      overallEl.textContent = item.overall;
       detailEl.innerHTML = fields
         .map(({ key, label }) => {
           const value = item[key] || '—';
@@ -418,15 +394,8 @@ const omikujiFields = [
         })
         .join('');
 
-      const match = messages.find((m) => m.fortune === item.fortune);
-      drawnMatch = match ?? null;
-      if (match) {
-        lineAvatar.style.backgroundImage = `url(${getAvatarUrl(item.fortune)})`;
-        lineMessage.textContent = '';
-        lineBox.classList.remove('hidden');
-      } else {
-        lineBox.classList.add('hidden');
-      }
+      lineAvatar.style.backgroundImage = `url(${getAvatarUrl(item.fortune)})`;
+      lineMessage.textContent = '';
 
       intro?.classList.add('hidden');
       heading.classList.remove('hidden');
@@ -446,8 +415,8 @@ const omikujiFields = [
         revealItems.forEach((el, i) => {
           setTimeout(() => {
             el.classList.add('is-visible');
-            if (el.id === 'omikuji-line' && drawnMatch) {
-              typeText(lineMessage, drawnMatch.message, 32);
+            if (el.id === 'omikuji-line' && drawnItem) {
+              typeText(lineMessage, drawnItem.overall, 32);
             }
           }, i * 150);
         });
