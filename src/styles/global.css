@@ -36,6 +36,9 @@
     --shadow-glow: 0 0 40px rgba(8, 145, 178, 0.25);
 
     color-scheme: light;
+
+    --size-body: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
+    --line-height: 1.6;
   }
 
   /* 端末のダーク設定 or ヘッダーのトグルで <html> に付与される。
@@ -77,6 +80,12 @@
     scroll-behavior: smooth;
   }
 
+  html[lang="ja"] {
+    line-break: strict;
+    word-break: keep-all;
+    overflow-wrap: anywhere; /* 英数字や長いURLに対応 */
+  }
+
   body {
     @apply bg-paper text-ink font-body antialiased transition-colors duration-300;
     /* ガラス面が光を透かして見えるよう、固定位置のソフトなカラーブロブを紙のドット柄の奥に敷く。
@@ -89,6 +98,8 @@
     background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
     background-repeat: no-repeat, no-repeat, no-repeat, repeat;
     background-attachment: fixed, fixed, fixed, scroll;
+    font-size: var(--size-body);
+    line-height: var(--line-height);
   }
 
   ::selection {
@@ -103,6 +114,16 @@
 
   h1, h2, h3, h4 {
     @apply font-display text-ink;
+  }
+
+  html[lang="ja"] {
+    line-break: strict;
+    word-break: keep-all;
+    overflow-wrap: anywhere; /* 英数字や長いURLに対応 */
+  }
+
+  p {
+    letter-spacing: 0.04em;
   }
 }
 
