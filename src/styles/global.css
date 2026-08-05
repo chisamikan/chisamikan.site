@@ -106,7 +106,7 @@
   }
 
   :focus-visible {
-    @apply rounded-[2px] outline outline-[2.5px] outline-accent outline-offset-[3px];
+    @apply rounded-[2px] outline-[2.5px] outline-accent outline-offset-[3px];
   }
 
   h1, h2, h3, h4 {
@@ -284,7 +284,7 @@
      ページ全体のスクロール連動(IntersectionObserver)専用のため、名前を分けて
      JS側(404.astro)から抽選ごとに is-visible を付け直せるようにする */
   .omikuji-reveal-item {
-    @apply opacity-0 translate-y-5 transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply opacity-0 translate-y-5 transition-[opacity,transform] duration-900 ease-[cubic-bezier(0.22,1,0.36,1)];
   }
 
   .omikuji-reveal-item.is-visible {
@@ -527,7 +527,7 @@
   /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる。JS(IntersectionObserver)が
      .is-visible を付与するまでは非表示にしておくが、JS未対応環境では .no-js で常に表示する */
   .reveal {
-    @apply opacity-0 translate-y-7 transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply opacity-0 translate-y-7 transition-[opacity,transform] duration-800 ease-[cubic-bezier(0.22,1,0.36,1)];
   }
 
   .reveal.is-visible {
