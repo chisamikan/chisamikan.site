@@ -77,13 +77,12 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    @apply scroll-smooth;
   }
 
   html[lang="ja"] {
     line-break: strict;
-    word-break: keep-all;
-    overflow-wrap: anywhere; /* 英数字や長いURLに対応 */
+    @apply break-keep wrap-anywhere; /* wrap-anywhereで英数字や長いURLに対応 */
   }
 
   body {
@@ -107,23 +106,15 @@
   }
 
   :focus-visible {
-    outline: 2.5px solid theme('colors.accent.DEFAULT');
-    outline-offset: 3px;
-    border-radius: 2px;
+    @apply rounded-[2px] outline outline-[2.5px] outline-accent outline-offset-[3px];
   }
 
   h1, h2, h3, h4 {
     @apply font-display text-ink;
   }
 
-  html[lang="ja"] {
-    line-break: strict;
-    word-break: keep-all;
-    overflow-wrap: anywhere; /* 英数字や長いURLに対応 */
-  }
-
   p {
-    letter-spacing: 0.04em;
+    @apply tracking-[0.04em];
   }
 }
 
@@ -151,12 +142,7 @@
   }
 
   .btn-glass-accent::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--reflection-top);
-    pointer-events: none;
+    @apply content-[''] absolute inset-0 rounded-[inherit] pointer-events-none [background:var(--reflection-top)];
   }
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
@@ -255,7 +241,7 @@
   }
 
   .glass-accordion-trigger::-webkit-details-marker {
-    display: none;
+    @apply hidden;
   }
 
   .glass-accordion-icon {
@@ -291,28 +277,23 @@
      常時更新している --mobile-header-h (名前はモバイルオーバーレイ用だが
      ブレークポイントを問わずヘッダーの実高さを反映する)をそのまま再利用する */
   #omikuji-title {
-    scroll-margin-top: calc(var(--mobile-header-h, 4.5rem) + 1rem);
+    @apply scroll-mt-[calc(var(--mobile-header-h,4.5rem)+1rem)];
   }
 
   /* おみくじ結果の各項目を時間差でフェードインアップさせる。既存の .reveal は
      ページ全体のスクロール連動(IntersectionObserver)専用のため、名前を分けて
      JS側(404.astro)から抽選ごとに is-visible を付け直せるようにする */
   .omikuji-reveal-item {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    @apply opacity-0 translate-y-5 transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)];
   }
 
   .omikuji-reveal-item.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+    @apply opacity-100 translate-y-0;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .omikuji-reveal-item {
-      opacity: 1;
-      transform: none;
-      transition: none;
+      @apply opacity-100 transform-none transition-none;
     }
   }
 
@@ -331,9 +312,7 @@
   }
 
   .line-mock-avatar {
-    @apply flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white text-4xl;
-    background-size: cover;
-    background-position: center;
+    @apply flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white bg-cover bg-center text-4xl;
   }
 
   .line-mock-bubble {
@@ -341,8 +320,7 @@
   }
 
   .line-mock-bubble::before {
-    content: '';
-    @apply absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
+    @apply content-[''] absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
   }
 
   /* モーダル */
@@ -363,9 +341,7 @@
   }
 
   .glass-modal::before {
-    content: '';
-    background: linear-gradient(90deg, rgb(var(--color-accent)) 0%, rgb(var(--color-accent-violet)) 50%, rgb(var(--color-accent-rose)) 100%);
-    @apply absolute inset-x-0 top-0 z-10 h-0.5;
+    @apply content-[''] absolute inset-x-0 top-0 z-10 h-0.5 bg-linear-to-r from-accent via-accent-violet to-accent-rose;
   }
 
   .glass-modal__header {
@@ -529,12 +505,7 @@
 
   /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動 */
   .glass-card {
-    cursor: pointer;
-    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease, border-color 300ms ease;
-  }
-
-  .glass-card:hover {
-    transform: translateY(-6px);
+    @apply cursor-pointer hover:-translate-y-1.5 [transition:transform_300ms_cubic-bezier(0.22,1,0.36,1),box-shadow_300ms_ease,border-color_300ms_ease];
   }
 
   /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素はデフォルトで
@@ -549,34 +520,27 @@
     .btn-glass,
     .btn-glass:hover,
     .btn-glass-accent:active {
-      transition: none !important;
-      transform: none !important;
+      @apply transition-none! transform-none!;
     }
   }
 
   /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる。JS(IntersectionObserver)が
      .is-visible を付与するまでは非表示にしておくが、JS未対応環境では .no-js で常に表示する */
   .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1), transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    @apply opacity-0 translate-y-7 transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)];
   }
 
   .reveal.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+    @apply opacity-100 translate-y-0;
   }
 
   .no-js .reveal {
-    opacity: 1;
-    transform: none;
+    @apply opacity-100 transform-none;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .reveal {
-      opacity: 1;
-      transform: none;
-      transition: none;
+      @apply opacity-100 transform-none transition-none;
     }
   }
 
@@ -586,10 +550,7 @@
      アイコン単体のボタン等、表示したくない場合は .no-external-icon を付与して除外する */
   a[href^="http://"]:not(.no-external-icon)::after,
   a[href^="https://"]:not(.no-external-icon)::after {
-    font: 900 0.8em 'Font Awesome 7 Free';
-    content: '\f08e';
-    display: inline-block;
-    margin-left: 0.3em;
-    vertical-align: 0.02em;
+    content: '\f08e'; /* Font AwesomeのUnicode指定はTailwindのアービトラリ値パーサーがバックスラッシュエスケープを解釈できず空文字になるため生のCSSのまま残す */
+    @apply inline-block font-['Font_Awesome_7_Free'] text-[0.8em] font-black leading-normal ml-[0.3em] align-[0.02em];
   }
 }
