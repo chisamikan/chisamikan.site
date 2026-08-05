@@ -547,10 +547,18 @@
   /* 外部サイトへのリンク(href が絶対URL = http/https始まり)には、手動でアイコンを
      追加しなくても自動で末尾に外部リンクアイコンを表示する。サイト内リンクは
      ルート相対パス(例: /contact)で書く運用のため href^="http" だけで判別できる。
-     アイコン単体のボタン等、表示したくない場合は .no-external-icon を付与して除外する */
+     アイコン単体のボタン等、表示したくない場合は .no-external-icon を付与して除外する。
+     以前はFont Awesomeのグリフを content: '\f08e' で描画していたが、Tailwind v4が
+     内部で使うLightning CSS(1.32.0時点)の圧縮処理がPrivate Use Area領域の文字を
+     含む文字列リテラルを content/カスタムプロパティ問わず空文字に潰してしまうバグが
+     あり、本番ビルドではアイコンが消えていた。content文字列にPUA文字を持たない
+     SVGマスクへ置き換えることでこの問題を回避する */
   a[href^="http://"]:not(.no-external-icon)::after,
   a[href^="https://"]:not(.no-external-icon)::after {
-    content: '\f08e'; /* Font AwesomeのUnicode指定はTailwindのアービトラリ値パーサーがバックスラッシュエスケープを解釈できず空文字になるため生のCSSのまま残す */
-    @apply inline-block font-['Font_Awesome_7_Free'] text-[0.8em] font-black leading-normal ml-[0.3em] align-[0.02em];
+    @apply content-[''] inline-block bg-current ml-[0.3em] align-[-0.125em];
+    width: 0.8em;
+    height: 0.8em;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 }
