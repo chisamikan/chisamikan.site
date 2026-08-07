@@ -467,6 +467,47 @@
   .glass-table tr:hover td {
     @apply bg-glass-md;
   }
+
+  /* ファーストビューのレンズフレア(HeroSlideshow.astro)。色付きの円を重ねてmix-blend-mode:overlayで馴染ませ、ゆっくり回転させる */
+  .flare-circle {
+    @apply absolute h-[min(55vw,55vh)] w-[min(55vw,55vh)] rounded-full mix-blend-overlay;
+  }
+  .flare-circle.top {
+    @apply top-[-15%] origin-bottom-right;
+    animation: flare-spin-top 5s linear infinite;
+  }
+  .flare-circle.bottom {
+    @apply bottom-[-15%] origin-top-right;
+    animation: flare-spin-bottom 7s linear infinite alternate;
+  }
+  .flare-circle.left {
+    @apply left-[-15%];
+  }
+  .flare-circle.right {
+    @apply right-[-10%];
+  }
+
+  .flare-circle.gold { background-image: radial-gradient(rgba(218, 201, 150, 1), rgba(218, 201, 150, 0) 70%); }
+  .flare-circle.green { background-image: radial-gradient(rgba(228, 236, 233, 1), rgba(228, 236, 233, 0) 70%); }
+  .flare-circle.pink { background-image: radial-gradient(rgba(238, 173, 146, 1), rgba(238, 173, 146, 0) 70%); }
+  .flare-circle.blue { background-image: radial-gradient(rgba(212, 242, 255, 1), rgba(212, 242, 255, 0) 70%); }
+  .flare-circle.gray { background-image: radial-gradient(rgba(161, 211, 81, 1), rgba(161, 211, 81, 0) 70%); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flare-circle.top,
+    .flare-circle.bottom {
+      animation: none;
+    }
+  }
+}
+
+@keyframes flare-spin-top {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(2); }
+}
+@keyframes flare-spin-bottom {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(-360deg) scale(0.5); }
 }
 
 @keyframes glass-skeleton-shimmer {

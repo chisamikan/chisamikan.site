@@ -19,6 +19,15 @@ const { images } = Astro.props;
   ))}
 </div>
 
+<!-- レンズフレア: グラデーションの円を重ねてゆっくり回転させるだけの演出。mix-blend-mode:overlayで下の写真と馴染ませる -->
+<div class="lens-flare pointer-events-none absolute inset-0" aria-hidden="true">
+  <div class="flare-circle gold top"></div>
+  <div class="flare-circle blue bottom"></div>
+  <div class="flare-circle pink top right"></div>
+  <div class="flare-circle green top right"></div>
+  <div class="flare-circle gray"></div>
+</div>
+
 <style>
   .hero-slide {
     transition: opacity 1.2s ease;
