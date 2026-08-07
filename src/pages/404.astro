@@ -158,7 +158,12 @@ const omikujiFields = [
     }
 
     if (introMessageEl) {
-      typeText(introMessageEl, introMessageEl.textContent, 32);
+      const introText = introMessageEl.textContent;
+      introMessageEl.style.visibility = 'hidden';
+      setTimeout(() => {
+        introMessageEl.style.visibility = '';
+        typeText(introMessageEl, introText, 32);
+      }, 1000);
     }
 
     function wrapCanvasText(ctx, text, maxWidth) {
