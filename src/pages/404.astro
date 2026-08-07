@@ -75,6 +75,9 @@ const omikujiFields = [
             <button id="omikuji-share" type="button" class="btn-glass btn-glass-accent w-full md:max-w-1/2">
               <i class="fa-solid fa-share-nodes pr-1" aria-hidden="true"></i>結果をシェアする
             </button>
+            <button id="omikuji-copy" type="button" class="btn-glass w-full md:max-w-1/2">
+              <i class="fa-solid fa-copy pr-1" aria-hidden="true"></i>結果をコピーする
+            </button>
             <button id="omikuji-redraw" type="button" class="btn-glass w-full md:max-w-1/2">
               <i class="fa-solid fa-rotate-right pr-1" aria-hidden="true"></i>もう一度引く
             </button>
@@ -103,7 +106,22 @@ const omikujiFields = [
     const lineAvatar = document.getElementById('omikuji-line-avatar');
     const lineMessage = document.getElementById('omikuji-line-message');
     const shareButton = document.getElementById('omikuji-share');
+    const copyButton = document.getElementById('omikuji-copy');
     const redrawButton = document.getElementById('omikuji-redraw');
+
+    // OSの共有シートの「コピー」はファイル+テキストを同時共有すると
+    // テキストのみコピーして画像を無視する端末が多いため、共有シートに頼らず
+    // Clipboard APIで直接画像をコピーする専用ボタンを用意する
+    const canCopyImage = !!(navigator.clipboard?.write && window.ClipboardItem);
+    if (!canCopyImage) copyButton?.remove();
+
+    // Windowsは共有ターゲット(X/Instagram等)が乏しく共有シートが実用的でないため、
+    // コピーが使える場合はシェアボタンを隠しコピーボタンを主要導線にする
+    const isWindows = /Windows/i.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent);
+    if (isWindows && canCopyImage) {
+      shareButton?.remove();
+      copyButton?.classList.add('btn-glass-accent');
+    }
     const titleEl = document.getElementById('omikuji-title');
     const introMessageEl = document.getElementById('omikuji-intro-message');
 
@@ -358,6 +376,10 @@ const omikujiFields = [
       return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     }
 
+    function buildShareText(item) {
+      return `【#蛇川神社おみくじ】今日の運勢は「${item.fortune}」でした。\nhttps://chisamikan.site/`;
+    }
+
     shareButton?.addEventListener('click', async () => {
       if (!drawnItem) return;
 
@@ -369,11 +391,11 @@ const omikujiFields = [
         const avatarImg = await loadImage(getAvatarUrl(drawnItem.fortune));
         const blob = await buildShareImage(drawnItem, avatarImg);
         const fileName = `omikuji-${drawnItem.fortune}.png`;
-        const shareText = `【#蛇川神社おみくじ】今日の運勢は「${drawnItem.fortune}」でした。\nhttps://chisamikan.site/`;
+        const shareText = buildShareText(drawnItem);
         const file = new File([blob], fileName, { type: 'image/png' });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: '蛇川神社 おみくじ', text: shareText });
+          await navigator.share({ files: [file], text: shareText });
         } else {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -395,6 +417,34 @@ const omikujiFields = [
         shareButton.disabled = false;
         shareButton.innerHTML = originalHTML;
       }
+    });
+
+    copyButton?.addEventListener('click', () => {
+      if (!drawnItem) return;
+
+      copyButton.disabled = true;
+      const originalHTML = copyButton.innerHTML;
+      copyButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
+
+      // clipboard.write自体はクリックハンドラ内で同期的に呼び、画像生成(非同期)は
+      // ClipboardItemにPromiseとして渡すことでSafariのユーザー操作起点を維持する
+      const item = drawnItem;
+      const blobPromise = loadImage(getAvatarUrl(item.fortune)).then((avatarImg) => buildShareImage(item, avatarImg));
+      const textBlob = new Blob([buildShareText(item)], { type: 'text/plain' });
+
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': blobPromise, 'text/plain': textBlob })])
+        .then(() => {
+          copyButton.innerHTML = '<i class="fa-solid fa-check pr-1" aria-hidden="true"></i>コピーしました';
+          setTimeout(() => { copyButton.innerHTML = originalHTML; }, 2000);
+        })
+        .catch((err) => {
+          console.error('[omikuji] 画像のコピーに失敗しました:', err);
+          copyButton.innerHTML = originalHTML;
+        })
+        .finally(() => {
+          copyButton.disabled = false;
+        });
     });
 
     function drawOmikuji() {
