@@ -1,11 +1,8 @@
 ---
-// 全ページ共通の初回表示ローディング演出。
-// 手描きのサインをペンでなぞるように、マスク用の線をstroke-dasharray/
-// stroke-dashoffsetで少しずつ描画し、その下のサイン文字を徐々に浮かび
-// 上がらせる(手書き風テキストアニメ)。ページの読み込み完了(window load)
-// を待ってフェードアウトする。
+// 全ページ共通の初回表示ローディング演出。手描きのサインをペンでなぞるように、
+// マスク用の線をstroke-dasharray/dashoffsetで少しずつ描画し、その下のサイン文字を
+// 徐々に浮かび上がらせる。ページの読み込み完了(window load)を待ってフェードアウトする。
 // 参考: https://knap.jp/blog/seisaku-fujii-20240521
-//       https://knap.jp/blog/seisaku-fujii-20240524
 ---
 
 <div id="page-loader" class="page-loader" role="status" aria-live="polite">

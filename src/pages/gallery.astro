@@ -102,9 +102,8 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     return tags.includes(currentFilter);
   }
 
-  // current を中心とした3ページ分の窓を作り、先頭/末尾に接していなければ
-  // その側に 1 (または total) と省略記号を追加する。窓が範囲外にはみ出す
-  // 場合は範囲内に収まるようスライドさせる。
+  // current を中心とした3ページ分の窓(範囲外にはみ出す場合はスライド)を作り、
+  // 先頭/末尾に接していなければその側に 1 (または total) と省略記号を追加する。
   function getPageItems(current: number, total: number): Array<number | 'ellipsis'> {
     let start = current - 1;
     let end = current + 1;

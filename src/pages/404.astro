@@ -122,8 +122,7 @@ const omikujiFields = [
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // メッセージ吹き出し(.line-mock-bubble)のテキストを1文字ずつ表示するタイピング風アニメーション。
-    // 同じ要素で連打(再抽選)された場合に前のタイマーが残って文字が混ざらないよう、
-    // 要素自身にタイマーIDを持たせて必ず先にクリアする。
+    // 連打(再抽選)時に前のタイマーが残って文字が混ざらないよう、要素自身にタイマーIDを持たせてクリアする。
     function typeText(el, text, speed = 32) {
       if (el._typingTimer) {
         clearInterval(el._typingTimer);
@@ -138,9 +137,8 @@ const omikujiFields = [
         return;
       }
 
-      // 先に全文を描画して吹き出しの最終的な高さを計測し、min-heightとして
-      // 固定してから改めて空にする。これによりタイピング中に文字が増えて
-      // 縦幅が変化しても、アバターや三角の位置が動かなくなる。
+      // 先に全文を描画して吹き出しの最終的な高さをmin-heightに固定してから空にする。
+      // これによりタイピング中に縦幅が変化しても、アバターや三角の位置が動かなくなる。
       if (bubble) {
         bubble.style.minHeight = '';
         el.textContent = text;

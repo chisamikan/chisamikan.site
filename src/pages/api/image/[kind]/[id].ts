@@ -2,10 +2,8 @@ import type { APIRoute } from 'astro';
 import { Client, isFullBlock, isFullPage } from '@notionhq/client';
 import { pickEnv } from '../../../../lib/env';
 
-// Notionへ独自にアップロードした画像のURLは署名付きで数時間程度で失効するため、
-// ビルド時(SSG)に埋め込まず、表示の都度このエンドポイント経由でNotionへ問い合わせて
-// 最新のURLへ302リダイレクトする。そのためこのルートだけは事前ビルドせず、
-// Cloudflare上でリクエストごとに実行する。
+// Notionへアップロードした画像のURLは数時間で失効するため、ビルド時に埋め込まず、
+// 表示の都度このエンドポイント経由でNotionへ問い合わせて最新URLへ302リダイレクトする。
 export const prerender = false;
 
 // Notion側の実際の有効期限(通常1時間=3600秒)より短くしておくことで、

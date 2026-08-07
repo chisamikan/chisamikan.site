@@ -27,8 +27,8 @@ const featuredGallery = gallery.slice(0, 3);
 const featuredNovels = novels.slice(0, 3);
 const featuredToolbox = toolbox.slice(0, 3);
 
-// ファーストビューの全画面イラスト: ギャラリーで「slideshow」がオンの作品(NSFWは除外)を
-// スライドショー表示する。対象が無ければ先頭作品、それも無ければ用意したイラストを使用する
+// ファーストビュー: ギャラリーで「slideshow」がオンの作品(NSFWは除外)をスライドショー表示する。
+// 対象が無ければ先頭作品、それも無ければ用意したイラストを使用する
 const slideshowImages = gallery
   .filter((item) => item.slideshow && !item.nsfw && item.imageUrl)
   .map((item) => item.imageUrl as string);
@@ -45,8 +45,7 @@ const heroImages =
   <!-- ファーストビュー: 全画面イラスト -->
   <section class="relative h-svh w-full overflow-hidden">
     <HeroSlideshow images={heroImages} />
-    <!-- ここから先はイラスト写真の上に重ねる常時ダークな覆い(スクリム)なので、
-         ページのテーマ(paper/ink)ではなく固定の black/white を使い、ダークモードでも見た目を変えない -->
+    <!-- イラストに重ねる常時ダークな覆い。ページのテーマではなく固定の black/white を使う -->
     <div class="absolute inset-0 bg-linear-to-t from-black/85 via-black/25 to-black/5"></div>
 
     <div class="relative z-10 flex h-full flex-col justify-end px-6 pb-6 pt-16 sm:px-10 sm:pb-10">

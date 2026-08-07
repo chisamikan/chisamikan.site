@@ -2,9 +2,7 @@
 @config '../../tailwind.config.mjs';
 
 @layer base {
-  /* 配色は CodePen "Liquid Glass UI kit" のトークンに準拠。
-     ライト = kit の [data-theme="light"]、ダーク = kit の :root(既定値)を移植し、
-     paper/ink/graphite/accent という変数名・呼び出し側のクラス名は変えずに中身だけ差し替える */
+  /* 配色は CodePen "Liquid Glass UI kit" のトークンに準拠(ライト = kit の [data-theme="light"]) */
   :root {
     --color-paper: 232 240 250;
     --color-paper-dim: 219 229 242;
@@ -41,8 +39,7 @@
     --line-height: 1.6;
   }
 
-  /* 端末のダーク設定 or ヘッダーのトグルで <html> に付与される。
-     paper/ink/graphite/accent とガラス面トークンを入れ替えるだけで、これらを参照する全クラスが追従する */
+  /* 端末のダーク設定 or ヘッダーのトグルで <html> に付与される */
   .dark {
     --color-paper: 11 14 26;
     --color-paper-dim: 20 24 40;
@@ -87,8 +84,7 @@
 
   body {
     @apply bg-paper text-ink font-body antialiased transition-colors duration-300;
-    /* ガラス面が光を透かして見えるよう、固定位置のソフトなカラーブロブを紙のドット柄の奥に敷く。
-       CodePen "Liquid Glass UI kit" の .scene__blob に倣い aqua/violet/amber のマルチアクセントで構成する */
+    /* ガラス面が光を透かして見えるよう、固定位置のカラーブロブを紙のドット柄の奥に敷く */
     background-image:
       radial-gradient(ellipse 60% 45% at 12% -8%, rgb(var(--color-accent) / 0.18), transparent 100%),
       radial-gradient(ellipse 55% 42% at 100% 12%, rgb(var(--color-accent-violet) / 0.14), transparent 100%),
@@ -119,8 +115,7 @@
 }
 
 @layer components {
-  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する。
-     a要素だけでなくbutton要素にも使われるため cursor-pointer を明示する */
+  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
   .btn-glass {
     @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-mono text-sm text-ink shadow-glass backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-glass-border-bright hover:bg-glass-md hover:shadow-glass-lg;
   }
@@ -129,8 +124,7 @@
     @apply px-3.5 py-1.5 text-xs;
   }
 
-  /* Liquid Glass UI Kit の Primary ボタン(.glass-btn--primary)に準拠。
-     単色塗りではなく accent → accent-2 の斜めグラデーション + 上面のガラス反射(::before)で構成する */
+  /* accent → accent-2 の斜めグラデーション + 上面のガラス反射(::before)で構成する */
   .btn-glass-accent {
     position: relative;
     background-image: linear-gradient(135deg, rgb(var(--color-accent) / 0.5) 0%, rgb(var(--color-accent-2) / 0.5) 100%);
@@ -150,11 +144,7 @@
     @apply cursor-pointer rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:bg-glass-md hover:text-accent;
   }
 
-  /* --------------------------------------------------------------------------
-     以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント。
-     現時点で未使用のものも含め、同じガラストークン(glass-*, shadow-glass 等)で
-     将来のUI追加にすぐ使えるように揃えておく。
-     -------------------------------------------------------------------------- */
+  /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント(未使用のものを含む) */
 
   /* タグ・バッジ: ArtworkCard/WorkItem/ProfileContent のスキルタグに使用 */
   .glass-tag {
@@ -226,8 +216,7 @@
     @apply block;
   }
 
-  /* アコーディオン: <details class="glass-accordion-item"><summary class="glass-accordion-trigger">
-     のようにネイティブ要素で組む想定(JS不要)。contact.astro のFAQで使用 */
+  /* アコーディオン: <details class="glass-accordion-item"><summary class="glass-accordion-trigger"> で組む(JS不要) */
   .glass-accordion {
     @apply flex flex-col gap-2;
   }
@@ -256,10 +245,8 @@
     @apply px-5 pb-4 text-sm leading-relaxed text-ink/75;
   }
 
-  /* おみくじ結果(404ページ)のラベル/値の行。JSで動的に生成するDOM向けのため、
-     Astroのスコープ付きstyleではなくここに定義する(scoped styleはビルド時に
-     テンプレート内の要素へ属性を付与する方式のため、実行時にinnerHTMLで
-     追加した要素には効かない) */
+  /* おみくじ結果(404ページ)のラベル/値の行。JSがinnerHTMLで生成するDOM向けのため、
+     効かないAstroのスコープ付きstyleではなくここに定義する */
   .omikuji-detail-row {
     @apply flex gap-4 border-b border-glass-border-subtle py-2 last:border-0;
   }
@@ -273,16 +260,13 @@
   }
 
   /* 「もう一度引く」クリック時にscrollIntoViewで見出しへ戻る際、sticky headerの
-     裏に隠れないようオフセットする。Header.astroがResizeObserverで実測して
-     常時更新している --mobile-header-h (名前はモバイルオーバーレイ用だが
-     ブレークポイントを問わずヘッダーの実高さを反映する)をそのまま再利用する */
+     裏に隠れないよう Header.astro が実測する --mobile-header-h でオフセットする */
   #omikuji-title {
     @apply scroll-mt-[calc(var(--mobile-header-h,4.5rem)+1rem)];
   }
 
-  /* おみくじ結果の各項目を時間差でフェードインアップさせる。既存の .reveal は
-     ページ全体のスクロール連動(IntersectionObserver)専用のため、名前を分けて
-     JS側(404.astro)から抽選ごとに is-visible を付け直せるようにする */
+  /* おみくじ結果の各項目を時間差でフェードインアップさせる。.reveal はスクロール連動
+     (IntersectionObserver)専用のため、404.astro が抽選ごとに付け直せるよう名前を分ける */
   .omikuji-reveal-item {
     @apply opacity-0 translate-y-5 transition-[opacity,transform] duration-900 ease-[cubic-bezier(0.22,1,0.36,1)];
   }
@@ -297,16 +281,13 @@
     }
   }
 
-  /* LINEのトーク画面を模したモックアップ(404ページのおみくじ結果に使用)。
-     吹き出し(.line-mock-bubble)の見た目のみでLINE感を出し、周囲の背景色や
-     幅は持たせず他の項目(.omikuji-detail-row等)と横幅を揃える */
+  /* LINEのトーク画面を模したモックアップ(404ページのおみくじ結果に使用) */
   .line-mock-body {
     @apply py-2;
   }
 
-  /* タイピング風アニメーション中に吹き出しの縦幅が伸び縮みしても、アバターと
-     三角(::before)の位置が動かないよう上詰めで固定する(縦幅自体はJS側で
-     全文表示時の高さをあらかじめ計測してmin-heightに固定している) */
+  /* タイピング中に吹き出しの縦幅が伸び縮みしても、アバターと三角(::before)の
+     位置が動かないよう上詰めで固定する */
   .line-mock-row {
     @apply flex items-start gap-3;
   }
@@ -508,8 +489,7 @@
     @apply cursor-pointer hover:-translate-y-1.5 [transition:transform_300ms_cubic-bezier(0.22,1,0.36,1),box-shadow_300ms_ease,border-color_300ms_ease];
   }
 
-  /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素はデフォルトで
-     ポインタカーソルにならないため明示的に指定する */
+  /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素用にカーソルを明示する */
   .lightbox-trigger {
     @apply cursor-pointer;
   }
@@ -524,8 +504,7 @@
     }
   }
 
-  /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる。JS(IntersectionObserver)が
-     .is-visible を付与するまでは非表示にしておくが、JS未対応環境では .no-js で常に表示する */
+  /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる(JSが .is-visible を付与) */
   .reveal {
     @apply opacity-0 translate-y-7 transition-[opacity,transform] duration-800 ease-[cubic-bezier(0.22,1,0.36,1)];
   }
@@ -544,15 +523,9 @@
     }
   }
 
-  /* 外部サイトへのリンク(href が絶対URL = http/https始まり)には、手動でアイコンを
-     追加しなくても自動で末尾に外部リンクアイコンを表示する。サイト内リンクは
-     ルート相対パス(例: /contact)で書く運用のため href^="http" だけで判別できる。
-     アイコン単体のボタン等、表示したくない場合は .no-external-icon を付与して除外する。
-     以前はFont Awesomeのグリフを content: '\f08e' で描画していたが、Tailwind v4が
-     内部で使うLightning CSS(1.32.0時点)の圧縮処理がPrivate Use Area領域の文字を
-     含む文字列リテラルを content/カスタムプロパティ問わず空文字に潰してしまうバグが
-     あり、本番ビルドではアイコンが消えていた。content文字列にPUA文字を持たない
-     SVGマスクへ置き換えることでこの問題を回避する */
+  /* 外部リンク(href が http/https始まり)に自動でアイコンを表示する。除外したい場合は
+     .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')はLightning CSS
+     の圧縮バグでPUA文字が空文字に潰され本番ビルドで消えるため、SVGマスクで代替する */
   a[href^="http://"]:not(.no-external-icon)::after,
   a[href^="https://"]:not(.no-external-icon)::after {
     @apply content-[''] inline-block bg-current ml-[0.3em] align-[-0.125em];

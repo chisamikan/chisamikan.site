@@ -42,9 +42,7 @@ async function verifyTurnstile(
 
 /**
  * Discord通知 / Zapier経由の管理者宛通知・送信者への自動返信をまとめて行います。
- * それぞれ対応する環境変数が未設定なら該当の通知だけスキップします。
- * 通知が1件失敗しても他の通知は続行し、例外は投げずログのみに記録します
- * (お問い合わせ自体はNotionへの保存時点で成功しているため)。
+ * 対応する環境変数が未設定の通知はスキップし、1件失敗しても他は続行してログのみに記録します。
  */
 async function sendNotifications(
   payload: { name: string; email: string; message: string },

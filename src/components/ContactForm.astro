@@ -125,9 +125,8 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       return;
     }
 
-    // Turnstileウィジェットがある場合、認証トークンを取得できているか送信時に確認する。
-    // (ボタンを強制的に無効化する方式だと、トークンの自動更新が間に合わなかった際に
-    //  ボタンが押せないまま固まって見えてしまうため、送信時チェックのみに留めている)
+    // Turnstileウィジェットがある場合、認証トークンを取得できているか送信時に確認する
+    // (ボタンを常時無効化する方式だと、トークン更新が間に合わず固まって見えるため)
     const turnstileToken = (data['cf-turnstile-response'] as string) ?? '';
     if (turnstileWidget && !turnstileToken) {
       showError('認証を確認できませんでした。数秒待ってからもう一度お試しください。');

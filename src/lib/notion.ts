@@ -1,11 +1,7 @@
 import { Client, isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
-// ---------------------------------------------------------------------------
-// Notionクライアント
-// ビルド時(SSG)にコンテンツを取得するため、トークンが無い場合は
-// エラーで止めずに空データを返し、ローカルでもUIの見た目を確認できるようにします。
-// ---------------------------------------------------------------------------
+// トークンが無い場合はエラーで止めずダミーデータを返す(ローカルでもUI確認できるように)
 const token = import.meta.env.NOTION_TOKEN;
 
 export const notion = token ? new Client({ auth: token, fetch: fetch.bind(globalThis) }) : null;
@@ -16,13 +12,9 @@ function warnMissingToken(context: string) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Notionへ独自にアップロードした画像(file.type === 'file')のURLは
-// 署名付きで数時間程度で失効し、ビルド時(SSG)に埋め込むと表示されなくなる。
-// そのためURLをそのまま使わず、リクエストの都度Notionから最新URLを
-// 取得し直す /api/image/[kind]/[id] 経由のパスに差し替える。
-// (外部URL(file.type === 'external')は失効しないためそのまま使用する)
-// ---------------------------------------------------------------------------
+// Notionへアップロードした画像(file.type === 'file')のURLは数時間で失効するため、
+// リクエストの都度最新URLを取得し直す /api/image/[kind]/[id] 経由に差し替える。
+// 外部URL(file.type === 'external')は失効しないためそのまま使用する。
 function imageProxyUrl(
   kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels',
   id: string
@@ -82,13 +74,8 @@ function richTextProp(props: PageObjectResponse['properties'], key: string): str
   return prop?.type === 'rich_text' ? richTextToPlain(prop.rich_text) : '';
 }
 
-// ---------------------------------------------------------------------------
-// Notion API はデータベースを直接クエリする方式を廃止し、データベース配下の
-// データソースをクエリする方式(dataSources.query)に変更された。
-// そのためデータベースIDからまずデータソースIDを取得してからクエリする。
-// クエリ結果は1回のリクエストにつき最大100件までしか返らないため、
-// iteratePaginatedAPIで全ページを辿って全件取得する。
-// ---------------------------------------------------------------------------
+// Notion APIはデータベースを直接クエリできないため、まずデータソースIDを取得してからクエリする。
+// 1回の取得上限は100件のため、iteratePaginatedAPIで全ページを辿って全件取得する。
 async function queryPublishedDatabase(
   dbId: string,
   sortProperty: string
@@ -391,7 +378,6 @@ export interface ContactPayload {
  *
  * このAPIはCloudflare上でリクエストごとに実行されるため、ビルド時専用の import.meta.env ではなく
  * Cloudflareのランタイム環境(Astro.locals.runtime.env)から渡された値を優先して使用します。
- * (Cloudflareの設定によっては、ビルド時とリクエスト実行時で参照できる環境変数が異なる場合があるため)
  */
 export async function createContactEntry(
   payload: ContactPayload,

@@ -35,8 +35,7 @@ const DIGITS = 6;
     };
 
     // 同じ端末での再読み込みで無限に加算されないよう、直近でカウント済みなら
-    // 加算せず現在値の取得(GET)のみ行う。クールダウン期間はlocalStorageに記録した
-    // 最終カウント時刻をもとに判定する。
+    // 加算せず現在値の取得(GET)のみ行う。判定はlocalStorageの最終カウント時刻による。
     const STORAGE_KEY = 'chisamikan-access-counter-last-counted';
     const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24時間
 
@@ -53,8 +52,7 @@ const DIGITS = 6;
       try {
         localStorage.setItem(STORAGE_KEY, String(Date.now()));
       } catch {
-        // localStorageが使えない(プライベートブラウジング等)場合は毎回加算されるが、
-        // カウンター自体の表示は継続できるため無視する。
+        // localStorageが使えない場合は毎回加算されるが、表示自体は継続できるため無視する
       }
     };
 

@@ -7,14 +7,9 @@ export interface BoothItem {
   url: string;
 }
 
-// ---------------------------------------------------------------------------
-// BOOTHのショップページ(https://{shop}.booth.pm/)自体はCloudflareの
-// Managed Challenge(JS実行が必要な認証)で保護されておりビルド時のfetchが弾かれるが、
-// 商品一覧ページ(/items)はその対象外で、各商品カードの data-item 属性に
-// 商品ID・商品名・価格・サムネイルURL・商品ページURLがJSONとしてそのまま
-// 埋め込まれている(新着順)。そのためHTMLをDOMパースする代わりに、この
-// data-item 属性を正規表現で抜き出すだけで先頭から新着順の一覧を取得できる。
-// ---------------------------------------------------------------------------
+// ショップページ本体はCloudflareのManaged Challengeでfetchが弾かれるが、商品一覧ページ
+// (/items)は対象外で、各商品カードのdata-item属性に商品情報がJSONで埋め込まれている
+// (新着順)。DOMパースせず、この属性を正規表現で抜き出すだけで一覧を取得できる。
 const DATA_ITEM_PATTERN =
   /<li class="js-mount-point-shop-item-card contents"[^>]*data-item="([^"]*)"/g;
 
