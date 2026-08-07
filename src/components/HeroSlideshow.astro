@@ -13,7 +13,7 @@ const { images } = Astro.props;
     <img
       src={src}
       alt="ファーストビューのイラスト"
-      class="hero-slide absolute inset-0 h-full w-full object-cover"
+      class={`hero-slide absolute inset-0 h-full w-full object-cover${i === 0 ? ' is-active' : ''}`}
       style={i === 0 ? undefined : 'opacity: 0;'}
     />
   ))}
@@ -22,6 +22,18 @@ const { images } = Astro.props;
 <style>
   .hero-slide {
     transition: opacity 1.2s ease;
+    transform: scale(1);
+  }
+  .hero-slide.is-active {
+    animation: hero-zoom 6.2s ease-out forwards;
+  }
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.08);
+    }
   }
 </style>
 
@@ -33,8 +45,13 @@ const { images } = Astro.props;
     let current = 0;
     setInterval(() => {
       const next = (current + 1) % slides.length;
+      // current側はis-activeを外さない: 外すとズームが一瞬元に戻ってフェードアウトが不自然になる
       slides[current].style.opacity = '0';
       slides[next].style.opacity = '1';
+      // クラスを一度外して再度付けることでズームアニメーションを最初から再生させる(この時点ではopacity:0で不可視)
+      slides[next].classList.remove('is-active');
+      void slides[next].offsetWidth;
+      slides[next].classList.add('is-active');
       current = next;
     }, 5000);
   });
