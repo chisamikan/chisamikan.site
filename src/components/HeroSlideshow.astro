@@ -15,6 +15,9 @@ const { images } = Astro.props;
       alt="ファーストビューのイラスト"
       class={`hero-slide absolute inset-0 h-full w-full object-cover${i === 0 ? ' is-active' : ''}`}
       style={i === 0 ? undefined : 'opacity: 0;'}
+      loading={i === 0 ? 'eager' : 'lazy'}
+      fetchpriority={i === 0 ? 'high' : 'low'}
+      decoding="async"
     />
   ))}
 </div>
