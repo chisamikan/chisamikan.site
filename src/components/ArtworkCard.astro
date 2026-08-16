@@ -43,7 +43,7 @@ const hasImage = Boolean(item.imageUrl);
       <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
     </div>
   )}
-  <figcaption class="flex flex-1 flex-col border-t border-glass-border-subtle p-4">
+  <figcaption class="flex flex-1 flex-col border-t border-glass-border-subtle p-4 break-normal">
     <Tag class="font-display text-lg font-medium leading-snug text-ink">{item.title}</Tag>
     {item.description && (
       <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>
