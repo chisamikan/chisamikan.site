@@ -57,6 +57,8 @@ const { images } = Astro.props;
     let current = 0;
     setInterval(() => {
       const next = (current + 1) % slides.length;
+      // 読み込みが終わっていない画像に切り替えると、その画像の遅い読み込み完了がLCPとして計測されてしまうため待つ
+      if (!slides[next].complete) return;
       // current側はis-activeを外さない: 外すとズームが一瞬元に戻ってフェードアウトが不自然になる
       slides[current].style.opacity = '0';
       slides[next].style.opacity = '1';
