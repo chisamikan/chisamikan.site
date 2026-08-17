@@ -525,9 +525,10 @@
     @apply relative inline-block px-13.75 before:absolute before:top-1/2 before:left-0 before:h-0.5 before:w-11.25 before:border-y before:content-[''] after:absolute after:top-1/2 after:right-0 after:h-0.5 after:w-11.25 after:border-y after:content-[''];
   }
 
-  /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動 */
+  /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動。
+     ボタン(.btn-glass)と同じ transition-all + duration-300 でイージングを揃える */
   .glass-card {
-    @apply cursor-pointer hover:-translate-y-1.5 [transition:transform_300ms_cubic-bezier(0.22,1,0.36,1),box-shadow_300ms_ease,border-color_300ms_ease];
+    @apply cursor-pointer transition-all duration-300 hover:-translate-y-1.5;
   }
 
   /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素用にカーソルを明示する */
