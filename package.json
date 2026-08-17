@@ -16,10 +16,10 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^14.2.0",
-    "@notionhq/client": "^5.24.0",
+    "@astrojs/cloudflare": "^14.2.1",
+    "@notionhq/client": "^5.25.2",
     "@tailwindcss/vite": "^4.0.0",
-    "astro": "^7.2.0",
+    "astro": "^7.2.2",
     "rss-parser": "^3.13.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^6.0.3"
