@@ -1,21 +1,19 @@
 ---
-import type { NovelItem } from '../lib/notion';
-
 interface Props {
-  item: NovelItem;
+  imageUrl: string | null;
+  /** ライトボックスのdata-alt、及び「〜を拡大表示」のaria-labelに使う見出し(例: `${item.title}の表紙`) */
+  label: string;
   class?: string;
   /** true の場合、外側のカードが枠を持つため縁取り・影・背景を付けない */
   bare?: boolean;
 }
-const { item, class: className = '', bare = false } = Astro.props;
+const { imageUrl, label, class: className = '', bare = false } = Astro.props;
 
 const PLACEHOLDER = '/images/work-placeholder.svg';
-const hasImage = Boolean(item.imageUrl);
-const src = item.imageUrl ?? PLACEHOLDER;
+const hasImage = Boolean(imageUrl);
+const src = imageUrl ?? PLACEHOLDER;
 
-const frameClass = bare
-  ? ''
-  : 'glass-card rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg';
+const frameClass = bare ? '' : 'glass-card glass-panel';
 ---
 
 {hasImage ? (
@@ -23,8 +21,8 @@ const frameClass = bare
     type="button"
     class:list={['lightbox-trigger group relative block aspect-square overflow-hidden', frameClass, className]}
     data-full={src}
-    data-alt={`${item.title}の表紙`}
-    aria-label={`${item.title}の表紙を拡大表示`}
+    data-alt={label}
+    aria-label={`${label}を拡大表示`}
   >
     <img
       src={src}

@@ -11,7 +11,7 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 const hasImage = Boolean(item.imageUrl);
 ---
 
-<figure class="glass-card group flex h-full flex-col overflow-hidden rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg">
+<figure class="glass-card glass-panel group flex h-full flex-col overflow-hidden">
   {hasImage ? (
     <button
       type="button"
@@ -43,7 +43,7 @@ const hasImage = Boolean(item.imageUrl);
       <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
     </div>
   )}
-  <figcaption class="flex flex-1 flex-col border-t border-glass-border-subtle p-4 break-normal">
+  <figcaption class="glass-card-body break-normal">
     <Tag class="font-display text-lg font-medium leading-snug text-ink">{item.title}</Tag>
     {item.description && (
       <p class="mt-1 line-clamp-2 text-sm text-ink/70">{item.description}</p>

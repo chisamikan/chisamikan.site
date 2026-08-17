@@ -531,6 +531,16 @@
     @apply cursor-pointer transition-all duration-300 hover:-translate-y-1.5;
   }
 
+  /* カード/サムネイルの共通の見た目(角丸・枠線・背景・影・ぼかし)。ホバー演出は .glass-card 側で付与 */
+  .glass-panel {
+    @apply rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg;
+  }
+
+  /* カード下部(figcaption/div)の共通レイアウト */
+  .glass-card-body {
+    @apply flex flex-1 flex-col border-t border-glass-border-subtle p-4;
+  }
+
   /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素用にカーソルを明示する */
   .lightbox-trigger {
     @apply cursor-pointer;

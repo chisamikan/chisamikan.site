@@ -14,7 +14,7 @@ const src = item.imageUrl ?? PLACEHOLDER;
 
 <a
   href={`/novels#novel-${item.id}`}
-  class="glass-card group flex h-full flex-col overflow-hidden rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg"
+  class="glass-card glass-panel group flex h-full flex-col overflow-hidden"
 >
   <div class="relative aspect-square w-full overflow-hidden bg-paper-dim">
     <img
@@ -28,7 +28,7 @@ const src = item.imageUrl ?? PLACEHOLDER;
     />
   </div>
 
-  <div class="flex flex-1 flex-col border-t border-glass-border-subtle p-4">
+  <div class="glass-card-body">
     <Tag class="font-display text-lg font-medium leading-snug text-ink">{item.title}</Tag>
     {item.description && (
       <p class="mt-1 line-clamp-2 whitespace-pre-line text-sm text-ink/70">{item.description}</p>
