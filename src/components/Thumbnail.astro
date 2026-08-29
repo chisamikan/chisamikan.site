@@ -13,7 +13,10 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 const hasImage = Boolean(imageUrl);
 const src = imageUrl ?? PLACEHOLDER;
 
-const frameClass = bare ? '' : 'glass-card glass-panel';
+// List.astro専用の枠スタイル(.thumbnail-frame/.thumbnail-frame-static)を使う。
+// Card UI(.glass-card/.glass-panel)とは角丸の値が異なるため、CSSを共有しない
+const frameClass = bare ? '' : 'thumbnail-frame';
+const placeholderFrameClass = bare ? '' : 'thumbnail-frame-static';
 ---
 
 {hasImage ? (
@@ -33,17 +36,9 @@ const frameClass = bare ? '' : 'glass-card glass-panel';
   </button>
 ) : (
   <div
-    class:list={['thumbnail-placeholder relative aspect-square overflow-hidden', frameClass, className]}
+    class:list={['relative aspect-square overflow-hidden', placeholderFrameClass, className]}
     aria-hidden="true"
   >
     <img src={src} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
   </div>
 )}
-
-<style>
-  /* .glass-card の cursor: pointer (global.css) を打ち消すため、
-     scoped styleのdata属性でスコープ限定+plainクラス以上の詳細度を確保 */
-  .thumbnail-placeholder {
-    cursor: default;
-  }
-</style>

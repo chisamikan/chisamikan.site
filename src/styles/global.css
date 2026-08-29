@@ -553,6 +553,17 @@
     @apply flex flex-1 flex-col border-t border-glass-border-subtle p-4;
   }
 
+  /* リストUI(List.astro/Thumbnail.astro)専用のサムネイル枠。
+     カードUI(.glass-card/.glass-panel)とは角丸の値が異なるため独立させている */
+  .thumbnail-frame {
+    @apply cursor-pointer rounded-lg border border-glass-border bg-glass shadow-card backdrop-blur-xl transition-all duration-300 will-change-transform hover:-translate-y-1.5 hover:border-glass-border-bright hover:shadow-card-lg sm:rounded-2xl;
+  }
+
+  /* 画像未設定時のプレースホルダー枠。ホバー演出は持たせない */
+  .thumbnail-frame-static {
+    @apply cursor-default rounded-lg border border-glass-border bg-glass shadow-card backdrop-blur-xl sm:rounded-2xl;
+  }
+
   /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素用にカーソルを明示する */
   .lightbox-trigger {
     @apply cursor-pointer;
@@ -561,6 +572,8 @@
   @media (prefers-reduced-motion: reduce) {
     .glass-card,
     .glass-card:hover,
+    .thumbnail-frame,
+    .thumbnail-frame:hover,
     .btn-glass,
     .btn-glass:hover,
     .btn-glass-accent:active {

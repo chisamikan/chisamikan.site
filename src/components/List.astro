@@ -49,19 +49,22 @@ function formatPeriod(start: string | null, end: string | null) {
     <div class="min-w-0 flex-1">
       {props.type === 'work' && (
         <>
-          <p class="font-mono text-xs text-graphite">{formatPeriod(props.item.periodStart, props.item.periodEnd)}</p>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            {formatPeriod(props.item.periodStart, props.item.periodEnd) && (
+              <p class="font-mono text-xs text-graphite">{formatPeriod(props.item.periodStart, props.item.periodEnd)}</p>
+            )}
+            {props.item.tags.length > 0 && (
+              <ul class="flex flex-wrap gap-1.5">
+                {props.item.tags.map((tag) => (
+                  <li class="glass-tag">
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <Tag class="mt-1 font-display text-xl font-semibold text-ink">{props.item.client}</Tag>
           {props.item.role && <p class="mt-0.5 text-sm font-medium text-accent">{props.item.role}</p>}
-
-          {props.item.tags.length > 0 && (
-            <ul class="mt-3 flex flex-wrap gap-1.5">
-              {props.item.tags.map((tag) => (
-                <li class="glass-tag">
-                  {tag}
-                </li>
-              ))}
-            </ul>
-          )}
 
           {props.item.url && (
             <a
