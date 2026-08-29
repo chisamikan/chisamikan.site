@@ -106,17 +106,19 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   }
 
   // 絞り込み/ページ送り直後は遅延読み込み(loading="lazy")の画像がまだ届いておらず、
-  // 一瞬「該当なし」に見えてしまう。読み込み中の画像がある間だけスピナーで覆い隠す。
-  function waitForVisibleImages() {
+  // 一瞬「該当なし」に見えてしまう。読み込み中の画像がある間だけスピナーで覆い隠し、
+  // 「すべて」読み込み終わってから解決するPromiseを返す(呼び出し側はこれに続けて
+  // カードのアニメーションを発火させ、スピナーとカード表示の間隔がズレないようにする)。
+  function waitForVisibleImages(): Promise<void> {
     const pendingImages = cards
       .filter((card) => card.style.display !== 'none')
       .map((card) => card.querySelector('img'))
       .filter((img): img is HTMLImageElement => !!img && !img.complete);
 
-    if (pendingImages.length === 0) return;
+    if (pendingImages.length === 0) return Promise.resolve();
 
     showLoading();
-    Promise.race(
+    return Promise.all(
       pendingImages.map(
         (img) =>
           new Promise<void>((resolve) => {
@@ -124,7 +126,22 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
             img.addEventListener('error', () => resolve(), { once: true });
           }),
       ),
-    ).then(hideLoading);
+    ).then(() => {
+      hideLoading();
+    });
+  }
+
+  // display:none→表示 と opacity:0→1 を同フレームで行うと、ブラウザが「まだ一度も
+  // 描画されていない要素の初期状態」とみなしてトランジションを省略してしまう。
+  // 2回のrequestAnimationFrameで1フレーム分待ってから is-visible を付与することで
+  // 確実にアニメーションを発火させる。
+  function revealCards(targets: HTMLElement[]) {
+    if (targets.length === 0) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        targets.forEach((card) => card.classList.add('is-visible'));
+      });
+    });
   }
 
   function matchesFilter(card: HTMLElement): boolean {
@@ -179,6 +196,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     const start = (currentPage - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;
 
+    const newlyShown: HTMLElement[] = [];
     let visibleIndex = 0;
     cards.forEach((card) => {
       if (!matchesFilter(card)) {
@@ -187,13 +205,11 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       }
       const show = visibleIndex >= start && visibleIndex < end;
       card.style.display = show ? '' : 'none';
-      // 初回表示はスクロール連動のフェードインに任せるが、絞り込み/ページ送り後の
-      // 再表示はスピナーで待たせた直後なので、二重にアニメーション遅延を挟まず即表示する。
+      // 初回表示はスクロール連動のフェードインに任せるが、絞り込み/ページ送りで
+      // 新たに表示されたカードはその場でスタッガーアニメーションを再生する。
+      // (読み込み中の画像がある間はスピナーが覆い隠すため、二重待ちには感じない)
       if (show && !isFirstRender && !card.classList.contains('is-visible')) {
-        card.style.transition = 'none';
-        card.classList.add('is-visible');
-        void card.offsetHeight;
-        card.style.transition = '';
+        newlyShown.push(card);
       }
       visibleIndex += 1;
     });
@@ -230,7 +246,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       });
     }
 
-    waitForVisibleImages();
+    waitForVisibleImages().then(() => revealCards(newlyShown));
     isFirstRender = false;
   }
 
