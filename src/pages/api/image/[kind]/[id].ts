@@ -30,13 +30,13 @@ const IMAGE_PROPERTY_NAME: Record<Exclude<Kind, 'profile'>, string> = {
   novels: 'Image',
 };
 
-export const GET: APIRoute = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params }) => {
   const { kind, id } = params;
   if (!id || !isKind(kind)) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const token = pickEnv(locals, 'NOTION_TOKEN', import.meta.env.NOTION_TOKEN);
+  const token = pickEnv('NOTION_TOKEN', import.meta.env.NOTION_TOKEN);
   if (!token) {
     return new Response('Notion is not configured', { status: 500 });
   }

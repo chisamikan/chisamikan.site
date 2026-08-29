@@ -2,9 +2,6 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "jsx": "preserve",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
     "types": ["@cloudflare/workers-types"]
   }
 }

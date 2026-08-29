@@ -1,4 +1,4 @@
-import type { APIContext, APIRoute } from 'astro';
+import type { APIRoute } from 'astro';
 import { createContactEntry } from '../../lib/notion';
 import { notifyDiscord, notifyZapier } from '../../lib/notify';
 import { pickEnv } from '../../lib/env';
@@ -44,24 +44,19 @@ async function verifyTurnstile(
  * Discord通知 / Zapier経由の管理者宛通知・送信者への自動返信をまとめて行います。
  * 対応する環境変数が未設定の通知はスキップし、1件失敗しても他は続行してログのみに記録します。
  */
-async function sendNotifications(
-  payload: { name: string; email: string; message: string },
-  locals: APIContext['locals']
-): Promise<void> {
-  const discordWebhookUrl = pickEnv(
-    locals,
-    'DISCORD_WEBHOOK_URL',
-    import.meta.env.DISCORD_WEBHOOK_URL
-  );
+async function sendNotifications(payload: {
+  name: string;
+  email: string;
+  message: string;
+}): Promise<void> {
+  const discordWebhookUrl = pickEnv('DISCORD_WEBHOOK_URL', import.meta.env.DISCORD_WEBHOOK_URL);
   // 管理者宛通知用のZap(Catch Hook → Outlookで自分宛に送信)
   const zapierAdminWebhookUrl = pickEnv(
-    locals,
     'ZAPIER_ADMIN_WEBHOOK_URL',
     import.meta.env.ZAPIER_ADMIN_WEBHOOK_URL
   );
   // 自動返信用のZap(Catch Hook → Outlookで問い合わせ者宛に送信)
   const zapierAutoreplyWebhookUrl = pickEnv(
-    locals,
     'ZAPIER_AUTOREPLY_WEBHOOK_URL',
     import.meta.env.ZAPIER_AUTOREPLY_WEBHOOK_URL
   );
@@ -122,11 +117,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   // 3. Cloudflare Turnstile(secretが設定されている場合のみ検証)
-  const turnstileSecret = pickEnv(
-    locals,
-    'TURNSTILE_SECRET_KEY',
-    import.meta.env.TURNSTILE_SECRET_KEY
-  );
+  const turnstileSecret = pickEnv('TURNSTILE_SECRET_KEY', import.meta.env.TURNSTILE_SECRET_KEY);
   if (turnstileSecret) {
     if (!body.turnstileToken) {
       return new Response(JSON.stringify({ error: 'turnstile_missing' }), { status: 400 });
@@ -160,9 +151,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     await createContactEntry(
       { name, email, message },
       {
-        NOTION_TOKEN: pickEnv(locals, 'NOTION_TOKEN', import.meta.env.NOTION_TOKEN),
+        NOTION_TOKEN: pickEnv('NOTION_TOKEN', import.meta.env.NOTION_TOKEN),
         NOTION_CONTACT_DB_ID: pickEnv(
-          locals,
           'NOTION_CONTACT_DB_ID',
           import.meta.env.NOTION_CONTACT_DB_ID
         ),
@@ -171,7 +161,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // 通知はベストエフォート: Notionへの保存は既に成功しているため、
     // ここで失敗してもユーザーへは成功として返し、ログにのみ記録する。
-    await sendNotifications({ name, email, message }, locals);
+    await sendNotifications({ name, email, message });
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
