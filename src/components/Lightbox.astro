@@ -85,6 +85,14 @@
     background: transparent;
     border: none;
     cursor: pointer;
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+
+  .lightbox-dialog.is-open .lightbox-close {
+    transform: scale(1);
+    opacity: 1;
   }
 
   .lightbox-close:hover {
