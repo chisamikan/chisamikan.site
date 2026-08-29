@@ -27,150 +27,98 @@
 </dialog>
 
 <style>
+  @reference "../styles/global.css";
+
   .lightbox-dialog {
-    max-width: min(90vw, 900px);
-    max-height: 85vh;
-    padding: 0;
-    border: none;
-    background: transparent;
-    overflow: visible;
     /* Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
        打ち消してしまうため、中央寄せを明示的に指定し直す */
-    position: fixed;
-    inset: 0;
-    margin: auto;
+    @apply fixed inset-0 m-auto max-h-[85vh] p-0 overflow-visible border-none bg-transparent;
+    /* min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
+    max-width: min(90vw, 900px);
   }
 
   .lightbox-dialog::backdrop {
+    @apply opacity-0 transition-opacity duration-[280ms] ease-[ease];
+    /* rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     background: rgba(34, 31, 27, 0.82);
-    opacity: 0;
-    transition: opacity 0.28s ease;
   }
 
   .lightbox-dialog.is-open::backdrop {
-    opacity: 1;
+    @apply opacity-100;
   }
 
   .lightbox-dialog img {
-    display: block;
+    @apply block max-h-[85vh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0;
+    /* min()/rgba()のコンマ、および is-visible時の transform: scale(1) と同じプロパティを
+       扱う都合上、この3行のみプレーンCSSのまま残す */
     max-width: min(90vw, 900px);
-    max-height: 85vh;
-    width: auto;
-    height: auto;
-    border-radius: 2px;
     box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
-    cursor: zoom-out;
     transform: scale(0.85);
-    opacity: 0;
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 
   .lightbox-dialog img.is-visible {
+    @apply opacity-100;
     transform: scale(1);
-    opacity: 1;
   }
 
   .lightbox-close {
-    position: absolute;
-    top: -2.5rem;
-    right: 0;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    line-height: 1;
-    color: #faf7f0;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-[#faf7f0] bg-transparent border-none cursor-pointer opacity-0;
     transform: scale(0.85);
-    opacity: 0;
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 
   .lightbox-dialog.is-open .lightbox-close {
+    @apply opacity-100;
     transform: scale(1);
-    opacity: 1;
   }
 
   .lightbox-close:hover {
-    color: #0099ff;
+    @apply text-[#0099ff];
   }
 
   .nsfw-warning-dialog {
+    @apply fixed inset-0 m-auto p-7 border border-[rgb(var(--color-ink)/0.1)] rounded-[0.75rem] bg-paper text-ink opacity-0;
+    /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 420px);
-    padding: 1.75rem;
-    border: 1px solid rgb(var(--color-ink) / 0.1);
-    border-radius: 0.75rem;
-    background: rgb(var(--color-paper));
-    color: rgb(var(--color-ink));
     box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
-    position: fixed;
-    inset: 0;
-    margin: auto;
     transform: scale(0.85);
-    opacity: 0;
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 
   .nsfw-warning-dialog.is-open {
+    @apply opacity-100;
     transform: scale(1);
-    opacity: 1;
   }
 
   .nsfw-warning-dialog::backdrop {
+    @apply opacity-0 transition-opacity duration-[280ms] ease-[ease];
     background: rgba(34, 31, 27, 0.82);
-    opacity: 0;
-    transition: opacity 0.28s ease;
   }
 
   .nsfw-warning-dialog.is-open::backdrop {
-    opacity: 1;
+    @apply opacity-100;
   }
 
   .nsfw-warning-title {
+    @apply text-lg font-semibold mb-2;
     font-family: var(--font-display, inherit);
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
   }
 
   .nsfw-warning-body {
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: rgb(var(--color-ink) / 0.75);
+    @apply text-sm leading-[1.6] text-ink/75;
   }
 
   .nsfw-warning-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
+    @apply flex justify-end gap-3 mt-6;
   }
 
   .nsfw-warning-close {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    line-height: 1;
-    color: rgb(var(--color-ink) / 0.5);
-    background: transparent;
-    border: none;
-    border-radius: 9999px;
-    cursor: pointer;
+    @apply absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-xl leading-none text-ink/50 bg-transparent border-none rounded-full cursor-pointer;
   }
 
   .nsfw-warning-close:hover {
-    color: rgb(var(--color-ink));
-    background: rgb(var(--color-ink) / 0.08);
+    @apply text-ink bg-ink/8;
   }
 </style>
 

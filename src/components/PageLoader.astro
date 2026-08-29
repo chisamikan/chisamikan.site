@@ -32,41 +32,38 @@
 </div>
 
 <style>
+  @reference "../styles/global.css";
+
   .page-loader {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    background-color: rgb(var(--color-paper));
+    @apply fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 bg-paper bg-size-[22px_22px] duration-[420ms] ease-[ease];
+    /* radial-gradient()のコンマ、および複数プロパティ分のtransition-propertyの
+       コンマがscoped styleの@apply内では正しく処理できないため、この2行のみプレーンCSSのまま残す */
     background-image: radial-gradient(circle at 1px 1px, rgb(var(--color-ink) / 0.055) 1px, transparent 0);
-    background-size: 22px 22px;
-    transition: opacity 420ms ease, visibility 420ms ease;
+    transition-property: opacity, visibility;
   }
 
   .page-loader.is-hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+    @apply opacity-0 invisible pointer-events-none;
   }
 
   .page-loader-signature {
+    @apply h-auto;
+    /* min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     width: min(260px, 60vw);
-    height: auto;
   }
 
   .page-loader-text {
+    /* data URI ではなく要素IDの参照だが、Tailwindのmaskユーティリティは
+       -webkit-mask を自動付与しないため、フォールバックを保つべくプレーンCSSのまま残す */
     mask: url(#page-loader-mask);
     -webkit-mask: url(#page-loader-mask);
   }
 
   .page-loader-text path {
-    fill: url(#page-loader-gradient);
+    @apply fill-[url(#page-loader-gradient)];
   }
 
+  /* stop-colorに対応するTailwindユーティリティが無いため、プレーンCSSのまま残す */
   .page-loader-gradient-stop-1 {
     stop-color: rgb(var(--color-accent));
   }
@@ -80,9 +77,9 @@
   }
 
   .page-loader-mask-path {
-    fill: none;
-    stroke: #fff;
-    stroke-width: 30px;
+    @apply fill-none stroke-[#fff] stroke-[30px];
+    /* stroke-linecap/linejoin/dasharray/dashoffset、animationに対応する
+       Tailwindユーティリティが無いため、この4行のみプレーンCSSのまま残す */
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-dasharray: 1000px;
@@ -104,7 +101,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .page-loader-mask-path {
-      animation: none;
+      @apply animate-none;
       stroke-dashoffset: 0;
     }
   }

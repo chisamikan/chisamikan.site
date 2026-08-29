@@ -43,6 +43,8 @@ const duration = Math.min(30, Math.max(10, (item.title.length + (formattedDate?.
 </div>
 
 <style>
+  @reference "../styles/global.css";
+
   /* タイトルを2つ並べて配置し、自身の50%(=コピー1個分)だけ動かすことで
      継ぎ目のない無限ループに見せる(電光掲示板と同じ仕組み) */
   .news-ticker-track {
@@ -67,12 +69,11 @@ const duration = Math.min(30, Math.max(10, (item.title.length + (formattedDate?.
 
   @media (prefers-reduced-motion: reduce) {
     .news-ticker-track {
-      animation: none;
-      transform: none;
+      @apply animate-none transform-none;
     }
 
     .news-ticker-copy:nth-child(2) {
-      display: none;
+      @apply hidden;
     }
   }
 </style>

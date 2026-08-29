@@ -32,12 +32,16 @@ const { images } = Astro.props;
 </div>
 
 <style>
+  @reference "../styles/global.css";
+
   .hero-slide {
-    transition: opacity 1.2s ease;
+    @apply transition-opacity duration-[1200ms] ease-[ease];
+    /* is-active時のhero-zoomアニメーションと同じtransformプロパティを扱うため、
+       ここもscale-100ではなくプレーンCSSで統一する */
     transform: scale(1);
   }
   .hero-slide.is-active {
-    animation: hero-zoom 6.2s ease-out forwards;
+    @apply animate-[hero-zoom_6.2s_ease-out_forwards];
   }
   @keyframes hero-zoom {
     from {
