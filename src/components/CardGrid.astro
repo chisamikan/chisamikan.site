@@ -1,7 +1,11 @@
 ---
 // Card.astro を並べるグリッドの共通ラッパー。画像は loading="lazy" のため、
-// 表示直後は中身が空に見えることがある。グリッド内の画像がすべて読み込まれるまで
+// 表示直後は中身が空に見えることがある。画面内(付近)の画像が読み込まれるまで
 // スピナーを重ねて隠すことで、その「空に見える瞬間」を目立たなくする。
+// 待つ対象を画面内の画像に限定しているのは、スマートフォンなど1カラム表示で
+// グリッドの縦幅が長くなる場合、画面外の(まだ表示されていない)カードの画像まで
+// 待ってしまうと、実際に見えているカードの画像はとっくに表示済みなのに
+// スピナーだけがいつまでも残るように見えてしまうため。
 // タグ絞り込み等でページ側が表示更新を担う場合は managed を付け、
 // このコンポーネントの自動初期化をスキップしてページ側スクリプトに委ねる
 // (対象は data-card-grid-loading={id} のオーバーレイ要素)。
@@ -39,7 +43,14 @@ const { id, class: gridClass = '', managed = false } = Astro.props;
     const grid = gridId ? document.getElementById(gridId) : null;
     if (!grid) return;
 
-    const pendingImages = Array.from(grid.querySelectorAll<HTMLImageElement>('img')).filter((img) => !img.complete);
+    const isNearViewport = (img: HTMLImageElement) => {
+      const rect = img.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    };
+
+    const pendingImages = Array.from(grid.querySelectorAll<HTMLImageElement>('img')).filter(
+      (img) => !img.complete && isNearViewport(img),
+    );
     if (pendingImages.length === 0) return;
 
     overlay.classList.remove('opacity-0');

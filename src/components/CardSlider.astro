@@ -331,34 +331,61 @@ const isSlider = count > 3;
 
   // CardGrid.astroと同じ「画像読み込み完了までスピナーで隠す」挙動をスライダーにも適用する。
   // ただしスライダーは2枚目以降がloading="lazy"でスクロールするまで読み込まれないため、
-  // 全画像ではなく初期表示で見えている範囲の画像だけを待つ(でないとスピナーが消えなくなる)
+  // 全画像ではなく初期表示で見えている範囲の画像だけを待つ(でないとスピナーが消えなくなる)。
+  //
+  // このセクション自体がまだ画面内にスクロールされていない間は判定を行わない。ページ読み込み
+  // 直後に(まだ見えていない)全スライダーぶん一斉に判定してしまうと、横方向には「見えている」
+  // と判定された画像でも、セクション自体が縦方向にまだ画面外(loading="lazy"で実際には
+  // 読み込みが始まっていない)であるケースを拾ってしまう。ユーザーが実際にそのセクションまで
+  // スクロールしてくる頃には、テキストなど周囲の要素は表示済みなのにスピナーだけがずっと
+  // 残っているように見えてしまうため、IntersectionObserverでセクションが画面内に入った瞬間に
+  // 判定を開始する
   document.querySelectorAll<HTMLElement>('[data-card-slider-loading]').forEach((overlay) => {
     const sliderId = overlay.dataset.cardSliderLoading;
     const slider = sliderId ? document.getElementById(sliderId) : null;
     if (!slider) return;
 
-    const sliderRect = slider.getBoundingClientRect();
-    const pendingImages = Array.from(slider.querySelectorAll<HTMLImageElement>('img')).filter((img) => {
-      if (img.complete) return false;
-      const rect = img.getBoundingClientRect();
-      return rect.left < sliderRect.right && rect.right > sliderRect.left;
-    });
-    if (pendingImages.length === 0) return;
+    const checkAndWait = () => {
+      const sliderRect = slider.getBoundingClientRect();
+      const pendingImages = Array.from(slider.querySelectorAll<HTMLImageElement>('img')).filter((img) => {
+        if (img.complete) return false;
+        const rect = img.getBoundingClientRect();
+        return rect.left < sliderRect.right && rect.right > sliderRect.left;
+      });
+      if (pendingImages.length === 0) return;
 
-    overlay.classList.remove('opacity-0');
-    overlay.setAttribute('aria-hidden', 'false');
+      overlay.classList.remove('opacity-0');
+      overlay.setAttribute('aria-hidden', 'false');
 
-    Promise.all(
-      pendingImages.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            img.addEventListener('load', () => resolve(), { once: true });
-            img.addEventListener('error', () => resolve(), { once: true });
-          }),
-      ),
-    ).then(() => {
-      overlay.classList.add('opacity-0');
-      overlay.setAttribute('aria-hidden', 'true');
-    });
+      Promise.all(
+        pendingImages.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              img.addEventListener('load', () => resolve(), { once: true });
+              img.addEventListener('error', () => resolve(), { once: true });
+            }),
+        ),
+      ).then(() => {
+        overlay.classList.add('opacity-0');
+        overlay.setAttribute('aria-hidden', 'true');
+      });
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              checkAndWait();
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { rootMargin: '200px 0px' },
+      );
+      observer.observe(slider);
+    } else {
+      checkAndWait();
+    }
   });
 </script>
