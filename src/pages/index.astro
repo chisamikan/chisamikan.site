@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Card from '../components/Card.astro';
+import CardGrid from '../components/CardGrid.astro';
 import NewsTicker from '../components/NewsTicker.astro';
 import AccessCounter from '../components/AccessCounter.astro';
 import ProfileContent from '../components/ProfileContent.astro';
@@ -116,13 +117,13 @@ const heroImages =
   <!-- ギャラリー抜粋 -->
   <section id="gallery" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" />
-    <div class="grid gap-8 sm:grid-cols-3">
+    <CardGrid id="home-gallery-grid" class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item) => (
         <div class="card-reveal h-full">
           <Card type="artwork" item={item} />
         </div>
       ))}
-    </div>
+    </CardGrid>
     <div class="mt-10 text-center">
       <a href="/gallery" class="btn-glass btn-glass-accent md:w-1/3 w-full">
         <i class="fa-solid fa-circle-chevron-right pr-1"></i>すべての作品を見る
@@ -134,13 +135,13 @@ const heroImages =
   <section id="novels" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Novels" title="小説" />
     {featuredNovels.length > 0 ? (
-      <div class="grid gap-8 sm:grid-cols-3">
+      <CardGrid id="home-novels-grid" class="grid gap-8 sm:grid-cols-3">
         {featuredNovels.map((item) => (
           <div class="card-reveal h-full">
             <Card type="novel" item={item} />
           </div>
         ))}
-      </div>
+      </CardGrid>
     ) : (
       <p class="font-mono text-sm text-graphite">まだ小説作品が登録されていません。</p>
     )}
@@ -155,13 +156,13 @@ const heroImages =
   <section id="toolbox" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Tool Box" title="ツールボックス" />
     {featuredToolbox.length > 0 ? (
-      <div class="grid gap-8 sm:grid-cols-3">
+      <CardGrid id="home-toolbox-grid" class="grid gap-8 sm:grid-cols-3">
         {featuredToolbox.map((item) => (
           <div class="card-reveal h-full">
             <Card type="toolbox" item={item} />
           </div>
         ))}
-      </div>
+      </CardGrid>
     ) : (
       <p class="font-mono text-sm text-graphite">まだツールが登録されていません。</p>
     )}
@@ -176,13 +177,13 @@ const heroImages =
   <section id="shop" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Shop" title="ショップ" />
     {shopItems.length > 0 ? (
-      <div class="grid gap-8 sm:grid-cols-3">
+      <CardGrid id="home-shop-grid" class="grid gap-8 sm:grid-cols-3">
         {shopItems.map((item) => (
           <div class="card-reveal h-full">
             <Card type="shop" item={item} />
           </div>
         ))}
-      </div>
+      </CardGrid>
     ) : (
       <p class="font-mono text-sm text-graphite">まだ商品が登録されていません。</p>
     )}

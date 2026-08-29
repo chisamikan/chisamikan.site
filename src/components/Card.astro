@@ -30,7 +30,7 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
             alt={props.item.title}
             loading="lazy"
             class:list={[
-              'absolute left-1/2 top-1/2 max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover transition-[width,height] duration-300',
+              'absolute left-1/2 top-1/2 max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top transition-[width,height] duration-300',
               props.item.nsfw
                 ? 'h-[110%] w-[110%] blur-xl'
                 : 'h-full w-full group-hover:h-[110%] group-hover:w-[110%]',
@@ -47,7 +47,7 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
         </button>
       ) : (
         <div class="flex aspect-square w-full cursor-default items-center justify-center bg-paper-dim" aria-hidden="true">
-          <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+          <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
         </div>
       )}
       {/* サムネイル下部にタグ・タイトルを重ねて表示する。クリック操作はサムネイル本体(button)が担うため pointer-events-none にする */}
@@ -106,7 +106,7 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
         alt={props.item.imageUrl ? props.item.title : ''}
         loading="lazy"
         class:list={[
-          'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover',
+          'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top',
           props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
         ]}
       />
@@ -150,14 +150,14 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
             alt={props.item.imageUrl ? props.item.title : ''}
             loading="lazy"
             class:list={[
-              'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover',
+              'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top',
               props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
             ]}
           />
         </a>
       ) : (
         <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
-          <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+          <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
         </div>
       )}
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
@@ -200,10 +200,10 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
             src={props.item.imageUrl}
             alt={props.item.title}
             loading="lazy"
-            class="absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]"
+            class="absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]"
           />
         ) : (
-          <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+          <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
         )}
       </a>
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">

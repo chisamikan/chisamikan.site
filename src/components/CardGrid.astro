@@ -1,0 +1,61 @@
+---
+// Card.astro を並べるグリッドの共通ラッパー。画像は loading="lazy" のため、
+// 表示直後は中身が空に見えることがある。最初の1枚が読み込まれるまで
+// スピナーを重ねて隠すことで、その「空に見える瞬間」を目立たなくする。
+// タグ絞り込み等でページ側が表示更新を担う場合は managed を付け、
+// このコンポーネントの自動初期化をスキップしてページ側スクリプトに委ねる
+// (対象は data-card-grid-loading={id} のオーバーレイ要素)。
+interface Props {
+  id: string;
+  class?: string;
+  managed?: boolean;
+}
+
+const { id, class: gridClass = '', managed = false } = Astro.props;
+---
+
+<div class="relative">
+  <div id={id} class={gridClass}>
+    <slot />
+  </div>
+  <div
+    data-card-grid-loading={id}
+    data-managed={managed ? 'true' : undefined}
+    class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300"
+    role="status"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+    <i class="fa-solid fa-spinner fa-spin text-4xl text-accent" aria-hidden="true"></i>
+    <span class="sr-only">読み込み中</span>
+  </div>
+</div>
+
+<script>
+  // ページ内の CardGrid インスタンスのうち、ページ側スクリプトが表示制御しないもの
+  // (data-managed が無いもの)だけ、ここで自動的にスピナー表示を行う。
+  document.querySelectorAll<HTMLElement>('[data-card-grid-loading]:not([data-managed])').forEach((overlay) => {
+    const gridId = overlay.dataset.cardGridLoading;
+    const grid = gridId ? document.getElementById(gridId) : null;
+    if (!grid) return;
+
+    const pendingImages = Array.from(grid.querySelectorAll<HTMLImageElement>('img')).filter((img) => !img.complete);
+    if (pendingImages.length === 0) return;
+
+    overlay.classList.remove('opacity-0');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    Promise.race(
+      pendingImages.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            img.addEventListener('load', () => resolve(), { once: true });
+            img.addEventListener('error', () => resolve(), { once: true });
+          }),
+      ),
+    ).then(() => {
+      overlay.classList.add('opacity-0');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+  });
+</script>
