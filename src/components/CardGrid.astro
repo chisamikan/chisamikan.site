@@ -14,7 +14,12 @@ interface Props {
 const { id, class: gridClass = '', managed = false } = Astro.props;
 ---
 
-<div class="relative">
+<!-- .card-reveal は表示前 opacity:0 のまま回転(transform)しており、その見えない回転分が
+     ページの横スクロールを生んでしまう(狭い画面で顕著)。ここで切り詰めて防ぐが、
+     境界ぴったりで隠すとカード自体のドロップシャドウやホバー時のせり上がりまで
+     切り詰めてしまうため、p-12/-m-12 で見た目上の余白(逃げ場)を確保してから隠す
+     (paddingとマイナスマージンを相殺させているのでレイアウト上の位置・間隔は変わらない) -->
+<div class="relative -m-12 overflow-hidden p-12">
   <div id={id} class={gridClass}>
     <slot />
   </div>
