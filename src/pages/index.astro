@@ -121,7 +121,9 @@ const heroImages =
     <SectionHeading eyebrow="Gallery" title="ギャラリー" />
     <div class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item) => (
-        <ArtworkCard item={item} />
+        <div class="card-reveal h-full">
+          <ArtworkCard item={item} />
+        </div>
       ))}
     </div>
     <div class="mt-10 text-center">
@@ -137,7 +139,9 @@ const heroImages =
     {featuredNovels.length > 0 ? (
       <div class="grid gap-8 sm:grid-cols-3">
         {featuredNovels.map((item) => (
-          <NovelCard item={item} />
+          <div class="card-reveal h-full">
+            <NovelCard item={item} />
+          </div>
         ))}
       </div>
     ) : (
@@ -156,7 +160,9 @@ const heroImages =
     {featuredToolbox.length > 0 ? (
       <div class="grid gap-8 sm:grid-cols-3">
         {featuredToolbox.map((item) => (
-          <ToolboxItemCard item={item} />
+          <div class="card-reveal h-full">
+            <ToolboxItemCard item={item} />
+          </div>
         ))}
       </div>
     ) : (
@@ -174,7 +180,11 @@ const heroImages =
     <SectionHeading eyebrow="Shop" title="ショップ" />
     {shopItems.length > 0 ? (
       <div class="grid gap-8 sm:grid-cols-3">
-        {shopItems.map((item) => <ShopItemCard item={item} />)}
+        {shopItems.map((item) => (
+          <div class="card-reveal h-full">
+            <ShopItemCard item={item} />
+          </div>
+        ))}
       </div>
     ) : (
       <p class="font-mono text-sm text-graphite">まだ商品が登録されていません。</p>

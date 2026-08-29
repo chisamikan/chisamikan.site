@@ -28,12 +28,8 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
 
     {novels.length > 0 ? (
       <div id="novels-list">
-        {novels.map((item, index) => (
-          <div
-            class="reveal"
-            data-tags={item.tags.join('|')}
-            style={`transition-delay: ${(index % 4) * 80}ms`}
-          >
+        {novels.map((item) => (
+          <div class="card-reveal" data-tags={item.tags.join('|')}>
             <NovelItemComponent item={item} headingLevel={2} />
           </div>
         ))}
