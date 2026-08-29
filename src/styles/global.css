@@ -31,6 +31,9 @@
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
     --shadow-glass-accent: 0 4px 24px rgba(8, 145, 178, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
     --shadow-glass-accent-lg: 0 8px 36px rgba(8, 145, 178, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    /* .btn-glass-accent と同じ形状(オフセット/ぼかし+内側ハイライト)に揃えつつ、色は従来の黒系のまま変更しない */
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.1), var(--reflection-inner);
+    --shadow-card-lg: 0 8px 36px rgba(0, 0, 0, 0.16), var(--reflection-inner);
     --shadow-glow: 0 0 40px rgba(8, 145, 178, 0.25);
 
     color-scheme: light;
@@ -68,6 +71,9 @@
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
     --shadow-glass-accent: 0 4px 24px rgba(94, 231, 223, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
     --shadow-glass-accent-lg: 0 8px 36px rgba(94, 231, 223, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    /* .btn-glass-accent と同じ形状(オフセット/ぼかし+内側ハイライト)に揃えつつ、色は従来の黒系のまま変更しない */
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.28), var(--reflection-inner);
+    --shadow-card-lg: 0 8px 36px rgba(0, 0, 0, 0.4), var(--reflection-inner);
     --shadow-glow: 0 0 40px rgba(120, 200, 255, 0.35);
 
     color-scheme: dark;
@@ -117,7 +123,7 @@
 @layer components {
   /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
   .btn-glass {
-    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-mono text-sm text-ink shadow-glass backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-glass-border-bright hover:bg-glass-md hover:shadow-glass-lg;
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-mono text-sm text-ink shadow-card backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-glass-border-bright hover:bg-glass-md hover:shadow-card-lg;
   }
 
   .btn-glass-sm {
@@ -539,7 +545,7 @@
 
   /* カード/サムネイルの共通の見た目(角丸・枠線・背景・影・ぼかし)。ホバー演出は .glass-card 側で付与 */
   .glass-panel {
-    @apply rounded-2xl border border-glass-border bg-glass shadow-glass backdrop-blur-xl hover:border-glass-border-bright hover:shadow-glass-lg;
+    @apply rounded-2xl border border-glass-border bg-glass shadow-card backdrop-blur-xl hover:border-glass-border-bright hover:shadow-card-lg;
   }
 
   /* カード下部(figcaption/div)の共通レイアウト */

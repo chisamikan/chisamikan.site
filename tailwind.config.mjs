@@ -62,6 +62,8 @@ export default {
         'glass-lg': 'var(--shadow-float)',
         'glass-accent': 'var(--shadow-glass-accent)',
         'glass-accent-lg': 'var(--shadow-glass-accent-lg)',
+        card: 'var(--shadow-card)',
+        'card-lg': 'var(--shadow-card-lg)',
         float: 'var(--shadow-float)',
         glow: 'var(--shadow-glow)',
       },
