@@ -207,12 +207,14 @@ const isSlider = count > 3;
     });
 
     if (originals.length > 1) {
+      // 複製は見た目・内容が本物と同一なので、そのまま操作可能にしておく(ホバー/クリック/
+      // Lightboxなどは.lightbox-triggerクラス等への委任なので複製にも自然に効く)。
+      // 中央のカードが端(1枚目・最後)にある間は、左右どちらかに見えている隣のカードが
+      // 複製側になるため、inertにすると「見えているのに反応しない」カードができてしまう
       const cloneAll = () =>
         originals.map((el) => {
           const clone = el.cloneNode(true) as HTMLElement;
           clone.classList.remove('card-reveal');
-          clone.setAttribute('inert', '');
-          clone.setAttribute('aria-hidden', 'true');
           return clone;
         });
 
