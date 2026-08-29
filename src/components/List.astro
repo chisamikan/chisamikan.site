@@ -22,9 +22,7 @@ function formatPeriod(start: string | null, end: string | null) {
 }
 ---
 
-<article id={id} class:list={['relative border-l-2 border-accent/30 py-6 pl-8', entryClass]}>
-  <span class="absolute -left-1.75 top-8 h-3 w-3 rounded-full border-2 border-accent bg-paper"></span>
-
+<article id={id} class:list={['py-6', entryClass]}>
   <div class="flex items-start gap-5">
     {props.type === 'work' && (
       <Thumbnail
