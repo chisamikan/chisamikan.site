@@ -19,8 +19,10 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
 
     <CardGrid id="gallery-grid" managed class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <div class="card-reveal h-full" data-tags={item.tags.join('|')}>
-          <Card type="artwork" item={item} headingLevel={2} />
+        <div class="card-clip h-full" data-tags={item.tags.join('|')}>
+          <div class="card-reveal h-full">
+            <Card type="artwork" item={item} headingLevel={2} />
+          </div>
         </div>
       ))}
     </CardGrid>
@@ -177,8 +179,9 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       // 表示されたカードは、既に表示済みのものも含めてその場でスタッガー
       // アニメーションを再生する。(読み込み中の画像がある間はスピナーが覆い隠す
       // ため、二重待ちには感じない)
-      if (show && !isFirstRender) {
-        cardsToReveal.push(card);
+      const reveal = card.querySelector<HTMLElement>('.card-reveal');
+      if (show && !isFirstRender && reveal) {
+        cardsToReveal.push(reveal);
       }
       visibleIndex += 1;
     });
