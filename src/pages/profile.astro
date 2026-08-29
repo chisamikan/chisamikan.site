@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ProfileContent from '../components/ProfileContent.astro';
-import WorkItemComponent from '../components/WorkItem.astro';
+import List from '../components/List.astro';
 import Lightbox from '../components/Lightbox.astro';
 import { getFeedItems } from '../lib/rss';
 import { getWorkHistory } from '../lib/notion';
@@ -108,7 +108,7 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
         <div id="works-list">
           {works.map((item) => (
             <div class="card-reveal" data-tags={item.tags.join('|')}>
-              <WorkItemComponent item={item} headingLevel={3} />
+              <List type="work" item={item} headingLevel={3} />
             </div>
           ))}
         </div>

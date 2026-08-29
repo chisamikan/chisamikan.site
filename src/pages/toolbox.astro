@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
-import ToolboxListItem from '../components/ToolboxListItem.astro';
+import List from '../components/List.astro';
 import Lightbox from '../components/Lightbox.astro';
 import { getToolboxItems } from '../lib/notion';
 
@@ -20,7 +20,7 @@ const items = await getToolboxItems();
       <div id="toolbox-list">
         {items.map((item) => (
           <div class="card-reveal">
-            <ToolboxListItem item={item} headingLevel={2} />
+            <List type="toolbox" item={item} headingLevel={2} />
           </div>
         ))}
       </div>

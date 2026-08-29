@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
-import NovelItemComponent from '../components/NovelItem.astro';
+import List from '../components/List.astro';
 import Lightbox from '../components/Lightbox.astro';
 import { getNovelItems } from '../lib/notion';
 
@@ -30,7 +30,7 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
       <div id="novels-list">
         {novels.map((item) => (
           <div class="card-reveal" data-tags={item.tags.join('|')}>
-            <NovelItemComponent item={item} headingLevel={2} />
+            <List type="novel" item={item} headingLevel={2} />
           </div>
         ))}
       </div>
