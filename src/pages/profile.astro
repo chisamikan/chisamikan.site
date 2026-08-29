@@ -106,12 +106,8 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
 
       {works.length > 0 ? (
         <div id="works-list">
-          {works.map((item, index) => (
-            <div
-              class="reveal"
-              data-tags={item.tags.join('|')}
-              style={`transition-delay: ${(index % 4) * 80}ms`}
-            >
+          {works.map((item) => (
+            <div class="card-reveal" data-tags={item.tags.join('|')}>
               <WorkItemComponent item={item} headingLevel={3} />
             </div>
           ))}

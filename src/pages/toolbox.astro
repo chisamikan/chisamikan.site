@@ -18,8 +18,8 @@ const items = await getToolboxItems();
 
     {items.length > 0 ? (
       <div id="toolbox-list">
-        {items.map((item, index) => (
-          <div class="reveal" style={`transition-delay: ${(index % 4) * 80}ms`}>
+        {items.map((item) => (
+          <div class="card-reveal">
             <ToolboxListItem item={item} headingLevel={2} />
           </div>
         ))}

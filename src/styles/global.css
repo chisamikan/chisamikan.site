@@ -575,6 +575,32 @@
     }
   }
 
+  /* カード一覧(ギャラリー/小説/ツールボックス/実績など)を、画面に入ったタイミングで
+     並び順に応じて回転させながら時間差でフェードインさせる。.reveal と同じくJSが
+     is-visible を付与するが、遅延と回転角はCSSのsibling-index()で並び順から自動計算する
+     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count) */
+  .card-reveal {
+    @apply opacity-0 transition-[opacity,transform] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)];
+    transform: rotate(calc((sibling-index() - 1) * 1.5deg));
+    transition-delay: calc((sibling-index() - 1) * 0.05s);
+  }
+
+  .card-reveal.is-visible {
+    @apply opacity-100;
+    transform: rotate(0deg);
+  }
+
+  .no-js .card-reveal {
+    @apply opacity-100 transform-none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-reveal {
+      @apply opacity-100 transition-none;
+      transform: none;
+    }
+  }
+
   /* 外部リンク(href が http/https始まり)に自動でアイコンを表示する。除外したい場合は
      .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')はLightning CSS
      の圧縮バグでPUA文字が空文字に潰され本番ビルドで消えるため、SVGマスクで代替する */
