@@ -528,7 +528,7 @@
   /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動。
      ボタン(.btn-glass)と同じ transition-all + duration-300 でイージングを揃える */
   .glass-card {
-    @apply cursor-pointer transition-all duration-300 hover:-translate-y-1.5;
+    @apply cursor-pointer transition-all duration-300 will-change-transform hover:-translate-y-1.5;
   }
 
   /* カード/サムネイルの共通の見た目(角丸・枠線・背景・影・ぼかし)。ホバー演出は .glass-card 側で付与 */

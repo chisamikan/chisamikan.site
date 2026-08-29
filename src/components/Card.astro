@@ -15,57 +15,80 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 
 {props.type === 'artwork' && (
   <figure class="glass-card glass-panel group flex h-full flex-col overflow-hidden">
-    {props.item.imageUrl ? (
-      <button
-        type="button"
-        class="lightbox-trigger relative block aspect-square w-full overflow-hidden bg-paper-dim"
-        data-full={props.item.imageUrl}
-        data-alt={props.item.title}
-        data-nsfw={props.item.nsfw ? 'true' : undefined}
-        aria-label={props.item.nsfw ? `${props.item.title}(NSFW)を拡大表示` : `${props.item.title}を拡大表示`}
-      >
-        <img
-          src={props.item.imageUrl}
-          alt={props.item.title}
-          loading="lazy"
-          class:list={[
-            'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105',
-            props.item.nsfw && 'scale-110 blur-xl',
-          ]}
-        />
-        {props.item.nsfw && (
-          // 画像の上に重ねる固定の暗幕バッジなので、ページのテーマに関わらず black/white で統一する
-          <span class="absolute inset-0 flex items-center justify-center bg-black/35">
-            <span class="rounded-full bg-black/85 px-3 py-1 font-mono text-xs uppercase tracking-widest text-white">
-              NSFW
+    <div class="relative">
+      {props.item.imageUrl ? (
+        <button
+          type="button"
+          class="lightbox-trigger relative block aspect-square w-full overflow-hidden bg-paper-dim"
+          data-full={props.item.imageUrl}
+          data-alt={props.item.title}
+          data-nsfw={props.item.nsfw ? 'true' : undefined}
+          aria-label={props.item.nsfw ? `${props.item.title}(NSFW)を拡大表示` : `${props.item.title}を拡大表示`}
+        >
+          <img
+            src={props.item.imageUrl}
+            alt={props.item.title}
+            loading="lazy"
+            class:list={[
+              'absolute left-1/2 top-1/2 max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover transition-[width,height] duration-300',
+              props.item.nsfw
+                ? 'h-[110%] w-[110%] blur-xl'
+                : 'h-full w-full group-hover:h-[110%] group-hover:w-[110%]',
+            ]}
+          />
+          {props.item.nsfw && (
+            // 画像の上に重ねる固定の暗幕バッジなので、ページのテーマに関わらず black/white で統一する
+            <span class="absolute inset-0 flex items-center justify-center bg-black/35">
+              <span class="rounded-full bg-black/85 px-3 py-1 font-mono text-xs uppercase tracking-widest text-white">
+                NSFW
+              </span>
             </span>
-          </span>
-        )}
-      </button>
-    ) : (
-      <div class="flex aspect-square w-full cursor-default items-center justify-center bg-paper-dim" aria-hidden="true">
-        <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
-      </div>
-    )}
-    <figcaption class="glass-card-body break-normal">
-      <Tag class="font-display text-lg font-medium leading-snug text-ink">{props.item.title}</Tag>
-      {props.item.description && (
-        <p class="mt-1 line-clamp-2 text-sm text-ink/70">{props.item.description}</p>
+          )}
+        </button>
+      ) : (
+        <div class="flex aspect-square w-full cursor-default items-center justify-center bg-paper-dim" aria-hidden="true">
+          <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+        </div>
       )}
-      <div class="mt-auto pt-3">
+      {/* サムネイル下部にタグ・タイトルを重ねて表示する。クリック操作はサムネイル本体(button)が担うため pointer-events-none にする */}
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
             {props.item.tags.map((tag) => (
-              <li class="glass-tag">
+              <li class="glass-tag backdrop-blur-none">
                 {tag}
               </li>
             ))}
           </ul>
         )}
-        {props.item.date && (
-          <p class="mt-2 font-mono text-[11px] text-graphite">
-            {new Date(props.item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-          </p>
+        <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white break-normal">
+          {props.item.title}
+        </Tag>
+      </div>
+    </div>
+    <figcaption class="glass-card-body break-normal">
+      {props.item.description && (
+        <p class="line-clamp-2 text-sm text-ink/70">{props.item.description}</p>
+      )}
+      <div class="mt-auto pt-3">
+        {(props.item.date || props.item.url) && (
+          <div class="mt-2 flex items-center gap-2">
+            {props.item.date && (
+              <p class="font-mono text-[11px] text-graphite">
+                {new Date(props.item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+              </p>
+            )}
+            {props.item.url && (
+              <a
+                href={props.item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="no-external-icon btn-glass btn-glass-sm ml-auto inline-flex"
+              >
+                <i class="fa-solid fa-link pr-1"></i>関連リンク
+              </a>
+            )}
+          </div>
         )}
       </div>
     </figcaption>
@@ -83,26 +106,29 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
         alt={props.item.imageUrl ? props.item.title : ''}
         loading="lazy"
         class:list={[
-          'h-full w-full object-cover',
-          props.item.imageUrl && 'transition-transform duration-300 group-hover:scale-105',
+          'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover',
+          props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
         ]}
       />
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
+        {props.item.tags.length > 0 && (
+          <ul class="flex flex-wrap gap-1.5">
+            {props.item.tags.map((tag) => (
+              <li class="glass-tag backdrop-blur-none">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
+        <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white">
+          {props.item.title}
+        </Tag>
+      </div>
     </div>
 
     <div class="glass-card-body">
-      <Tag class="font-display text-lg font-medium leading-snug text-ink">{props.item.title}</Tag>
       {props.item.description && (
-        <p class="mt-1 line-clamp-2 whitespace-pre-line text-sm text-ink/70">{props.item.description}</p>
-      )}
-
-      {props.item.tags.length > 0 && (
-        <ul class="mt-auto flex flex-wrap gap-1.5 pt-3">
-          {props.item.tags.map((tag) => (
-            <li class="glass-tag">
-              {tag}
-            </li>
-          ))}
-        </ul>
+        <p class="line-clamp-2 whitespace-pre-line text-sm text-ink/70">{props.item.description}</p>
       )}
     </div>
   </a>
@@ -110,46 +136,50 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 
 {props.type === 'toolbox' && (
   <figure class="glass-card glass-panel group flex h-full flex-col overflow-hidden">
-    {props.item.url ? (
-      <a
-        href={props.item.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="no-external-icon relative block aspect-square w-full overflow-hidden bg-paper-dim"
-        aria-label={`${props.item.title}を開く`}
-      >
-        <img
-          src={props.item.imageUrl ?? PLACEHOLDER}
-          alt={props.item.imageUrl ? props.item.title : ''}
-          loading="lazy"
-          class:list={[
-            'h-full w-full object-cover',
-            props.item.imageUrl && 'transition-transform duration-300 group-hover:scale-105',
-          ]}
-        />
-      </a>
-    ) : (
-      <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
-        <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+    <div class="relative">
+      {props.item.url ? (
+        <a
+          href={props.item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="no-external-icon relative block aspect-square w-full overflow-hidden bg-paper-dim"
+          aria-label={`${props.item.title}を開く`}
+        >
+          <img
+            src={props.item.imageUrl ?? PLACEHOLDER}
+            alt={props.item.imageUrl ? props.item.title : ''}
+            loading="lazy"
+            class:list={[
+              'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover',
+              props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
+            ]}
+          />
+        </a>
+      ) : (
+        <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
+          <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+        </div>
+      )}
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
+        <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white">
+          {props.item.url ? (
+            <a
+              href={props.item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pointer-events-auto no-external-icon transition-colors hover:text-accent"
+            >
+              {props.item.title}
+            </a>
+          ) : (
+            props.item.title
+          )}
+        </Tag>
       </div>
-    )}
+    </div>
     <figcaption class="glass-card-body">
-      <Tag class="font-display text-lg font-medium leading-snug text-ink">
-        {props.item.url ? (
-          <a
-            href={props.item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="no-external-icon transition-colors hover:text-accent"
-          >
-            {props.item.title}
-          </a>
-        ) : (
-          props.item.title
-        )}
-      </Tag>
       {props.item.description && (
-        <p class="mt-1 line-clamp-2 text-sm text-ink/70">{props.item.description}</p>
+        <p class="line-clamp-2 text-sm text-ink/70">{props.item.description}</p>
       )}
     </figcaption>
   </figure>
@@ -157,41 +187,45 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 
 {props.type === 'shop' && (
   <article class="glass-card glass-panel group flex h-full flex-col overflow-hidden">
-    <a
-      href={props.item.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="no-external-icon block aspect-square w-full overflow-hidden bg-paper-dim"
-      aria-label={`${props.item.title}をBOOTHで見る`}
-    >
-      {props.item.imageUrl ? (
-        <img
-          src={props.item.imageUrl}
-          alt={props.item.title}
-          loading="lazy"
-          class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-      ) : (
-        <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
-      )}
-    </a>
+    <div class="relative">
+      <a
+        href={props.item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="no-external-icon relative block aspect-square w-full overflow-hidden bg-paper-dim"
+        aria-label={`${props.item.title}をBOOTHで見る`}
+      >
+        {props.item.imageUrl ? (
+          <img
+            src={props.item.imageUrl}
+            alt={props.item.title}
+            loading="lazy"
+            class="absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]"
+          />
+        ) : (
+          <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover" />
+        )}
+      </a>
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
+        {props.item.category && (
+          <ul class="flex flex-wrap gap-1.5">
+            <li class="glass-tag backdrop-blur-none">{props.item.category}</li>
+          </ul>
+        )}
+        <Tag class="line-clamp-2 font-display text-base font-medium leading-snug text-white">
+          <a
+            href={props.item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="pointer-events-auto transition-colors hover:text-accent"
+          >
+            {props.item.title}
+          </a>
+        </Tag>
+      </div>
+    </div>
     <div class="glass-card-body">
-      <Tag class="line-clamp-2 font-display text-base font-medium leading-snug text-ink">
-        <a
-          href={props.item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="transition-colors hover:text-accent"
-        >
-          {props.item.title}
-        </a>
-      </Tag>
-      {props.item.category && (
-        <ul class="mt-2 flex flex-wrap gap-1.5">
-          <li class="glass-tag">{props.item.category}</li>
-        </ul>
-      )}
-      <p class="mt-auto pt-3 font-mono text-sm text-accent">{props.item.price}</p>
+      <p class="font-mono text-sm text-accent">{props.item.price}</p>
     </div>
   </article>
 )}

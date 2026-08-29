@@ -33,6 +33,7 @@ export interface ArtworkItem {
   date: string | null;
   nsfw: boolean;
   slideshow: boolean;
+  url: string | null;
 }
 
 export interface ToolboxItem {
@@ -105,7 +106,8 @@ async function queryPublishedDatabase(
  * ギャラリー用データベースを取得します。
  * Notion側のプロパティ名(想定):
  *   Name(title) / Image(files) / Tags(multi_select) / Description(rich_text) /
- *   Date(date) / Published(checkbox) / NSFW(checkbox) / Slideshow(checkbox)
+ *   Date(date) / Published(checkbox) / NSFW(checkbox) / Slideshow(checkbox) /
+ *   URL(url, 未入力なら非表示)
  */
 export async function getGalleryItems(): Promise<ArtworkItem[]> {
   const dbId = import.meta.env.NOTION_GALLERY_DB_ID;
@@ -144,7 +146,9 @@ function pageToArtwork(page: PageObjectResponse): ArtworkItem {
   const slideshow =
     props.Slideshow?.type === 'checkbox' ? props.Slideshow.checkbox : false;
 
-  return { id: page.id, title, imageUrl, tags, description, date, nsfw, slideshow };
+  const url = props.URL?.type === 'url' ? props.URL.url : null;
+
+  return { id: page.id, title, imageUrl, tags, description, date, nsfw, slideshow, url };
 }
 
 const sampleGallery: ArtworkItem[] = [
@@ -157,6 +161,7 @@ const sampleGallery: ArtworkItem[] = [
     date: '2026-01-01',
     nsfw: false,
     slideshow: true,
+    url: null,
   },
 ];
 
