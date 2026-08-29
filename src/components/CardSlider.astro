@@ -1,0 +1,362 @@
+---
+// カード一覧を横スクロールのスライダーとして表示する共通コンポーネント。
+// 外部ライブラリは使わず、CSSのscroll-snapと矢印ボタンだけで実装する
+// (ページ読み込み速度への影響を避けるため)。画像はCard側で引き続きloading="lazy"
+// のままなので、画面外(スライダー未表示分)のカードは実際にスライドされるまで読み込まれない。
+//
+// カードが3枚以下の場合はデスクトップで元々全件が1行に収まり、スライドさせる意味が
+// 無い(むしろモバイルで1枚ずつしか見えなくなり不便)ため、CardGridでの通常グリッド表示にフォールバックする。
+import CardGrid from './CardGrid.astro';
+
+interface Props {
+  id: string;
+  count: number;
+  class?: string;
+}
+
+const { id, count, class: sliderClass = '' } = Astro.props;
+const isSlider = count > 3;
+---
+
+{!isSlider && (
+  <CardGrid id={id} class:list={['grid gap-8 sm:grid-cols-3', sliderClass]}>
+    <slot />
+  </CardGrid>
+)}
+
+{isSlider && (
+<div class="relative card-slider-fullbleed" data-card-slider-wrapper>
+  {/* CSSのscroll-smoothは付けない: ループ補正のscrollLeft直接代入まで巻き込んでアニメーションしてしまうため。
+      矢印クリックのアニメーションはJS側でscrollBy/scrollToにbehavior:'smooth'を渡して個別に指定する。
+      py-11は余白ではなく、overflow-x-autoで縦方向もクリップされるカードの影(shadow-card-lg)と
+      ホバー時の浮き上がり(-translate-y-1.5)がちょうど収まる分の遊びを確保するため */}
+  <div
+    id={id}
+    class:list={['card-slider flex items-stretch snap-x snap-mandatory gap-4 sm:gap-8 overflow-x-auto py-11', sliderClass]}
+    data-card-slider
+  >
+    <slot />
+  </div>
+
+  <button
+    type="button"
+    class="card-slider-nav absolute left-4 top-[calc(50%-1.25rem)] hidden sm:flex"
+    data-slider-prev
+    aria-label="前のカードへ"
+  >
+    <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+  </button>
+  <button
+    type="button"
+    class="card-slider-nav absolute right-4 top-[calc(50%-1.25rem)] hidden sm:flex"
+    data-slider-next
+    aria-label="次のカードへ"
+  >
+    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+  </button>
+
+  <div
+    data-card-slider-loading={id}
+    class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300"
+    role="status"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+    <i class="fa-solid fa-spinner fa-spin text-4xl text-accent" aria-hidden="true"></i>
+    <span class="sr-only">読み込み中</span>
+  </div>
+
+  {/* カルーセルであることを示すためのページネーションドット。本物のカード1枚につき1つ表示し、
+      現在中央に表示されているカードに合わせてJSからis-activeを切り替える */}
+  <div class="mt-3 flex flex-wrap items-center justify-center gap-2" data-slider-dots role="tablist" aria-label="表示中のカード">
+    {Array.from({ length: count }).map((_, i) => (
+      <button
+        type="button"
+        class="card-slider-dot"
+        data-slider-dot
+        data-index={i}
+        aria-label={`${i + 1}枚目のカードへ`}
+      />
+    ))}
+  </div>
+</div>
+)}
+
+<style>
+  @reference '../styles/global.css';
+
+  /* セクション側のmax-w-5xl(64rem)/px-6による幅制限を、左右6remずつはみ出す幅まで
+     突き抜ける(画面幅いっぱいまでは広げない)。50%はこの要素の containing block(=中央寄せ
+     されたセクション)の幅に対する割合だが、そのセクション自体が画面中央に配置されているため、
+     この方法でも画面全体を基準に中央寄せできる。画面が狭い場合はmin()により100vwに収まる */
+  .card-slider-fullbleed {
+    width: min(100vw, 76rem);
+    margin-left: calc(50% - min(50vw, 38rem));
+    /* 内側のスライダーに付けているpy-11(影・ホバー用の余白)がそのままレイアウト上の高さにも
+       乗ってしまい、前後の要素(見出し/「すべて見る」ボタン)を押し下げてしまうため、
+       同じ分だけ上のマージンを引いて打ち消す。見た目の余白(影の逃げ場)自体は
+       内側のoverflowにより保たれたまま、見出しとの間隔だけ元の位置に戻る */
+    margin-top: -2.75rem;
+    /* 下側は同じ-2.75remにすると、下に続く要素側のmt-10(隣接マージンの相殺)と合わさって
+       ページネーションドットとボタンが近づきすぎ、誤タップしやすくなってしまう。
+       打ち消しをやめて0にすることで、隣接マージンがmt-10の40pxそのまま活き、
+       ドットとボタンの間に元のカード〜ボタン間と同じだけの間隔を確保する */
+    margin-bottom: 0;
+  }
+
+  .card-slider {
+    scrollbar-width: none;
+  }
+  .card-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 両端のカードがoverflow-x-autoの境界でぶつ切りにならないよう、端をグラデーションで
+     透明にフェードさせる。矢印ボタンはこの要素の外側(兄弟要素)にあるため影響を受けない。
+     モバイルはカード自体が画面の大半を占めるため、フェードさせると絵が欠けて見えてしまう
+     ので、sm以上(タブレット・デスクトップ)のみ適用する */
+  @media (min-width: 640px) {
+    .card-slider {
+      --card-slider-fade: clamp(1.25rem, 4vw, 3rem);
+      mask-image: linear-gradient(
+        to right,
+        transparent,
+        #000 var(--card-slider-fade),
+        #000 calc(100% - var(--card-slider-fade)),
+        transparent
+      );
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        #000 var(--card-slider-fade),
+        #000 calc(100% - var(--card-slider-fade)),
+        transparent
+      );
+    }
+  }
+
+  /* スライダー各カードの幅。モバイルは次のカードが少し見えるよう画面幅の85%(1枚寄り)。
+     sm以上はフルブリードでコンテナがそのまま画面幅になるため、コンテナ比率(%)ではなく
+     固定幅(元の3枚並び時とほぼ同じ約19rem)にする。これにより画面が広いほどカードが
+     大きくなるのではなく、表示される枚数が増える形になる。
+     heightをautoで上書きするのは、各カードのラッパー(index.astro側で付与するh-full=height:100%)が
+     flexのalign-items:stretchによる高さ揃えを無効化してしまい(stretchは子のcross-sizeがautoの時だけ効く)、
+     カードごとに縦幅がバラバラになってしまうため */
+  .card-slider > :global(*) {
+    /* startだと、scroll-snap-type: x mandatoryがプログラムでのscrollLeft指定も
+       「あるカードの左端が揃う位置」に強制的にスナップしてしまい、中央寄せができない。
+       centerにすることでネイティブのスナップ自体をカードの中央寄せ位置に合わせる */
+    scroll-snap-align: center;
+    flex: none;
+    width: 85%;
+    height: auto;
+    /* flexアイテムはmin-heightの初期値がauto(0ではない)のため、中身(説明文など)が
+       stretchされた高さより大きいと箱ごと膨らんでしまう。0にして確実に高さを揃える */
+    min-height: 0;
+  }
+  @media (min-width: 640px) {
+    .card-slider > :global(*) {
+      width: 19rem;
+    }
+  }
+
+  .card-slider-nav {
+    @apply z-20 h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-glass-border bg-glass text-ink shadow-card backdrop-blur-xl transition-opacity duration-200 hover:border-glass-border-bright hover:text-accent;
+  }
+  .card-slider-nav:disabled {
+    @apply pointer-events-none opacity-0;
+  }
+
+  /* 現在位置を示すページネーションドット。アクティブなものだけピル状に伸ばして目立たせる */
+  .card-slider-dot {
+    @apply h-2 w-2 cursor-pointer rounded-full bg-ink/20 transition-all duration-300 hover:bg-ink/40;
+  }
+  .card-slider-dot.is-active {
+    @apply w-6 bg-accent hover:bg-accent;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-card-slider-wrapper]').forEach((wrapper) => {
+    const slider = wrapper.querySelector<HTMLElement>('[data-card-slider]');
+    const prevBtn = wrapper.querySelector<HTMLButtonElement>('[data-slider-prev]');
+    const nextBtn = wrapper.querySelector<HTMLButtonElement>('[data-slider-next]');
+    if (!slider || !prevBtn || !nextBtn) return;
+
+    // 本物のカード群の前後に複製を1セットずつ配置し、[複製][本物][複製]の3ブロック構成にする。
+    // 端まで達しても隣に(見た目が同じ)複製カードが既に並んでいるため、「巻き戻り」を見せずに
+    // 継ぎ目なくループしているように見せられる。スクロールが落ち着いたら複製ブロックから
+    // 本物ブロックの同じ位置へ瞬間移動(アニメーション無し)して補正し、次の操作分のバッファを確保する。
+    const originals = Array.from(slider.children) as HTMLElement[];
+    const dots = Array.from(wrapper.querySelectorAll<HTMLButtonElement>('[data-slider-dot]'));
+    let blockWidth = 0;
+
+    // gap-4/sm:gap-8 とブレークポイントで値が変わるため、定数で持たずCSSの実値を都度読む
+    const currentGap = () => parseFloat(getComputedStyle(slider).columnGap) || 0;
+    const stepDistance = () => {
+      const card = originals[0] as HTMLElement | undefined;
+      return card ? card.getBoundingClientRect().width + currentGap() : slider.clientWidth;
+    };
+
+    // 複製を前に挿入すると本物カードのDOM位置(sibling-index())がずれ、global.cssの
+    // .card-revealが参照する --card-reveal-index も連動してずれてしまう(スタッガー演出の
+    // 遅延がほぼ揃ってしまい、点滅したように見える不具合の原因)。複製前の並び順を
+    // 明示的に指定して打ち消す
+    originals.forEach((el, i) => {
+      el.style.setProperty('--card-reveal-index', String(i));
+    });
+
+    if (originals.length > 1) {
+      const cloneAll = () =>
+        originals.map((el) => {
+          const clone = el.cloneNode(true) as HTMLElement;
+          clone.classList.remove('card-reveal');
+          clone.setAttribute('inert', '');
+          clone.setAttribute('aria-hidden', 'true');
+          return clone;
+        });
+
+      const headClones = cloneAll();
+      const headFrag = document.createDocumentFragment();
+      headClones.forEach((clone) => headFrag.appendChild(clone));
+      slider.insertBefore(headFrag, slider.firstChild);
+
+      const tailClones = cloneAll();
+      const tailFrag = document.createDocumentFragment();
+      tailClones.forEach((clone) => tailFrag.appendChild(clone));
+      slider.appendChild(tailFrag);
+
+      // 初期状態は1枚目のカードが画面端に寄るのではなく、スライダーの中央に来るようにする。
+      // anchorは「1枚目のカードを中央に置いたときのscrollLeft」で、ループ補正の基準位置も
+      // (blockWidthそのものではなく)このanchorを起点にずらす
+      let anchor = 0;
+      const measure = () => {
+        blockWidth = tailClones[0].offsetLeft - originals[0].offsetLeft;
+        const cardWidth = originals[0].getBoundingClientRect().width;
+        anchor = originals[0].offsetLeft - (slider.clientWidth - cardWidth) / 2;
+      };
+      measure();
+      slider.scrollLeft = anchor;
+
+      // 現在中央にあるカードに対応するドットにis-activeを付与する。anchorが1枚目の位置なので
+      // (scrollLeft - anchor)を1枚分の距離で割った回数がそのまま何枚目かに対応する
+      const updateActiveDot = () => {
+        if (dots.length === 0) return;
+        const step = stepDistance();
+        if (step <= 0) return;
+        const count = originals.length;
+        const rawIndex = Math.round((slider.scrollLeft - anchor) / step);
+        const activeIndex = ((rawIndex % count) + count) % count;
+        dots.forEach((dot, i) => dot.classList.toggle('is-active', i === activeIndex));
+      };
+      updateActiveDot();
+
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+          slider.scrollTo({ left: anchor + i * stepDistance(), behavior: 'smooth' });
+        });
+      });
+
+      // 初期表示でスライダーの外(横スクロールでクリップされた領域)にあるカードは、
+      // BaseLayoutの.reveal監視(IntersectionObserver、しきい値15%)がページの縦スクロール
+      // にしか反応せず発火しないため、カルーセル操作で表示してもopacity:0のまま回転して
+      // 固まってしまう。右端などにわずかに覗いているだけのカードも、見えている割合が
+      // このしきい値未満だと同じく発火せず固まるため、「見えている割合」で同じ基準を使い、
+      // 15%未満のカードはあらかじめ表示済み扱いにしておく
+      const sliderRect = slider.getBoundingClientRect();
+      originals.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const overlapWidth = Math.max(
+          0,
+          Math.min(rect.right, sliderRect.right) - Math.max(rect.left, sliderRect.left),
+        );
+        const visibleRatio = rect.width > 0 ? overlapWidth / rect.width : 0;
+        if (visibleRatio < 0.15) {
+          el.classList.add('is-visible');
+        }
+      });
+
+      const correctLoopPosition = () => {
+        if (blockWidth <= 0) return;
+        if (slider.scrollLeft >= anchor + blockWidth - 2) {
+          slider.scrollLeft -= blockWidth;
+        } else if (slider.scrollLeft < anchor - 2) {
+          slider.scrollLeft += blockWidth;
+        }
+      };
+
+      // ドットの追従はスクロール中(スワイプ中)も逐次更新し、スワイプ完了を待たず即座に反応させる。
+      // 無限ループの補正(複製ブロックから本物ブロックへの瞬間移動)は見た目が同じ位置への
+      // ジャンプとはいえ、スクロール中に動かすと連続したドラッグ操作と衝突するため、
+      // 完全に止まってから(デバウンス後)行う
+      let settleTimer: number | undefined;
+      slider.addEventListener(
+        'scroll',
+        () => {
+          updateActiveDot();
+          window.clearTimeout(settleTimer);
+          settleTimer = window.setTimeout(() => {
+            correctLoopPosition();
+            updateActiveDot();
+          }, 120);
+        },
+        { passive: true },
+      );
+
+      window.addEventListener('resize', () => {
+        measure();
+        correctLoopPosition();
+        updateActiveDot();
+      });
+    }
+
+    const scrollByCard = (dir: 1 | -1) => {
+      slider.scrollBy({ left: stepDistance() * dir, behavior: 'smooth' });
+    };
+
+    // ループするため端での無効化はせず、そもそも全カードが収まっていてスクロール不要な場合のみ無効化する
+    const updateNavState = () => {
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
+      const hasOverflow = maxScroll > 4;
+      prevBtn.disabled = !hasOverflow;
+      nextBtn.disabled = !hasOverflow;
+    };
+
+    prevBtn.addEventListener('click', () => scrollByCard(-1));
+    nextBtn.addEventListener('click', () => scrollByCard(1));
+    updateNavState();
+  });
+
+  // CardGrid.astroと同じ「画像読み込み完了までスピナーで隠す」挙動をスライダーにも適用する。
+  // ただしスライダーは2枚目以降がloading="lazy"でスクロールするまで読み込まれないため、
+  // 全画像ではなく初期表示で見えている範囲の画像だけを待つ(でないとスピナーが消えなくなる)
+  document.querySelectorAll<HTMLElement>('[data-card-slider-loading]').forEach((overlay) => {
+    const sliderId = overlay.dataset.cardSliderLoading;
+    const slider = sliderId ? document.getElementById(sliderId) : null;
+    if (!slider) return;
+
+    const sliderRect = slider.getBoundingClientRect();
+    const pendingImages = Array.from(slider.querySelectorAll<HTMLImageElement>('img')).filter((img) => {
+      if (img.complete) return false;
+      const rect = img.getBoundingClientRect();
+      return rect.left < sliderRect.right && rect.right > sliderRect.left;
+    });
+    if (pendingImages.length === 0) return;
+
+    overlay.classList.remove('opacity-0');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    Promise.all(
+      pendingImages.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            img.addEventListener('load', () => resolve(), { once: true });
+            img.addEventListener('error', () => resolve(), { once: true });
+          }),
+      ),
+    ).then(() => {
+      overlay.classList.add('opacity-0');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+  });
+</script>

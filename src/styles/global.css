@@ -89,7 +89,10 @@
   }
 
   body {
-    @apply bg-paper text-ink font-body antialiased transition-colors duration-300;
+    /* CardSlider.astroのフルブリード(100vwを使った突き抜け)は、縦スクロールバーの分だけ
+       実際に見えている幅より広くなるブラウザがあり、それがそのままページ全体の横スクロール
+       バーとして出てしまう。中身が見切れるわけではない誤差なので、横方向のoverflowを隠して防ぐ */
+    @apply overflow-x-hidden bg-paper text-ink font-body antialiased transition-colors duration-300;
     /* ガラス面が光を透かして見えるよう、固定位置のカラーブロブを紙のドット柄の奥に敷く */
     background-image:
       radial-gradient(ellipse 60% 45% at 12% -8%, rgb(var(--color-accent) / 0.18), transparent 100%),
@@ -543,9 +546,12 @@
     @apply rounded-2xl border border-glass-border bg-glass shadow-card backdrop-blur-xl hover:border-glass-border-bright hover:shadow-card-lg;
   }
 
-  /* カード下部(figcaption/div)の共通レイアウト */
+  /* カード下部(figcaption/div)の共通レイアウト。
+     flexアイテムはmin-heightの初期値がauto(中身の最小サイズ)になり、説明文が長いと
+     flex-1で縮められる想定でもそれ以上縮まらずカード全体が膨らんでしまう(line-clampが
+     効く前に箱ごと伸びてしまう)ため、min-h-0で明示的に0にしてline-clampでの省略を効かせる */
   .glass-card-body {
-    @apply flex flex-1 flex-col border-t border-glass-border-subtle p-4;
+    @apply flex min-h-0 flex-1 flex-col border-t border-glass-border-subtle p-4;
   }
 
   /* リストUI(List.astro/Thumbnail.astro)専用のサムネイル枠。
@@ -606,9 +612,14 @@
   .card-reveal {
     @apply opacity-0 transition-[opacity,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)];
     /* sibling-index()の演算結果を丸ごとクラス名化するとTailwindの矢括弧記法が
-       極端に読みづらくなるため、この2行のみプレーンCSSのまま残す */
-    transform: rotate(clamp(0deg, calc((sibling-index() - 1) * 1.5deg), 12deg));
-    transition-delay: clamp(0s, calc((sibling-index() - 1) * 0.05s), 0.4s);
+       極端に読みづらくなるため、この2行のみプレーンCSSのまま残す。
+       --card-reveal-index を経由させているのは、CardSlider.astro
+       (無限ループ用に複製カードをDOM上の前後へ挿入するため、本物カードの
+       sibling-index()がずれてしまう)がJSから並び順を明示的に上書きできるようにするため。
+       未指定時はこれまで通りsibling-index()から自動計算する */
+    --card-reveal-index: calc(sibling-index() - 1);
+    transform: rotate(clamp(0deg, calc(var(--card-reveal-index) * 1.5deg), 12deg));
+    transition-delay: clamp(0s, calc(var(--card-reveal-index) * 0.05s), 0.4s);
   }
 
   .card-reveal.is-visible {
