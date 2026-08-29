@@ -1,6 +1,8 @@
 ---
 // ページ内に1つだけ配置する。サムネイル側は
 // class="lightbox-trigger" data-full="{画像URL}" data-alt="{alt}" を付与するだけで連動する。
+// data-nsfw="true" を付けると、初回クリック時のみ注意書きモーダルを挟む
+// (同意状況はlocalStorageに保存し、2回目以降は素通りする)。
 ---
 
 <dialog id="lightbox" class="lightbox-dialog">
@@ -8,6 +10,20 @@
     &times;
   </button>
   <img id="lightbox-img" src="" alt="" />
+</dialog>
+
+<dialog id="nsfw-warning" class="nsfw-warning-dialog">
+  <button type="button" id="nsfw-warning-close" aria-label="閉じる" class="nsfw-warning-close">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+  <p class="nsfw-warning-title"><i class="fa-solid fa-triangle-exclamation"></i>閲覧注意</p>
+  <p class="nsfw-warning-body">
+    この作品には、性的・暴力的な表現など、閲覧に注意が必要な内容が含まれています。
+  </p>
+  <div class="nsfw-warning-actions">
+    <button type="button" id="nsfw-warning-cancel" class="btn-glass-ghost">やめる</button>
+    <button type="button" id="nsfw-warning-confirm" class="btn-glass btn-glass-accent">同意して見る</button>
+  </div>
 </dialog>
 
 <style>
@@ -74,12 +90,127 @@
   .lightbox-close:hover {
     color: #0099ff;
   }
+
+  .nsfw-warning-dialog {
+    max-width: min(90vw, 420px);
+    padding: 1.75rem;
+    border: 1px solid rgb(var(--color-ink) / 0.1);
+    border-radius: 0.75rem;
+    background: rgb(var(--color-paper));
+    color: rgb(var(--color-ink));
+    box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+
+  .nsfw-warning-dialog.is-open {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .nsfw-warning-dialog::backdrop {
+    background: rgba(34, 31, 27, 0.82);
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+
+  .nsfw-warning-dialog.is-open::backdrop {
+    opacity: 1;
+  }
+
+  .nsfw-warning-title {
+    font-family: var(--font-display, inherit);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .nsfw-warning-body {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgb(var(--color-ink) / 0.75);
+  }
+
+  .nsfw-warning-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .nsfw-warning-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: rgb(var(--color-ink) / 0.5);
+    background: transparent;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+  }
+
+  .nsfw-warning-close:hover {
+    color: rgb(var(--color-ink));
+    background: rgb(var(--color-ink) / 0.08);
+  }
 </style>
 
 <script>
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
   const img = document.querySelector<HTMLImageElement>('#lightbox-img');
   const closeBtn = document.querySelector<HTMLButtonElement>('#lightbox-close');
+
+  const nsfwDialog = document.querySelector<HTMLDialogElement>('#nsfw-warning');
+  const nsfwConfirmBtn = document.querySelector<HTMLButtonElement>('#nsfw-warning-confirm');
+  const nsfwCancelBtn = document.querySelector<HTMLButtonElement>('#nsfw-warning-cancel');
+  const nsfwCloseBtn = document.querySelector<HTMLButtonElement>('#nsfw-warning-close');
+  // NSFW注意書きへの同意状況。1度承諾すれば以後は表示しないためlocalStorageに保存する
+  const NSFW_ACK_KEY = 'chisamikan-nsfw-warning-acknowledged';
+
+  const hasAcknowledgedNsfw = (): boolean => {
+    try {
+      return localStorage.getItem(NSFW_ACK_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  };
+
+  const markNsfwAcknowledged = (): void => {
+    try {
+      localStorage.setItem(NSFW_ACK_KEY, 'true');
+    } catch {
+      // localStorageが使えない場合は次回以降も注意書きが再表示されるが、閲覧自体は継続できる
+    }
+  };
+
+  function openLightbox(trigger: HTMLElement) {
+    if (!dialog || !img) return;
+    const full = trigger.dataset.full;
+    if (!full) return;
+    img.src = full;
+    img.alt = trigger.dataset.alt ?? '';
+    img.classList.remove('is-visible');
+    dialog.classList.remove('is-open');
+    dialog.showModal();
+    // 初期状態(縮小・透明)を描画してからズームイン/背景フェードインさせる
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        img.classList.add('is-visible');
+        dialog.classList.add('is-open');
+      });
+    });
+  }
 
   function closeWithZoomOut() {
     if (!dialog || !img || !dialog.open) return;
@@ -93,24 +224,75 @@
     img.addEventListener('transitionend', onEnd);
   }
 
-  document.querySelectorAll<HTMLElement>('.lightbox-trigger').forEach((trigger) => {
-    trigger.addEventListener('click', () => {
-      if (!dialog || !img) return;
-      const full = trigger.dataset.full;
-      if (!full) return;
-      img.src = full;
-      img.alt = trigger.dataset.alt ?? '';
-      img.classList.remove('is-visible');
-      dialog.classList.remove('is-open');
-      dialog.showModal();
-      // 初期状態(縮小・透明)を描画してからズームイン/背景フェードインさせる
+  // 保留中(注意書きへの回答待ち)のトリガー。承諾されたらこれを開く
+  let pendingTrigger: HTMLElement | null = null;
+
+  function openNsfwWarning() {
+    if (!nsfwDialog) return;
+    nsfwDialog.classList.remove('is-open');
+    nsfwDialog.showModal();
+    // 初期状態(縮小・透明)を描画してからズームイン/背景フェードインさせる
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          img.classList.add('is-visible');
-          dialog.classList.add('is-open');
-        });
+        nsfwDialog.classList.add('is-open');
       });
     });
+  }
+
+  function closeNsfwWarning(onClosed?: () => void) {
+    if (!nsfwDialog || !nsfwDialog.open) return;
+    nsfwDialog.classList.remove('is-open');
+    const onEnd = (e: TransitionEvent) => {
+      if (e.propertyName !== 'transform') return;
+      nsfwDialog.removeEventListener('transitionend', onEnd);
+      nsfwDialog.close();
+      onClosed?.();
+    };
+    nsfwDialog.addEventListener('transitionend', onEnd);
+  }
+
+  document.querySelectorAll<HTMLElement>('.lightbox-trigger').forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      if (trigger.dataset.nsfw === 'true' && !hasAcknowledgedNsfw()) {
+        pendingTrigger = trigger;
+        openNsfwWarning();
+        return;
+      }
+      openLightbox(trigger);
+    });
+  });
+
+  nsfwConfirmBtn?.addEventListener('click', () => {
+    markNsfwAcknowledged();
+    const trigger = pendingTrigger;
+    pendingTrigger = null;
+    closeNsfwWarning(() => {
+      if (trigger) openLightbox(trigger);
+    });
+  });
+
+  nsfwCancelBtn?.addEventListener('click', () => {
+    pendingTrigger = null;
+    closeNsfwWarning();
+  });
+  nsfwCloseBtn?.addEventListener('click', () => {
+    pendingTrigger = null;
+    closeNsfwWarning();
+  });
+
+  // 背景(dialog自身)をクリックしたらズームアウトして閉じる
+  nsfwDialog?.addEventListener('click', (e) => {
+    if (e.target === nsfwDialog) {
+      pendingTrigger = null;
+      closeNsfwWarning();
+    }
+  });
+
+  // Escキーでもズームアウトしてから閉じる
+  nsfwDialog?.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    pendingTrigger = null;
+    closeNsfwWarning();
   });
 
   // 画像自体をタップしたらズームアウトして閉じる
