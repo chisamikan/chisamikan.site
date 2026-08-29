@@ -131,15 +131,25 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     });
   }
 
-  // display:none→表示 と opacity:0→1 を同フレームで行うと、ブラウザが「まだ一度も
-  // 描画されていない要素の初期状態」とみなしてトランジションを省略してしまう。
-  // 2回のrequestAnimationFrameで1フレーム分待ってから is-visible を付与することで
-  // 確実にアニメーションを発火させる。
+  // 絞り込み/ページ送りのたびに、既に一度表示済み(is-visible付与済み)のカードも
+  // 含めて毎回スタッガーアニメーションを再生し直す。参考実装(ics-creative)のリプレイ
+  // ボタンと同じ手順で、まずtransitionを無効化してis-visibleを外し「隠れた」状態へ
+  // 瞬時に巻き戻す→リフローで確定→次のフレームでtransitionを戻しつつis-visibleを
+  // 再付与することでアニメーションを再発火させる(reflowを挟まないと、display:none→
+  // 表示とopacity:0→1が同フレームで処理され、ブラウザがトランジションを省略してしまう)。
   function revealCards(targets: HTMLElement[]) {
     if (targets.length === 0) return;
+
+    targets.forEach((card) => {
+      card.style.transition = 'none';
+      card.classList.remove('is-visible');
+    });
+    void targets[0].offsetHeight;
+
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        targets.forEach((card) => card.classList.add('is-visible'));
+      targets.forEach((card) => {
+        card.style.transition = '';
+        card.classList.add('is-visible');
       });
     });
   }
@@ -196,7 +206,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     const start = (currentPage - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;
 
-    const newlyShown: HTMLElement[] = [];
+    const cardsToReveal: HTMLElement[] = [];
     let visibleIndex = 0;
     cards.forEach((card) => {
       if (!matchesFilter(card)) {
@@ -206,10 +216,11 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       const show = visibleIndex >= start && visibleIndex < end;
       card.style.display = show ? '' : 'none';
       // 初回表示はスクロール連動のフェードインに任せるが、絞り込み/ページ送りで
-      // 新たに表示されたカードはその場でスタッガーアニメーションを再生する。
-      // (読み込み中の画像がある間はスピナーが覆い隠すため、二重待ちには感じない)
-      if (show && !isFirstRender && !card.classList.contains('is-visible')) {
-        newlyShown.push(card);
+      // 表示されたカードは、既に表示済みのものも含めてその場でスタッガー
+      // アニメーションを再生する。(読み込み中の画像がある間はスピナーが覆い隠す
+      // ため、二重待ちには感じない)
+      if (show && !isFirstRender) {
+        cardsToReveal.push(card);
       }
       visibleIndex += 1;
     });
@@ -246,7 +257,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       });
     }
 
-    waitForVisibleImages().then(() => revealCards(newlyShown));
+    waitForVisibleImages().then(() => revealCards(cardsToReveal));
     isFirstRender = false;
   }
 

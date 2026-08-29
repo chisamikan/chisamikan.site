@@ -584,11 +584,15 @@
   /* カード一覧(ギャラリー/小説/ツールボックス/実績など)を、画面に入ったタイミングで
      並び順に応じて回転させながら時間差でフェードインさせる。.reveal と同じくJSが
      is-visible を付与するが、遅延と回転角はCSSのsibling-index()で並び順から自動計算する
-     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count) */
+     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count)。
+     ギャラリーは絞り込み/ページ送り用に全件を常にDOMへ描画しており、sibling-index()は
+     表示中の件数ではなくグリッド内の全カード中のDOM位置を返してしまう。そのため
+     100件目以降のカードでは遅延が数秒単位に達し、ロード完了後もカードが表示され
+     ないという不具合になっていた。9件(1ページ分)相当の値で頭打ちにして防ぐ */
   .card-reveal {
     @apply opacity-0 transition-[opacity,transform] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)];
-    transform: rotate(calc((sibling-index() - 1) * 1.5deg));
-    transition-delay: calc((sibling-index() - 1) * 0.05s);
+    transform: rotate(clamp(0deg, calc((sibling-index() - 1) * 1.5deg), 12deg));
+    transition-delay: clamp(0s, calc((sibling-index() - 1) * 0.05s), 0.4s);
   }
 
   .card-reveal.is-visible {

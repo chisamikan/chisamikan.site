@@ -1,6 +1,6 @@
 ---
 // Card.astro を並べるグリッドの共通ラッパー。画像は loading="lazy" のため、
-// 表示直後は中身が空に見えることがある。最初の1枚が読み込まれるまで
+// 表示直後は中身が空に見えることがある。グリッド内の画像がすべて読み込まれるまで
 // スピナーを重ねて隠すことで、その「空に見える瞬間」を目立たなくする。
 // タグ絞り込み等でページ側が表示更新を担う場合は managed を付け、
 // このコンポーネントの自動初期化をスキップしてページ側スクリプトに委ねる
@@ -45,7 +45,7 @@ const { id, class: gridClass = '', managed = false } = Astro.props;
     overlay.classList.remove('opacity-0');
     overlay.setAttribute('aria-hidden', 'false');
 
-    Promise.race(
+    Promise.all(
       pendingImages.map(
         (img) =>
           new Promise<void>((resolve) => {
