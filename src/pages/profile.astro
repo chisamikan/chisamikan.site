@@ -4,6 +4,7 @@ import SectionHeading from '../components/SectionHeading.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import List from '../components/List.astro';
 import Lightbox from '../components/Lightbox.astro';
+import TagFilter from '../components/TagFilter.astro';
 import { getFeedItems } from '../lib/rss';
 import { getWorkHistory } from '../lib/notion';
 import { supportLinks, zennFeedUrl } from '../lib/config';
@@ -91,18 +92,7 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
     <div class="mx-auto mt-16 max-w-2xl">
       <h2 class="profile-section-heading">仕事履歴</h2>
 
-      {workTags.length > 0 && (
-        <div class="mb-4 flex flex-wrap gap-2" role="group" aria-label="タグで絞り込み">
-          <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
-            すべて
-          </button>
-          {workTags.map((tag) => (
-            <button type="button" data-filter={tag} class="filter-btn btn-glass-ghost">
-              {tag}
-            </button>
-          ))}
-        </div>
-      )}
+      <TagFilter tags={workTags} containerSelector="#works-list" emptySelector="#works-empty" />
 
       {works.length > 0 ? (
         <div id="works-list">
@@ -141,37 +131,4 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
   .profile-section-heading {
     @apply mb-4 border-l-4 border-accent pl-3 text-lg font-semibold text-ink;
   }
-
-  .filter-btn.is-active {
-    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
-  }
 </style>
-
-<script>
-  // タグボタンでの絞り込み(依存ライブラリなしのシンプルなvanilla JS)
-  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-  const items = Array.from(
-    document.querySelectorAll<HTMLElement>('#works-list > [data-tags]')
-  );
-  const emptyMessage = document.querySelector<HTMLElement>('#works-empty');
-
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      buttons.forEach((b) => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      const filter = btn.dataset.filter;
-
-      let visibleCount = 0;
-      items.forEach((item) => {
-        const tags = (item.dataset.tags ?? '').split('|').filter(Boolean);
-        const match = filter === 'all' || tags.includes(filter ?? '');
-        item.style.display = match ? '' : 'none';
-        if (match) visibleCount += 1;
-      });
-
-      if (emptyMessage) {
-        emptyMessage.classList.toggle('hidden', visibleCount > 0);
-      }
-    });
-  });
-</script>

@@ -1,0 +1,96 @@
+---
+// タグ絞り込みボタンのUIと、標準的な「即時表示切り替え」の挙動を提供する共通コンポーネント。
+// containerSelector を渡すと、このコンポーネント自身がクリックのたびに絞り込みと
+// スタッガーアニメーションの再生まで面倒を見る(novels/profile/toolboxのような単純な一覧向け)。
+// ギャラリーのようにページ送りと連動させたいなど表示制御をページ側に委ねたい場合は
+// containerSelector を渡さず、tagfilter:change イベント(detail.filter)を購読して
+// ページ側で表示制御する(このときも revealItems は lib/tagFilter からインポートして使い回せる)。
+interface Props {
+  tags: string[];
+  containerSelector?: string;
+  itemSelector?: string;
+  emptySelector?: string;
+  ariaLabel?: string;
+  allLabel?: string;
+  class?: string;
+}
+
+const {
+  tags,
+  containerSelector,
+  itemSelector = ':scope > [data-tags]',
+  emptySelector,
+  ariaLabel = 'タグで絞り込み',
+  allLabel = 'すべて',
+  class: wrapperClass = 'mb-4 flex flex-wrap justify-center gap-2',
+} = Astro.props;
+---
+
+{tags.length > 0 && (
+  <div
+    class={wrapperClass}
+    role="group"
+    aria-label={ariaLabel}
+    data-tag-filter
+    data-container={containerSelector}
+    data-item-selector={itemSelector}
+    data-empty={emptySelector}
+  >
+    <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
+      {allLabel}
+    </button>
+    {tags.map((tag) => (
+      <button type="button" data-filter={tag} class="filter-btn btn-glass-ghost">
+        {tag}
+      </button>
+    ))}
+  </div>
+)}
+
+<style>
+  @reference '../styles/global.css';
+
+  .filter-btn.is-active {
+    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
+  }
+</style>
+
+<script>
+  import { matchesTag, revealItems } from '../lib/tagFilter';
+
+  document.querySelectorAll<HTMLElement>('[data-tag-filter]').forEach((group) => {
+    const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>('.filter-btn'));
+    const containerSelector = group.dataset.container;
+    const itemSelector = group.dataset.itemSelector || ':scope > [data-tags]';
+    const emptySelector = group.dataset.empty;
+
+    const container = containerSelector ? document.querySelector<HTMLElement>(containerSelector) : null;
+    const emptyMessage = emptySelector ? document.querySelector<HTMLElement>(emptySelector) : null;
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const filter = btn.dataset.filter ?? 'all';
+
+        if (container) {
+          const items = Array.from(container.querySelectorAll<HTMLElement>(itemSelector));
+          let visibleCount = 0;
+          const itemsToReveal: HTMLElement[] = [];
+          items.forEach((item) => {
+            const match = matchesTag(item, filter);
+            item.style.display = match ? '' : 'none';
+            if (match) {
+              visibleCount += 1;
+              itemsToReveal.push(item);
+            }
+          });
+          if (emptyMessage) emptyMessage.classList.toggle('hidden', visibleCount > 0);
+          revealItems(itemsToReveal);
+        }
+
+        group.dispatchEvent(new CustomEvent('tagfilter:change', { detail: { filter }, bubbles: true }));
+      });
+    });
+  });
+</script>

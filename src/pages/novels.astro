@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import List from '../components/List.astro';
 import Lightbox from '../components/Lightbox.astro';
+import TagFilter from '../components/TagFilter.astro';
 import { getNovelItems } from '../lib/notion';
 
 const novels = await getNovelItems();
@@ -13,18 +14,7 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
   <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
     <SectionHeading eyebrow="Novels" title="小説" level={1} />
 
-    {tags.length > 0 && (
-      <div class="mb-4 flex flex-wrap justify-center gap-2" role="group" aria-label="タグで絞り込み">
-        <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
-          すべて
-        </button>
-        {tags.map((tag) => (
-          <button type="button" data-filter={tag} class="filter-btn btn-glass-ghost">
-            {tag}
-          </button>
-        ))}
-      </div>
-    )}
+    <TagFilter tags={tags} containerSelector="#novels-list" emptySelector="#novels-empty" />
 
     {novels.length > 0 ? (
       <div id="novels-list">
@@ -56,40 +46,3 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
 
   <Lightbox />
 </BaseLayout>
-
-<style>
-  @reference '../styles/global.css';
-
-  .filter-btn.is-active {
-    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
-  }
-</style>
-
-<script>
-  // タグボタンでの絞り込み(依存ライブラリなしのシンプルなvanilla JS)
-  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-  const items = Array.from(
-    document.querySelectorAll<HTMLElement>('#novels-list > [data-tags]')
-  );
-  const emptyMessage = document.querySelector<HTMLElement>('#novels-empty');
-
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      buttons.forEach((b) => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      const filter = btn.dataset.filter;
-
-      let visibleCount = 0;
-      items.forEach((item) => {
-        const tags = (item.dataset.tags ?? '').split('|').filter(Boolean);
-        const match = filter === 'all' || tags.includes(filter ?? '');
-        item.style.display = match ? '' : 'none';
-        if (match) visibleCount += 1;
-      });
-
-      if (emptyMessage) {
-        emptyMessage.classList.toggle('hidden', visibleCount > 0);
-      }
-    });
-  });
-</script>

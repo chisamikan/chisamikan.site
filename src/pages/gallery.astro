@@ -4,6 +4,7 @@ import SectionHeading from '../components/SectionHeading.astro';
 import Card from '../components/Card.astro';
 import CardGrid from '../components/CardGrid.astro';
 import Lightbox from '../components/Lightbox.astro';
+import TagFilter from '../components/TagFilter.astro';
 import { getGalleryItems } from '../lib/notion';
 
 const items = await getGalleryItems();
@@ -14,18 +15,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" level={1} />
 
-    {tags.length > 0 && (
-      <div class="mb-10 flex flex-wrap justify-center gap-2" role="group" aria-label="タグで絞り込み">
-        <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
-          すべて
-        </button>
-        {tags.map((tag) => (
-          <button type="button" data-filter={tag} class="filter-btn btn-glass-ghost">
-            {tag}
-          </button>
-        ))}
-      </div>
-    )}
+    <TagFilter tags={tags} class="mb-10 flex flex-wrap justify-center gap-2" />
 
     <CardGrid id="gallery-grid" managed class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
@@ -69,22 +59,19 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   <Lightbox />
 </BaseLayout>
 
-<style>
-  @reference '../styles/global.css';
-
-  .filter-btn.is-active {
-    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
-  }
-</style>
-
 <script>
   // タグ絞り込みとページネーションをクライアント側で連動させる。
   // (絞り込み後の件数をもとにページ数を再計算するため、ページ遷移なしで完結する)
+  // タグ絞り込みボタン自体のUIとactive状態の切り替えはTagFilter.astroに任せ、
+  // このページはページ送りと連動させる必要があるため tagfilter:change イベントを
+  // 購読して表示制御(件数計算・ページ割り)だけを自前で行う。
+  import { matchesTag, revealItems } from '../lib/tagFilter';
+
   const PAGE_SIZE = 9;
 
   const grid = document.querySelector<HTMLElement>('#gallery-grid');
   const cards = Array.from(grid?.querySelectorAll<HTMLElement>(':scope > [data-tags]') ?? []);
-  const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const filterGroup = document.querySelector<HTMLElement>('[data-tag-filter]');
   const nav = document.querySelector<HTMLElement>('#pagination-nav');
   const prevBtn = document.querySelector<HTMLButtonElement>('#prev-page');
   const nextBtn = document.querySelector<HTMLButtonElement>('#next-page');
@@ -131,35 +118,6 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     });
   }
 
-  // 絞り込み/ページ送りのたびに、既に一度表示済み(is-visible付与済み)のカードも
-  // 含めて毎回スタッガーアニメーションを再生し直す。参考実装(ics-creative)のリプレイ
-  // ボタンと同じ手順で、まずtransitionを無効化してis-visibleを外し「隠れた」状態へ
-  // 瞬時に巻き戻す→リフローで確定→次のフレームでtransitionを戻しつつis-visibleを
-  // 再付与することでアニメーションを再発火させる(reflowを挟まないと、display:none→
-  // 表示とopacity:0→1が同フレームで処理され、ブラウザがトランジションを省略してしまう)。
-  function revealCards(targets: HTMLElement[]) {
-    if (targets.length === 0) return;
-
-    targets.forEach((card) => {
-      card.style.transition = 'none';
-      card.classList.remove('is-visible');
-    });
-    void targets[0].offsetHeight;
-
-    requestAnimationFrame(() => {
-      targets.forEach((card) => {
-        card.style.transition = '';
-        card.classList.add('is-visible');
-      });
-    });
-  }
-
-  function matchesFilter(card: HTMLElement): boolean {
-    if (currentFilter === 'all') return true;
-    const tags = (card.dataset.tags ?? '').split('|').filter(Boolean);
-    return tags.includes(currentFilter);
-  }
-
   // current を中心とした3ページ分の窓(範囲外にはみ出す場合はスライド)を作り、
   // 先頭/末尾に接していなければその側に 1 (または total) と省略記号を追加する。
   function getPageItems(current: number, total: number): Array<number | 'ellipsis'> {
@@ -198,7 +156,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   }
 
   function render() {
-    const filtered = cards.filter(matchesFilter);
+    const filtered = cards.filter((card) => matchesTag(card, currentFilter));
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     if (currentPage > totalPages) currentPage = totalPages;
     if (currentPage < 1) currentPage = 1;
@@ -209,7 +167,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     const cardsToReveal: HTMLElement[] = [];
     let visibleIndex = 0;
     cards.forEach((card) => {
-      if (!matchesFilter(card)) {
+      if (!matchesTag(card, currentFilter)) {
         card.style.display = 'none';
         return;
       }
@@ -257,18 +215,14 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       });
     }
 
-    waitForVisibleImages().then(() => revealCards(cardsToReveal));
+    waitForVisibleImages().then(() => revealItems(cardsToReveal));
     isFirstRender = false;
   }
 
-  filterButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      filterButtons.forEach((b) => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      currentFilter = btn.dataset.filter ?? 'all';
-      currentPage = 1;
-      render();
-    });
+  filterGroup?.addEventListener('tagfilter:change', (e) => {
+    currentFilter = (e as CustomEvent<{ filter: string }>).detail.filter;
+    currentPage = 1;
+    render();
   });
 
   prevBtn?.addEventListener('click', () => goToPage(currentPage - 1));
