@@ -146,7 +146,7 @@
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント(未使用のものを含む) */
 
-  /* タグ・バッジ: ArtworkCard/WorkItem/ProfileContent のスキルタグに使用 */
+  /* タグ・バッジ: Card/WorkItem/ProfileContent のスキルタグに使用 */
   .glass-tag {
     @apply inline-flex items-center rounded-full border border-glass-border-subtle bg-glass px-2.5 py-0.5 font-mono text-[11px] text-ink/80 backdrop-blur-sm transition-colors duration-300;
   }

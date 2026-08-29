@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
-import ArtworkCard from '../components/ArtworkCard.astro';
+import Card from '../components/Card.astro';
 import Lightbox from '../components/Lightbox.astro';
 import { getGalleryItems } from '../lib/notion';
 
@@ -29,7 +29,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
     <div id="gallery-grid" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
         <div class="card-reveal h-full" data-tags={item.tags.join('|')}>
-          <ArtworkCard item={item} headingLevel={2} />
+          <Card type="artwork" item={item} headingLevel={2} />
         </div>
       ))}
     </div>

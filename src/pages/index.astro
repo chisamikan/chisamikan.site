@@ -1,10 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
-import ArtworkCard from '../components/ArtworkCard.astro';
-import NovelCard from '../components/NovelCard.astro';
-import ShopItemCard from '../components/ShopItemCard.astro';
-import ToolboxItemCard from '../components/ToolboxItemCard.astro';
+import Card from '../components/Card.astro';
 import NewsTicker from '../components/NewsTicker.astro';
 import AccessCounter from '../components/AccessCounter.astro';
 import ProfileContent from '../components/ProfileContent.astro';
@@ -122,7 +119,7 @@ const heroImages =
     <div class="grid gap-8 sm:grid-cols-3">
       {featuredGallery.map((item) => (
         <div class="card-reveal h-full">
-          <ArtworkCard item={item} />
+          <Card type="artwork" item={item} />
         </div>
       ))}
     </div>
@@ -140,7 +137,7 @@ const heroImages =
       <div class="grid gap-8 sm:grid-cols-3">
         {featuredNovels.map((item) => (
           <div class="card-reveal h-full">
-            <NovelCard item={item} />
+            <Card type="novel" item={item} />
           </div>
         ))}
       </div>
@@ -161,7 +158,7 @@ const heroImages =
       <div class="grid gap-8 sm:grid-cols-3">
         {featuredToolbox.map((item) => (
           <div class="card-reveal h-full">
-            <ToolboxItemCard item={item} />
+            <Card type="toolbox" item={item} />
           </div>
         ))}
       </div>
@@ -182,7 +179,7 @@ const heroImages =
       <div class="grid gap-8 sm:grid-cols-3">
         {shopItems.map((item) => (
           <div class="card-reveal h-full">
-            <ShopItemCard item={item} />
+            <Card type="shop" item={item} />
           </div>
         ))}
       </div>
