@@ -265,6 +265,12 @@
     @apply scroll-mt-[calc(var(--mobile-header-h,4.5rem)+1rem)];
   }
 
+  /* ページネーション操作時にscrollIntoViewでグリッド先頭へ戻る際、sticky headerの
+     裏に隠れないよう Header.astro が実測する --mobile-header-h でオフセットする */
+  #gallery-grid {
+    @apply scroll-mt-[calc(var(--mobile-header-h,4.5rem)+1rem)];
+  }
+
   /* おみくじ結果の各項目を時間差でフェードインアップさせる。.reveal はスクロール連動
      (IntersectionObserver)専用のため、404.astro が抽選ごとに付け直せるよう名前を分ける */
   .omikuji-reveal-item {
