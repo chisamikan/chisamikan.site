@@ -69,7 +69,10 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   // 購読して表示制御(件数計算・ページ割り)だけを自前で行う。
   import { matchesTag, revealItems } from '../lib/tagFilter';
 
-  const PAGE_SIZE = 9;
+  // 2カラム表示(sm〜lg未満)・3カラム表示(lg以上)のどちらでも1ページの
+  // 表示件数が割り切れるよう、2と3の最小公倍数である12を採用する
+  // (9のままだと2カラム表示時に最後の1枚だけ半端に余り、右側に空白ができていた)
+  const PAGE_SIZE = 12;
 
   const grid = document.querySelector<HTMLElement>('#gallery-grid');
   const cards = Array.from(grid?.querySelectorAll<HTMLElement>(':scope > [data-tags]') ?? []);
