@@ -78,55 +78,10 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   const prevBtn = document.querySelector<HTMLButtonElement>('#prev-page');
   const nextBtn = document.querySelector<HTMLButtonElement>('#next-page');
   const pageNumbers = document.querySelector<HTMLElement>('#page-numbers');
-  const loadingEl = document.querySelector<HTMLElement>('[data-card-grid-loading="gallery-grid"]');
 
   let currentFilter = 'all';
   let currentPage = 1;
   let isFirstRender = true;
-
-  function showLoading() {
-    loadingEl?.classList.remove('opacity-0');
-    loadingEl?.setAttribute('aria-hidden', 'false');
-  }
-
-  function hideLoading() {
-    loadingEl?.classList.add('opacity-0');
-    loadingEl?.setAttribute('aria-hidden', 'true');
-  }
-
-  // 絞り込み/ページ送り直後は遅延読み込み(loading="lazy")の画像がまだ届いておらず、
-  // 一瞬「該当なし」に見えてしまう。読み込み中の画像がある間だけスピナーで覆い隠し、
-  // 「すべて」読み込み終わってから解決するPromiseを返す(呼び出し側はこれに続けて
-  // カードのアニメーションを発火させ、スピナーとカード表示の間隔がズレないようにする)。
-  // 待つ対象は画面内(付近)の画像に限定する。スマートフォンの1カラム表示など
-  // グリッドが縦に長くなる場合、画面外のカードの画像まで待ってしまうと、実際に
-  // 見えているカードの画像はとっくに表示済みなのにスピナーだけ残って見えてしまう。
-  function isNearViewport(img: HTMLImageElement): boolean {
-    const rect = img.getBoundingClientRect();
-    return rect.top < window.innerHeight && rect.bottom > 0;
-  }
-
-  function waitForVisibleImages(): Promise<void> {
-    const pendingImages = cards
-      .filter((card) => card.style.display !== 'none')
-      .map((card) => card.querySelector('img'))
-      .filter((img): img is HTMLImageElement => !!img && !img.complete && isNearViewport(img));
-
-    if (pendingImages.length === 0) return Promise.resolve();
-
-    showLoading();
-    return Promise.all(
-      pendingImages.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            img.addEventListener('load', () => resolve(), { once: true });
-            img.addEventListener('error', () => resolve(), { once: true });
-          }),
-      ),
-    ).then(() => {
-      hideLoading();
-    });
-  }
 
   // current を中心とした3ページ分の窓(範囲外にはみ出す場合はスライド)を作り、
   // 先頭/末尾に接していなければその側に 1 (または total) と省略記号を追加する。
@@ -185,8 +140,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       card.style.display = show ? '' : 'none';
       // 初回表示はスクロール連動のフェードインに任せるが、絞り込み/ページ送りで
       // 表示されたカードは、既に表示済みのものも含めてその場でスタッガー
-      // アニメーションを再生する。(読み込み中の画像がある間はスピナーが覆い隠す
-      // ため、二重待ちには感じない)
+      // アニメーションを再生する。
       const reveal = card.querySelector<HTMLElement>('.card-reveal');
       if (show && reveal) {
         // .card-revealは横スクロールバー対策の.card-clipに包まれ、常にその唯一の
@@ -233,7 +187,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
       });
     }
 
-    waitForVisibleImages().then(() => revealItems(cardsToReveal));
+    revealItems(cardsToReveal);
     isFirstRender = false;
   }
 

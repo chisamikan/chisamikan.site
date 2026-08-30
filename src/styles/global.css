@@ -611,6 +611,11 @@
      ないという不具合になっていた。9件(1ページ分)相当の値で頭打ちにして防ぐ */
   .card-reveal {
     @apply opacity-0 transition-[opacity,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)];
+    /* will-changeで事前にコンポジットレイヤーを確保しておかないと、
+       display:none解除と同時にトランジションが始まる際、レイヤー昇格が
+       アニメーション開始と同一フレームで発生し、前半のフレームが
+       まとめて省略されて瞬間的に終端値へワープして見えることがある */
+    will-change: opacity, transform;
     /* sibling-index()の演算結果を丸ごとクラス名化するとTailwindの矢括弧記法が
        極端に読みづらくなるため、この2行のみプレーンCSSのまま残す。
        --card-reveal-index を経由させているのは、CardSlider.astro
@@ -618,8 +623,18 @@
        sibling-index()がずれてしまう)がJSから並び順を明示的に上書きできるようにするため。
        未指定時はこれまで通りsibling-index()から自動計算する */
     --card-reveal-index: calc(sibling-index() - 1);
-    transform: rotate(clamp(0deg, calc(var(--card-reveal-index) * 1.5deg), 12deg));
-    transition-delay: clamp(0s, calc(var(--card-reveal-index) * 0.05s), 0.4s);
+    /* --card-reveal-indexは0始まりのため、素の (index * 1.5deg) だと1枚目
+       (index 0)だけ回転角が常に0degになり、フェードするだけで回転による
+       スタッガー感が出ない。+1してから掛けることで1枚目にも回転を持たせる */
+    transform: rotate(clamp(0deg, calc((var(--card-reveal-index) + 1) * 1.5deg), 12deg));
+    /* transition-delayが0の要素は、lib/tagFilter.tsのrevealItemsが
+       transitionを戻す→is-visibleを付与するのを同一フレームで行うと、
+       ブラウザが変化前の状態を観測できずワープすることがある
+       (revealItems側でこの2つを別フレームに分けて根本対応済み)。
+       ここでは下限を0sではなく0.05sにして、さらに余裕を持たせる。
+       calcの引数を+1しているのは、下限のクランプにより index 0 と
+       index 1 が両方0.05sになって段差が消えるのを防ぐため */
+    transition-delay: clamp(0.05s, calc((var(--card-reveal-index) + 1) * 0.05s), 0.4s);
   }
 
   .card-reveal.is-visible {
