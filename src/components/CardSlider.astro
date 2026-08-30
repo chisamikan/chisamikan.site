@@ -177,6 +177,8 @@ const isSlider = count > 3;
 </style>
 
 <script>
+  import { watchImageLoading } from '../lib/imageLoading';
+
   document.querySelectorAll<HTMLElement>('[data-card-slider-wrapper]').forEach((wrapper) => {
     const slider = wrapper.querySelector<HTMLElement>('[data-card-slider]');
     const prevBtn = wrapper.querySelector<HTMLButtonElement>('[data-slider-prev]');
@@ -347,27 +349,10 @@ const isSlider = count > 3;
 
     const checkAndWait = () => {
       const sliderRect = slider.getBoundingClientRect();
-      const pendingImages = Array.from(slider.querySelectorAll<HTMLImageElement>('img')).filter((img) => {
+      watchImageLoading(overlay, slider, (img) => {
         if (img.complete) return false;
         const rect = img.getBoundingClientRect();
         return rect.left < sliderRect.right && rect.right > sliderRect.left;
-      });
-      if (pendingImages.length === 0) return;
-
-      overlay.classList.remove('opacity-0');
-      overlay.setAttribute('aria-hidden', 'false');
-
-      Promise.all(
-        pendingImages.map(
-          (img) =>
-            new Promise<void>((resolve) => {
-              img.addEventListener('load', () => resolve(), { once: true });
-              img.addEventListener('error', () => resolve(), { once: true });
-            }),
-        ),
-      ).then(() => {
-        overlay.classList.add('opacity-0');
-        overlay.setAttribute('aria-hidden', 'true');
       });
     };
 

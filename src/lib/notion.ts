@@ -1,5 +1,5 @@
 import { Client, isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
-import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { PageObjectResponse, QueryDataSourceParameters } from '@notionhq/client/build/src/api-endpoints';
 
 // トークンが無い場合はエラーで止めずダミーデータを返す(ローカルでもUI確認できるように)
 const token = import.meta.env.NOTION_TOKEN;
@@ -77,9 +77,9 @@ function richTextProp(props: PageObjectResponse['properties'], key: string): str
 
 // Notion APIはデータベースを直接クエリできないため、まずデータソースIDを取得してからクエリする。
 // 1回の取得上限は100件のため、iteratePaginatedAPIで全ページを辿って全件取得する。
-async function queryPublishedDatabase(
+async function queryDatabase(
   dbId: string,
-  sortProperty: string
+  options: Omit<QueryDataSourceParameters, 'data_source_id'> = {}
 ): Promise<PageObjectResponse[]> {
   const db = await notion!.databases.retrieve({ database_id: dbId });
   if (!isFullDatabase(db) || db.data_sources.length === 0) {
@@ -89,8 +89,7 @@ async function queryPublishedDatabase(
   const results: PageObjectResponse[] = [];
   for await (const page of iteratePaginatedAPI(notion!.dataSources.query, {
     data_source_id: db.data_sources[0].id,
-    filter: { property: 'Published', checkbox: { equals: true } },
-    sorts: [{ property: sortProperty, direction: 'descending' }],
+    ...options,
   })) {
     if (isFullPage(page)) {
       results.push(page);
@@ -98,6 +97,17 @@ async function queryPublishedDatabase(
   }
 
   return results;
+}
+
+function queryPublishedDatabase(dbId: string, sortProperty: string): Promise<PageObjectResponse[]> {
+  return queryDatabase(dbId, {
+    filter: { property: 'Published', checkbox: { equals: true } },
+    sorts: [{ property: sortProperty, direction: 'descending' }],
+  });
+}
+
+function queryByCreatedTime(dbId: string): Promise<PageObjectResponse[]> {
+  return queryDatabase(dbId, { sorts: [{ timestamp: 'created_time', direction: 'descending' }] });
 }
 
 // --- ギャラリー ---------------------------------------------------------------
@@ -181,21 +191,7 @@ export async function getNovelItems(): Promise<NovelItem[]> {
     return sampleNovels;
   }
 
-  const db = await notion.databases.retrieve({ database_id: dbId });
-  if (!isFullDatabase(db) || db.data_sources.length === 0) {
-    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
-  }
-
-  const pages: PageObjectResponse[] = [];
-  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
-    data_source_id: db.data_sources[0].id,
-    sorts: [{ timestamp: 'created_time', direction: 'descending' }],
-  })) {
-    if (isFullPage(page)) {
-      pages.push(page);
-    }
-  }
-
+  const pages = await queryByCreatedTime(dbId);
   return pages.map(pageToNovel);
 }
 
@@ -320,21 +316,7 @@ export async function getToolboxItems(): Promise<ToolboxItem[]> {
     return sampleToolbox;
   }
 
-  const db = await notion.databases.retrieve({ database_id: dbId });
-  if (!isFullDatabase(db) || db.data_sources.length === 0) {
-    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
-  }
-
-  const pages: PageObjectResponse[] = [];
-  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
-    data_source_id: db.data_sources[0].id,
-    sorts: [{ timestamp: 'created_time', direction: 'descending' }],
-  })) {
-    if (isFullPage(page)) {
-      pages.push(page);
-    }
-  }
-
+  const pages = await queryByCreatedTime(dbId);
   return pages.map(pageToToolbox);
 }
 
@@ -442,20 +424,7 @@ export async function getOmikujiItems(): Promise<OmikujiItem[]> {
     return sampleOmikuji;
   }
 
-  const db = await notion.databases.retrieve({ database_id: dbId });
-  if (!isFullDatabase(db) || db.data_sources.length === 0) {
-    throw new Error(`Notionデータベース(${dbId})のデータソースを取得できませんでした。`);
-  }
-
-  const pages: PageObjectResponse[] = [];
-  for await (const page of iteratePaginatedAPI(notion.dataSources.query, {
-    data_source_id: db.data_sources[0].id,
-  })) {
-    if (isFullPage(page)) {
-      pages.push(page);
-    }
-  }
-
+  const pages = await queryDatabase(dbId);
   return pages.map(pageToOmikuji);
 }
 

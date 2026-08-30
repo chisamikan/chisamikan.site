@@ -36,6 +36,8 @@ const { id, class: gridClass = '', managed = false } = Astro.props;
 </div>
 
 <script>
+  import { watchImageLoading } from '../lib/imageLoading';
+
   // ページ内の CardGrid インスタンスのうち、ページ側スクリプトが表示制御しないもの
   // (data-managed が無いもの)だけ、ここで自動的にスピナー表示を行う。
   document.querySelectorAll<HTMLElement>('[data-card-grid-loading]:not([data-managed])').forEach((overlay) => {
@@ -43,30 +45,10 @@ const { id, class: gridClass = '', managed = false } = Astro.props;
     const grid = gridId ? document.getElementById(gridId) : null;
     if (!grid) return;
 
-    const isNearViewport = (img: HTMLImageElement) => {
+    watchImageLoading(overlay, grid, (img) => {
+      if (img.complete) return false;
       const rect = img.getBoundingClientRect();
       return rect.top < window.innerHeight && rect.bottom > 0;
-    };
-
-    const pendingImages = Array.from(grid.querySelectorAll<HTMLImageElement>('img')).filter(
-      (img) => !img.complete && isNearViewport(img),
-    );
-    if (pendingImages.length === 0) return;
-
-    overlay.classList.remove('opacity-0');
-    overlay.setAttribute('aria-hidden', 'false');
-
-    Promise.all(
-      pendingImages.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            img.addEventListener('load', () => resolve(), { once: true });
-            img.addEventListener('error', () => resolve(), { once: true });
-          }),
-      ),
-    ).then(() => {
-      overlay.classList.add('opacity-0');
-      overlay.setAttribute('aria-hidden', 'true');
     });
   });
 </script>
