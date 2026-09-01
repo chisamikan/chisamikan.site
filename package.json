@@ -15,10 +15,10 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^14.2.3",
+    "@astrojs/cloudflare": "^14.2.5",
     "@notionhq/client": "^5.26.0",
     "@tailwindcss/vite": "^4.0.0",
-    "astro": "^7.2.4",
+    "astro": "^7.2.9",
     "rss-parser": "^3.13.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^6.0.3"
