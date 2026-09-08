@@ -1,0 +1,29 @@
+---
+import { newsCategories, type NewsCategory } from '../lib/news';
+
+interface Props {
+  current?: NewsCategory;
+  categoryPath: (category: NewsCategory) => string;
+  allPath: string;
+}
+const { current, categoryPath, allPath } = Astro.props;
+---
+
+<nav class="mb-10 flex flex-wrap justify-center gap-2" aria-label="お知らせをカテゴリで絞り込み">
+  <a href={allPath} class:list={['filter-btn btn-glass-ghost', !current && 'is-active']}>
+    すべて
+  </a>
+  {newsCategories.map((c) => (
+    <a href={categoryPath(c.value)} class:list={['filter-btn btn-glass-ghost', current === c.value && 'is-active']}>
+      <i class={c.icon} aria-hidden="true"></i> {c.label}
+    </a>
+  ))}
+</nav>
+
+<style>
+  @reference '../styles/global.css';
+
+  .filter-btn.is-active {
+    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
+  }
+</style>

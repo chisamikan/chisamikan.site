@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import NewsCategoryFilter from '../../components/NewsCategoryFilter.astro';
+import NewsList from '../../components/NewsList.astro';
+import NewsPagination from '../../components/NewsPagination.astro';
+import { getAllNewsItems, type NewsCategory } from '../../lib/news';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const items = await getAllNewsItems();
+  return paginate(items, { pageSize: 20 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+
+const categoryPath = (category: NewsCategory) => `/news/category/${category}`;
+---
+
+<BaseLayout title="News" description="サイトの更新履歴・お知らせ一覧です。">
+  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="News" title="お知らせ" level={1} />
+
+    <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} />
+
+    <NewsList items={page.data} />
+
+    <NewsPagination page={page} basePath="/news" />
+
+    <div class="mt-16 text-center">
+      <a href="/" class="btn-glass md:w-1/3 w-full">
+        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      </a>
+    </div>
+  </section>
+</BaseLayout>

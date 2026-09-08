@@ -28,22 +28,3 @@ export async function getFeedItems(feedUrl: string, limit = 10): Promise<NewsIte
     return [];
   }
 }
-
-/**
- * お知らせ(トップページのRSS_FEED_URLで指定したフィード)を取得します。
- */
-export async function getNewsItems(limit = 10): Promise<NewsItem[]> {
-  const feedUrl = import.meta.env.RSS_FEED_URL;
-  if (!feedUrl) {
-    console.warn('[rss] RSS_FEED_URL が設定されていないため、ダミーデータを表示します。');
-    return [
-      {
-        title: '(サンプル) RSS_FEED_URL を設定するとお知らせが表示されます',
-        link: '#',
-        date: new Date().toISOString(),
-      },
-    ];
-  }
-
-  return getFeedItems(feedUrl, limit);
-}

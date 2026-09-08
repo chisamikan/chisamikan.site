@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly NOTION_WORKS_DB_ID: string;
   readonly NOTION_TOOLBOX_DB_ID: string;
   readonly NOTION_CONTACT_DB_ID: string;
+  readonly NOTION_NEWS_DB_ID: string;
   readonly RSS_FEED_URL: string;
   readonly BOOTH_SHOP_URL: string;
   readonly SITE_TITLE: string;

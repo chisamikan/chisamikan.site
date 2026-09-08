@@ -4,12 +4,13 @@ import SectionHeading from '../components/SectionHeading.astro';
 import Card from '../components/Card.astro';
 import CardSlider from '../components/CardSlider.astro';
 import NewsTicker from '../components/NewsTicker.astro';
+import NewsList from '../components/NewsList.astro';
 import AccessCounter from '../components/AccessCounter.astro';
 import ProfileContent from '../components/ProfileContent.astro';
 import Lightbox from '../components/Lightbox.astro';
 import HeroSlideshow from '../components/HeroSlideshow.astro';
 import { getGalleryItems, getNovelItems, getToolboxItems } from '../lib/notion';
-import { getNewsItems } from '../lib/rss';
+import { getAllNewsItems } from '../lib/news';
 import { getBoothItems } from '../lib/booth';
 import { site } from '../lib/config';
 
@@ -17,7 +18,7 @@ const [gallery, novels, toolbox, news, shopItems] = await Promise.all([
   getGalleryItems(),
   getNovelItems(),
   getToolboxItems(),
-  getNewsItems(3),
+  getAllNewsItems(),
   getBoothItems(10),
 ]);
 
@@ -25,6 +26,9 @@ const [gallery, novels, toolbox, news, shopItems] = await Promise.all([
 // スライダー2ページ目以降のカードはスクロールして見えるまで読み込まれないため
 // ページ初期読み込みへの影響はほぼ増えない。カードは固定幅(約19rem)表示のため、
 // 横幅の広い画面では一度に見える枚数が増える分、件数にも余裕を持たせる
+// ファーストビューのティッカーは「お知らせ(note)」の更新のみを表示する
+const noteNews = news.filter((item) => item.category === 'note');
+
 const featuredGallery = gallery.slice(0, 10);
 const featuredNovels = novels.slice(0, 10);
 const featuredToolbox = toolbox.slice(0, 10);
@@ -52,8 +56,8 @@ const heroImages =
 
     <div class="relative z-10 flex h-full flex-col justify-end px-6 pb-6 pt-16 sm:px-10 sm:pb-10">
       <div class="max-w-md rounded-xl border border-white/20 bg-white/10 p-5 text-left shadow-lg backdrop-blur-md sm:p-6">
-        {news.length > 0 ? (
-          <NewsTicker item={news[0]} />
+        {noteNews.length > 0 ? (
+          <NewsTicker item={noteNews[0]} />
         ) : (
           <p class="flex items-center gap-2 text-sm leading-relaxed text-white/85">
             <i class="fa-solid fa-bullhorn shrink-0 text-white/80" aria-hidden="true"></i>
@@ -64,42 +68,12 @@ const heroImages =
     </div>
   </section>
 
-  <!-- お知らせ(RSSフィードの最新3件) -->
+  <!-- お知らせ(統合フィードの最新3件) -->
   <section id="news" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
     <SectionHeading eyebrow="News" title="お知らせ" />
-    {news.length > 0 ? (
-      <ul class="mx-auto max-w-2xl divide-y divide-ink/10">
-        {news.slice(0, 3).map((item) => (
-          <li class="py-4 first:pt-0 last:pb-0">
-            <a
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="no-external-icon group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
-            >
-              {item.date && (
-                <span class="shrink-0 font-mono text-xs text-graphite">
-                  {new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-                </span>
-              )}
-              <span class="text-ink transition-colors group-hover:text-accent">
-                {item.title}
-                <i class="fa-solid fa-arrow-up-right-from-square ml-0.5 text-[0.8em]" aria-hidden="true"></i>
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p class="text-center font-mono text-sm text-graphite">お知らせはまだありません。</p>
-    )}
+    <NewsList items={news.slice(0, 3)} />
     <div class="mt-10 text-center">
-      <a
-        href="https://note.com/chisamikan"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn-glass btn-glass-accent md:w-1/3 w-full"
-      >
+      <a href="/news" class="btn-glass btn-glass-accent md:w-1/3 w-full">
         <i class="fa-solid fa-circle-chevron-right pr-1"></i>お知らせをもっと見る
       </a>
     </div>

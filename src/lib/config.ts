@@ -6,7 +6,7 @@ export const site = {
 
 export const nav = [
   { href: '/', label: 'Top' },
-  { href: '/#news', label: 'News' },
+  { href: '/news', label: 'News' },
   { href: '/profile', label: 'Profile' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/novels', label: 'Novels' },

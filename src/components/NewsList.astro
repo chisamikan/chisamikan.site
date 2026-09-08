@@ -1,0 +1,60 @@
+---
+import type { NewsFeedItem } from '../lib/news';
+import { getCategoryMeta } from '../lib/news';
+
+interface Props {
+  items: NewsFeedItem[];
+  showCategory?: boolean;
+}
+const { items, showCategory = true } = Astro.props;
+---
+
+{items.length > 0 ? (
+  <ul class="mx-auto max-w-2xl divide-y divide-ink/10">
+    {items.map((item) => {
+      const meta = getCategoryMeta(item.category);
+      const formattedDate = new Date(item.date).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+      const Wrapper = item.link ? 'a' : 'div';
+      const linkProps = item.link
+        ? {
+            href: item.link,
+            ...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {}),
+          }
+        : {};
+      return (
+        <li class="py-4 first:pt-0 last:pb-0">
+          <Wrapper
+            {...linkProps}
+            class:list={[
+              'flex flex-col gap-1.5',
+              item.link && 'no-external-icon group',
+            ]}
+          >
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span class="shrink-0 font-mono text-xs text-graphite">{formattedDate}</span>
+              {showCategory && (
+                <span class="glass-tag">
+                  <i class={`${meta.icon} mr-1`} aria-hidden="true"></i>
+                  {meta.label}
+                </span>
+              )}
+            </div>
+            <span class:list={['text-ink', item.link && 'transition-colors group-hover:text-accent']}>
+              {item.title}
+              {item.link && item.external && (
+                <i class="fa-solid fa-arrow-up-right-from-square ml-0.5 text-[0.8em]" aria-hidden="true"></i>
+              )}
+            </span>
+            {item.body && <p class="text-sm leading-relaxed text-ink/70">{item.body}</p>}
+          </Wrapper>
+        </li>
+      );
+    })}
+  </ul>
+) : (
+  <p class="text-center font-mono text-sm text-graphite">お知らせはまだありません。</p>
+)}

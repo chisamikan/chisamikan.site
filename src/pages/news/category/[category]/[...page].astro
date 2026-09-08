@@ -1,0 +1,52 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../../components/SectionHeading.astro';
+import NewsCategoryFilter from '../../../../components/NewsCategoryFilter.astro';
+import NewsList from '../../../../components/NewsList.astro';
+import NewsPagination from '../../../../components/NewsPagination.astro';
+import {
+  getAllNewsItems,
+  newsCategories,
+  getCategoryMeta,
+  type NewsCategory,
+  type NewsCategoryMeta,
+  type NewsFeedItem,
+} from '../../../../lib/news';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const items = await getAllNewsItems();
+
+  return newsCategories.flatMap((category: NewsCategoryMeta) => {
+    const filtered = items.filter((item: NewsFeedItem) => item.category === category.value);
+    return paginate(filtered, {
+      params: { category: category.value },
+      pageSize: 20,
+    });
+  });
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.params as { category: NewsCategory };
+const { page } = Astro.props;
+const meta = getCategoryMeta(category);
+
+const categoryPath = (c: NewsCategory) => `/news/category/${c}`;
+---
+
+<BaseLayout title={`News - ${meta.label}`} description={`${meta.label}に関するお知らせ・更新履歴の一覧です。`}>
+  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="News" title="お知らせ" level={1} />
+
+    <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} current={category} />
+
+    <NewsList items={page.data} showCategory={false} />
+
+    <NewsPagination page={page} basePath={`/news/category/${category}`} />
+
+    <div class="mt-16 text-center">
+      <a href="/" class="btn-glass md:w-1/3 w-full">
+        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      </a>
+    </div>
+  </section>
+</BaseLayout>

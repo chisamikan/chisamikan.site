@@ -34,6 +34,7 @@ export interface ArtworkItem {
   nsfw: boolean;
   slideshow: boolean;
   url: string | null;
+  createdTime: string;
 }
 
 export interface ToolboxItem {
@@ -42,6 +43,7 @@ export interface ToolboxItem {
   url: string | null;
   imageUrl: string | null;
   description: string;
+  createdTime: string;
 }
 
 export interface NovelItem {
@@ -53,6 +55,7 @@ export interface NovelItem {
   kakuyomuUrl: string | null;
   pixivUrl: string | null;
   shopUrl: string | null;
+  createdTime: string;
 }
 
 export interface WorkItem {
@@ -64,6 +67,16 @@ export interface WorkItem {
   url: string | null;
   imageUrl: string | null;
   tags: string[];
+  createdTime: string;
+}
+
+export interface ManualNewsItem {
+  id: string;
+  title: string;
+  body: string;
+  date: string | null;
+  url: string | null;
+  createdTime: string;
 }
 
 function richTextToPlain(richText: { plain_text: string }[]): string {
@@ -158,7 +171,7 @@ function pageToArtwork(page: PageObjectResponse): ArtworkItem {
 
   const url = props.URL?.type === 'url' ? props.URL.url : null;
 
-  return { id: page.id, title, imageUrl, tags, description, date, nsfw, slideshow, url };
+  return { id: page.id, title, imageUrl, tags, description, date, nsfw, slideshow, url, createdTime: page.created_time };
 }
 
 const sampleGallery: ArtworkItem[] = [
@@ -172,6 +185,7 @@ const sampleGallery: ArtworkItem[] = [
     nsfw: false,
     slideshow: true,
     url: null,
+    createdTime: '2026-01-01T00:00:00.000Z',
   },
 ];
 
@@ -219,7 +233,17 @@ function pageToNovel(page: PageObjectResponse): NovelItem {
 
   const shopUrl = props.shop?.type === 'url' ? props.shop.url : null;
 
-  return { id: page.id, title, imageUrl, tags, description, kakuyomuUrl, pixivUrl, shopUrl };
+  return {
+    id: page.id,
+    title,
+    imageUrl,
+    tags,
+    description,
+    kakuyomuUrl,
+    pixivUrl,
+    shopUrl,
+    createdTime: page.created_time,
+  };
 }
 
 const sampleNovels: NovelItem[] = [
@@ -232,6 +256,7 @@ const sampleNovels: NovelItem[] = [
     kakuyomuUrl: null,
     pixivUrl: null,
     shopUrl: null,
+    createdTime: '2026-01-01T00:00:00.000Z',
   },
 ];
 
@@ -285,6 +310,7 @@ function pageToWork(page: PageObjectResponse): WorkItem {
     url,
     imageUrl,
     tags,
+    createdTime: page.created_time,
   };
 }
 
@@ -298,6 +324,7 @@ const sampleWorks: WorkItem[] = [
     url: null,
     imageUrl: null,
     tags: ['装画', '書籍'],
+    createdTime: '2025-04-01T00:00:00.000Z',
   },
 ];
 
@@ -337,7 +364,7 @@ function pageToToolbox(page: PageObjectResponse): ToolboxItem {
   const description =
     props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
 
-  return { id: page.id, title, url, imageUrl, description };
+  return { id: page.id, title, url, imageUrl, description, createdTime: page.created_time };
 }
 
 const sampleToolbox: ToolboxItem[] = [
@@ -347,6 +374,51 @@ const sampleToolbox: ToolboxItem[] = [
     url: null,
     imageUrl: null,
     description: 'NOTION_TOOLBOX_DB_ID を設定するとNotionのツールがここに並びます。',
+    createdTime: '2026-01-01T00:00:00.000Z',
+  },
+];
+
+// --- お知らせ(手動投稿) ---------------------------------------------------------
+
+/**
+ * 手動投稿用データベースを取得します。
+ * Notion側のプロパティ名(想定):
+ *   Name(title) / Body(rich_text) / Date(date) / Published(checkbox) / URL(url, 未入力なら非表示)
+ */
+export async function getManualNewsItems(): Promise<ManualNewsItem[]> {
+  const dbId = import.meta.env.NOTION_NEWS_DB_ID;
+  if (!notion || !dbId) {
+    warnMissingToken('お知らせ(手動投稿)');
+    return sampleManualNews;
+  }
+
+  const pages = await queryPublishedDatabase(dbId, 'Date');
+  return pages.map(pageToManualNews);
+}
+
+function pageToManualNews(page: PageObjectResponse): ManualNewsItem {
+  const props = page.properties;
+
+  const title =
+    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
+
+  const body = props.Body?.type === 'rich_text' ? richTextToPlain(props.Body.rich_text) : '';
+
+  const date = props.Date?.type === 'date' ? (props.Date.date?.start ?? null) : null;
+
+  const url = props.URL?.type === 'url' ? props.URL.url : null;
+
+  return { id: page.id, title, body, date, url, createdTime: page.created_time };
+}
+
+const sampleManualNews: ManualNewsItem[] = [
+  {
+    id: 'sample-news-1',
+    title: '(サンプル) サイトをリニューアルしました',
+    body: 'NOTION_NEWS_DB_ID を設定するとNotionのお知らせがここに並びます。',
+    date: '2026-01-01',
+    url: null,
+    createdTime: '2026-01-01T00:00:00.000Z',
   },
 ];
 

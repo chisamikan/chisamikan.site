@@ -1,0 +1,72 @@
+---
+import type { Page } from 'astro';
+import type { NewsFeedItem } from '../lib/news';
+
+interface Props {
+  page: Page<NewsFeedItem>;
+  /** ページ番号を含まないベースパス(例: "/news", "/news/category/gallery") */
+  basePath: string;
+}
+const { page, basePath } = Astro.props;
+const pathFor = (n: number) => (n === 1 ? basePath : `${basePath}/${n}`);
+
+// gallery.astro のページネーションUIと揃える: current を中心とした3ページ分の窓を作り、
+// 先頭/末尾に接していなければその側に 1 (または total) と省略記号を追加する。
+function getPageItems(current: number, total: number): Array<number | 'ellipsis'> {
+  let start = current - 1;
+  let end = current + 1;
+  if (start < 1) {
+    end += 1 - start;
+    start = 1;
+  }
+  if (end > total) {
+    start -= end - total;
+    end = total;
+  }
+  start = Math.max(start, 1);
+  end = Math.min(end, total);
+
+  const window: number[] = [];
+  for (let p = start; p <= end; p += 1) window.push(p);
+
+  const items: Array<number | 'ellipsis'> = [];
+  if (window[0] === 1) {
+    items.push(...window);
+  } else {
+    items.push(1, 'ellipsis', ...window);
+  }
+  if (window[window.length - 1] !== total) {
+    items.push('ellipsis', total);
+  }
+  return items;
+}
+
+const pageItems = getPageItems(page.currentPage, page.lastPage);
+---
+
+{page.lastPage > 1 && (
+  <nav aria-label="ページ送り" class="mt-16 flex items-center justify-center gap-2 font-mono text-sm">
+    {page.currentPage > 1 && (
+      <a href={pathFor(page.currentPage - 1)} aria-label="前のページ" class="btn-glass-ghost px-3!">&lt;</a>
+    )}
+    <div class="flex items-center gap-2">
+      {pageItems.map((item) =>
+        item === 'ellipsis' ? (
+          <span class="px-1 text-ink/40">…</span>
+        ) : item === page.currentPage ? (
+          <span
+            aria-current="page"
+            class="rounded-full border border-glass-border-subtle bg-glass px-3 py-1.5 text-ink/40 backdrop-blur-md cursor-not-allowed"
+          >
+            {item}
+          </span>
+        ) : (
+          <a href={pathFor(item)} class="btn-glass-ghost px-3!">{item}</a>
+        )
+      )}
+    </div>
+    {page.currentPage < page.lastPage && (
+      <a href={pathFor(page.currentPage + 1)} aria-label="次のページ" class="btn-glass-ghost px-3!">&gt;</a>
+    )}
+  </nav>
+)}

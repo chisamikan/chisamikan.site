@@ -1,8 +1,8 @@
 ---
-import type { NewsItem } from '../lib/rss';
+import type { NewsFeedItem } from '../lib/news';
 
 interface Props {
-  item: NewsItem;
+  item: NewsFeedItem;
 }
 const { item } = Astro.props;
 
@@ -12,32 +12,34 @@ const formattedDate = item.date
 
 // 文字数に関わらず流れる速さ(px/秒)が揃って見えるよう、日付+タイトルの長さから再生時間を概算する
 const duration = Math.min(30, Math.max(10, (item.title.length + (formattedDate?.length ?? 0)) * 0.35));
+
+// リンクが無い(URL未設定の手動投稿)場合はテキストのみ表示する
+const Wrapper = item.link ? 'a' : 'span';
+const linkProps = item.link
+  ? { href: item.link, ...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {}) }
+  : {};
 ---
 
 <div class="news-ticker relative flex items-center gap-2">
   <i class="fa-solid fa-bullhorn shrink-0 text-white/80" aria-hidden="true"></i>
   <div class="news-ticker-viewport min-w-0 flex-1 overflow-hidden">
     <div class="news-ticker-track flex w-max" style={`animation-duration: ${duration}s;`}>
-      <a
-        href={item.link}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Wrapper
+        {...linkProps}
         class="news-ticker-copy shrink-0 whitespace-nowrap pr-16 font-mono text-sm text-white/90 transition-colors hover:text-accent"
       >
         {formattedDate && <span class="mr-2 text-white/60">{formattedDate}</span>}
         {item.title}
-      </a>
-      <a
-        href={item.link}
-        target="_blank"
-        rel="noopener noreferrer"
+      </Wrapper>
+      <Wrapper
+        {...linkProps}
         aria-hidden="true"
         tabindex="-1"
         class="news-ticker-copy shrink-0 whitespace-nowrap pr-16 font-mono text-sm text-white/90 transition-colors hover:text-accent"
       >
         {formattedDate && <span class="mr-2 text-white/60">{formattedDate}</span>}
         {item.title}
-      </a>
+      </Wrapper>
     </div>
   </div>
 </div>
