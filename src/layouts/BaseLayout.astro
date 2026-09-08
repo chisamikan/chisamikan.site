@@ -8,8 +8,9 @@ import { site } from '../lib/config';
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
-const { title, description = site.description } = Astro.props;
+const { title, description = site.description, noindex = false } = Astro.props;
 const pageTitle = title ? `${title} | ${site.title}` : site.title;
 const ogImageURL = new URL('/og-image.webp', Astro.site ?? Astro.url).toString();
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
@@ -37,6 +38,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toStri
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="canonical" href={canonicalURL} />
 
