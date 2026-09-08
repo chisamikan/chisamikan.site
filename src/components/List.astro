@@ -10,9 +10,9 @@ type Props =
 const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
 
-// novels.astro のギャラリーからの「/novels#novel-{id}」深リンク先として使うスクロールアンカー
-const id = props.type === 'novel' ? `novel-${props.item.id}` : undefined;
-const entryClass = props.type === 'novel' ? 'scroll-mt-24' : undefined;
+// お知らせページからの「/novels#novel-{id}」等の深リンク先として使うスクロールアンカー
+const id = `${props.type}-${props.item.id}`;
+const entryClass = 'scroll-mt-24';
 
 function formatPeriod(start: string | null, end: string | null) {
   const fmt = (d: string) =>

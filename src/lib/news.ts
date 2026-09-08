@@ -67,7 +67,7 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       title: `ギャラリーに『${item.title}』を追加しました`,
       body: null,
       date: item.createdTime,
-      link: '/gallery',
+      link: `/gallery#gallery-${item.id}`,
       external: false,
     })),
     ...novels.map((item) => ({
@@ -76,7 +76,7 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       title: `小説に『${item.title}』を追加しました`,
       body: null,
       date: item.createdTime,
-      link: '/novels',
+      link: `/novels#novel-${item.id}`,
       external: false,
     })),
     ...toolbox.map((item) => ({
@@ -85,7 +85,7 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       title: `ツールボックスに『${item.title}』を追加しました`,
       body: null,
       date: item.createdTime,
-      link: '/toolbox',
+      link: `/toolbox#toolbox-${item.id}`,
       external: false,
     })),
     ...works.map((item) => ({
@@ -94,7 +94,7 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       title: `仕事履歴に『${item.client}』を追加しました`,
       body: null,
       date: item.createdTime,
-      link: '/profile',
+      link: `/profile#work-${item.id}`,
       external: false,
     })),
     ...manual.map((item) => ({

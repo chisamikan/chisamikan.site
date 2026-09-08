@@ -19,7 +19,7 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
 
     <CardGrid id="gallery-grid" managed class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <div class="card-clip h-full" data-tags={item.tags.join('|')}>
+        <div id={`gallery-${item.id}`} class="card-clip h-full scroll-mt-24" data-tags={item.tags.join('|')}>
           <div class="card-reveal h-full">
             <Card type="artwork" item={item} headingLevel={2} />
           </div>
@@ -85,6 +85,14 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   let currentFilter = 'all';
   let currentPage = 1;
   let isFirstRender = true;
+
+  // URLに#gallery-<id>形式のアンカーが付いている場合(お知らせページ等からの深リンク)、
+  // そのカードが含まれるページ番号を初期表示ページとして計算しておく
+  const initialHash = window.location.hash.slice(1);
+  const initialTargetIndex = initialHash ? cards.findIndex((card) => card.id === initialHash) : -1;
+  if (initialTargetIndex >= 0) {
+    currentPage = Math.floor(initialTargetIndex / PAGE_SIZE) + 1;
+  }
 
   // current を中心とした3ページ分の窓(範囲外にはみ出す場合はスライド)を作り、
   // 先頭/末尾に接していなければその側に 1 (または total) と省略記号を追加する。
@@ -204,4 +212,8 @@ const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
   nextBtn?.addEventListener('click', () => goToPage(currentPage + 1));
 
   render();
+
+  if (initialTargetIndex >= 0) {
+    document.getElementById(initialHash)?.scrollIntoView({ block: 'start' });
+  }
 </script>
