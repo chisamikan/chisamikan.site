@@ -1,6 +1,7 @@
 ---
 import type { WorkItem, NovelItem, ToolboxItem } from '../lib/notion';
 import Thumbnail from './Thumbnail.astro';
+import { isNewItem } from '../lib/isNew';
 
 type Props =
   | { type: 'work'; item: WorkItem; headingLevel?: 2 | 3 }
@@ -9,6 +10,8 @@ type Props =
 
 const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
+// 仕事履歴(work)はNewバッジのスコープ外
+const isNew = props.type !== 'work' && isNewItem(props.item.createdTime);
 
 // お知らせページからの「/novels#novel-{id}」等の深リンク先として使うスクロールアンカー
 const id = `${props.type}-${props.item.id}`;
@@ -91,7 +94,8 @@ function formatPeriod(start: string | null, end: string | null) {
             </ul>
           )}
 
-          <Tag class:list={['font-display text-xl font-semibold text-ink', props.item.tags.length > 0 && 'mt-2']}>
+          <Tag class:list={['flex items-baseline gap-2 font-display text-xl font-semibold text-ink', props.item.tags.length > 0 && 'mt-2']}>
+            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap text-sm">NEW</span>}
             {props.item.title}
           </Tag>
           {props.item.description && (
@@ -137,7 +141,10 @@ function formatPeriod(start: string | null, end: string | null) {
 
       {props.type === 'toolbox' && (
         <>
-          <Tag class="font-display text-xl font-semibold text-ink">{props.item.title}</Tag>
+          <Tag class="flex items-baseline gap-2 font-display text-xl font-semibold text-ink">
+            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap text-sm">NEW</span>}
+            {props.item.title}
+          </Tag>
           {props.item.description && <p class="mt-1 text-sm text-ink/70">{props.item.description}</p>}
 
           {props.item.url && (

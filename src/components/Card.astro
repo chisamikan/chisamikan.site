@@ -1,6 +1,7 @@
 ---
 import type { ArtworkItem, NovelItem, ToolboxItem } from '../lib/notion';
 import type { BoothItem } from '../lib/booth';
+import { isNewItem } from '../lib/isNew';
 
 type Props =
   | { type: 'artwork'; item: ArtworkItem; headingLevel?: 2 | 3 }
@@ -11,6 +12,8 @@ type Props =
 const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
 const PLACEHOLDER = '/images/work-placeholder.svg';
+// BOOTH商品(shop)は追加日時を取得できないため対象外
+const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
 ---
 
 {props.type === 'artwork' && (
@@ -49,6 +52,9 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
         <div class="flex aspect-square w-full cursor-default items-center justify-center bg-paper-dim" aria-hidden="true">
           <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
         </div>
+      )}
+      {isNew && (
+        <span class="glass-badge glass-badge-accent pointer-events-none absolute right-4 top-4 z-10 text-base">NEW</span>
       )}
       {/* サムネイル下部にタグ・タイトルを重ねて表示する。クリック操作はサムネイル本体(button)が担うため pointer-events-none にする */}
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
@@ -110,6 +116,9 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
           props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
         ]}
       />
+      {isNew && (
+        <span class="glass-badge glass-badge-accent pointer-events-none absolute right-4 top-4 z-10 text-base">NEW</span>
+      )}
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
@@ -159,6 +168,9 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
         <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
           <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
         </div>
+      )}
+      {isNew && (
+        <span class="glass-badge glass-badge-accent pointer-events-none absolute right-4 top-4 z-10 text-base">NEW</span>
       )}
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
         <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white">
