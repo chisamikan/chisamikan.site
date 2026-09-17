@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 // サイト全体は静的生成(SSG)し、/api/contact のみ
 // 各ページ側で `export const prerender = false` を指定することで
@@ -12,6 +13,12 @@ export default defineConfig({
     imageService: 'compile',
     platformProxy: { enabled: true },
   }),
+  integrations: [
+    sitemap({
+      // /secret は隠しページ、/404 はエラーページのためサイトマップから除外する
+      filter: (page) => !page.includes('/secret') && !page.includes('/404'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     ssr: {

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /secret
+Disallow: /api/
+
+Sitemap: https://chisamikan.site/sitemap-index.xml
