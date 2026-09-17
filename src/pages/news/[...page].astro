@@ -21,6 +21,12 @@ const categoryPath = (category: NewsCategory) => `/news/category/${category}`;
   <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
     <SectionHeading eyebrow="News" title="お知らせ" level={1} />
 
+    <div class="mb-6 text-center">
+      <a href="/rss.xml" class="no-external-icon inline-flex items-center gap-1.5 font-mono text-xs text-graphite transition-colors hover:text-accent">
+        <i class="fa-solid fa-rss" aria-hidden="true"></i>RSSで購読する
+      </a>
+    </div>
+
     <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} />
 
     <NewsList items={page.data} />
