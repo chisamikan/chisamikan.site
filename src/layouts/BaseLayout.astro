@@ -3,7 +3,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PageLoader from '../components/PageLoader.astro';
 import '../styles/global.css';
-import { site } from '../lib/config';
+import { site, person, snsLinks } from '../lib/config';
 
 interface Props {
   title?: string;
@@ -14,6 +14,36 @@ const { title, description = site.description, noindex = false } = Astro.props;
 const pageTitle = title ? `${title} | ${site.title}` : site.title;
 const ogImageURL = new URL('/og-image.webp', Astro.site ?? Astro.url).toString();
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
+const siteURL = new URL('/', Astro.site ?? Astro.url).toString();
+const profileURL = new URL('/profile', Astro.site ?? Astro.url).toString();
+const personImageURL = new URL(person.image, Astro.site ?? Astro.url).toString();
+
+// サイト運営者(千紗みかん)とサイト自体を表す構造化データ。全ページ共通で埋め込む
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteURL}#website`,
+      url: siteURL,
+      name: site.title,
+      description: site.description,
+      inLanguage: 'ja',
+      publisher: { '@id': `${siteURL}#person` },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${siteURL}#person`,
+      name: person.name,
+      alternateName: person.alternateName,
+      url: profileURL,
+      image: personImageURL,
+      jobTitle: person.jobTitle,
+      description: person.description,
+      sameAs: snsLinks.map((link) => link.href),
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -41,6 +71,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toStri
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="canonical" href={canonicalURL} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
 
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />

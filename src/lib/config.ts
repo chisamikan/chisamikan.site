@@ -4,6 +4,15 @@ export const site = {
     import.meta.env.SITE_DESCRIPTION || 'イラストレーターのポートフォリオサイトです。',
 };
 
+// 構造化データ(JSON-LD)のPersonスキーマで使うサイト運営者情報
+export const person = {
+  name: '千紗みかん',
+  alternateName: 'Chisa Mikan',
+  jobTitle: 'イラストレーター',
+  description: 'インターネット絵とデザインと文マン。同人サークル『Pt.Spoon』・『Satellite Galaxy』主催。',
+  image: '/images/profile-icon.webp',
+};
+
 export const nav = [
   { href: '/', label: 'Top' },
   { href: '/news', label: 'News' },

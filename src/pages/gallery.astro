@@ -6,12 +6,43 @@ import CardGrid from '../components/CardGrid.astro';
 import Lightbox from '../components/Lightbox.astro';
 import TagFilter from '../components/TagFilter.astro';
 import { getGalleryItems } from '../lib/notion';
+import { person } from '../lib/config';
 
 const items = await getGalleryItems();
 const tags = Array.from(new Set(items.flatMap((i) => i.tags))).sort();
+
+// NSFW作品はサムネイルにぼかしがかかり公開の場でも伏せているため、
+// 構造化データ(検索エンジン向けの画像一覧)からも除外する
+const galleryStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'ギャラリー',
+  url: new URL('/gallery', Astro.site ?? Astro.url).toString(),
+  about: { '@type': 'Person', name: person.name },
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: items
+      .filter((item) => !item.nsfw && item.imageUrl)
+      .map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'ImageObject',
+          contentUrl: new URL(item.imageUrl as string, Astro.site ?? Astro.url).toString(),
+          name: item.title,
+          description: item.description || undefined,
+          datePublished: item.date || undefined,
+          creator: { '@type': 'Person', name: person.name },
+        },
+      })),
+  },
+};
 ---
 
 <BaseLayout title="Gallery" description="これまでに描いたイラスト作品のギャラリーです。">
+  {items.length > 0 && (
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(galleryStructuredData)} />
+  )}
   <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" level={1} />
 
