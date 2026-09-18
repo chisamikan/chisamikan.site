@@ -16,6 +16,7 @@ export const person = {
 export const nav = [
   { href: '/', label: 'Top' },
   { href: '/news', label: 'News' },
+  { href: '/about', label: 'About' },
   { href: '/profile', label: 'Profile' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/novels', label: 'Novels' },

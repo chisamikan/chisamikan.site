@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+---
+
+<BaseLayout title="About" description="このサイトについてのページです。">
+  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+    <SectionHeading eyebrow="About" title="このサイトについて" level={1} />
+
+    <p class="mb-10 text-center leading-relaxed text-ink/80">chisamikan.siteは千紗みかんのポートフォリオサイトです。</p>
+
+    <div class="about-content font-mono text-sm leading-relaxed text-ink">
+
+      <h2>サイト情報</h2>
+      <dl>
+        <div>
+          <dt>管理人</dt>
+          <dd><a href="/profile">千紗みかん</a></dd>
+        </div>
+        <div>
+          <dt>サイト名</dt>
+          <dd>chisamikan.site</dd>
+        </div>
+        <div>
+          <dt>URL</dt>
+          <dd>
+            <button type="button" id="about-url-copy" class="url-copy-btn">
+              <span id="about-url-text">https://chisamikan.site/</span>
+              <i class="fa-regular fa-copy" aria-hidden="true"></i>
+            </button>
+          </dd>
+        </div>
+      </dl>
+      <p>このサイトはリンクフリーです。サイト内コンテンツ（画像・文章等）の無断転載を禁じます。</p>
+
+      <h2>コンテンツ</h2>
+      <ul>
+        <li><a href="/news">News</a> — サイトの更新履歴・お知らせ一覧</li>
+		<li><a href="/about">About</a> — ここです</li>
+        <li><a href="/profile">Profile</a> — 千紗みかんのプロフィール</li>
+        <li><a href="/gallery">Gallery</a> — これまでに描いたイラスト作品のギャラリー</li>
+        <li><a href="/novels">Novels</a> — これまでに執筆した小説作品の一覧</li>
+        <li><a href="/toolbox">ToolBox</a> — これまでに制作したツール・素材の一覧</li>
+        <li><a href="/#shop">Shop</a> — BOOTHで販売中のグッズ・データ</li>
+        <li><a href="/contact">Contact</a> — お仕事のご依頼・ご質問はこちら</li>
+      </ul>
+
+      <h2>各種ガイドライン</h2>
+      <ul>
+        <li>
+          <a
+            href="https://gist.github.com/chisamikan/00052edc1a8a33bd4e2854e7199fff18"
+            target="_blank"
+            rel="noopener noreferrer">千紗みかん作品の二次創作ガイドライン</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://gist.github.com/chisamikan/b2e8d147113c349c5da957d70a064caf"
+            target="_blank"
+            rel="noopener noreferrer">千紗みかんのイラスト作品の生成AIポリシー</a
+          >
+        </li>
+        <li><a href="/privacy">プライバシーポリシー</a></li>
+      </ul>
+    </div>
+
+    <div class="mt-10 flex flex-col items-center gap-4">
+      <a href="/contact" class="btn-glass btn-glass-accent md:w-1/3 w-full">
+        <i class="fa-solid fa-envelope pr-1"></i>お問い合わせはこちら
+      </a>
+      <a href="/" class="btn-glass md:w-1/3 w-full">
+        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const copyButton = document.getElementById('about-url-copy');
+  const urlText = document.getElementById('about-url-text');
+  const icon = copyButton?.querySelector('i');
+
+  copyButton?.addEventListener('click', async () => {
+    if (!urlText || !icon) return;
+    try {
+      await navigator.clipboard.writeText(urlText.textContent?.trim() ?? '');
+    } catch {
+      return;
+    }
+    const originalClass = icon.className;
+    icon.className = 'fa-solid fa-check';
+    setTimeout(() => {
+      icon.className = originalClass;
+    }, 2000);
+  });
+</script>
+
+<style>
+  @reference '../styles/global.css';
+
+  .about-content h2 {
+    @apply mt-10 mb-4 border-l-4 border-accent pl-3 text-lg font-semibold first:mt-0;
+  }
+
+  .about-content p {
+    @apply mb-4 text-graphite;
+  }
+
+  .about-content dl {
+    @apply mb-6 space-y-1.5;
+  }
+
+  .about-content dl > div {
+    @apply flex gap-3;
+  }
+
+  .about-content dt {
+    @apply w-20 shrink-0 text-ink-soft;
+  }
+
+  .about-content dd {
+    @apply text-graphite;
+  }
+
+  .url-copy-btn {
+    @apply inline-flex cursor-pointer items-center gap-1.5 text-graphite transition-colors hover:text-accent;
+  }
+
+  .about-content ul {
+    @apply mb-4 list-disc space-y-1.5 pl-6 text-graphite;
+  }
+
+  .about-content a {
+    @apply text-accent underline underline-offset-4 transition-colors hover:text-ink;
+  }
+</style>
