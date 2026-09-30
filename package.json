@@ -26,8 +26,8 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260918.1",
-    "wrangler": "^4.131.0"
+    "@cloudflare/workers-types": "^5.20260925.1",
+    "wrangler": "^4.140.0"
   },
   "overrides": {
     "undici": "7.29.0"
