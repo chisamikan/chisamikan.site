@@ -18,7 +18,7 @@
     "@astrojs/cloudflare": "^14.3.3",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "@notionhq/client": "^5.26.0",
+    "@notionhq/client": "^5.27.0",
     "@tailwindcss/vite": "^4.0.0",
     "astro": "^7.3.5",
     "rss-parser": "^3.13.0",
