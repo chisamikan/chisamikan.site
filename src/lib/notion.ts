@@ -4,7 +4,24 @@ import type { PageObjectResponse, QueryDataSourceParameters } from '@notionhq/cl
 // トークンが無い場合はエラーで止めずダミーデータを返す(ローカルでもUI確認できるように)
 const token = import.meta.env.NOTION_TOKEN;
 
-export const notion = token ? new Client({ auth: token, fetch: fetch.bind(globalThis) }) : null;
+/**
+ * Notion SDK のクライアントを生成する共通関数。このプロジェクトでは必ずこれを使うこと。
+ *
+ * 新しい @notionhq/client は「ブラウザ環境」を検出するとトークン使用を拒否する。
+ * Astro のプリレンダーや Cloudflare Workers(workerd)は window 等が存在するためブラウザと
+ * 誤判定されるので、dangerouslyAllowBrowser を有効にしている。
+ * この関数はサーバー側(ビルド時 / Workers / APIルート)でのみ呼ぶこと。
+ * クライアント側の <script> やコンポーネントから import するとトークンが漏洩する。
+ */
+export function createNotionClient(auth: string): Client {
+  return new Client({
+    auth,
+    fetch: fetch.bind(globalThis),
+    dangerouslyAllowBrowser: true,
+  });
+}
+
+export const notion = token ? createNotionClient(token) : null;
 
 function warnMissingToken(context: string) {
   console.warn(
@@ -451,7 +468,7 @@ export async function createContactEntry(
     );
   }
 
-  const client = new Client({ auth: runtimeToken, fetch: fetch.bind(globalThis) });
+  const client = createNotionClient(runtimeToken);
 
   await client.pages.create({
     parent: { database_id: dbId },

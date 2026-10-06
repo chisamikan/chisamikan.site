@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { Client, isFullBlock, isFullPage } from '@notionhq/client';
+import { isFullBlock, isFullPage } from '@notionhq/client';
+import { createNotionClient } from '../../../../lib/notion';
 import { pickEnv } from '../../../../lib/env';
 
 // Notionへアップロードした画像のURLは数時間で失効するため、ビルド時に埋め込まず、
@@ -41,7 +42,7 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response('Notion is not configured', { status: 500 });
   }
 
-  const notion = new Client({ auth: token, fetch: fetch.bind(globalThis) });
+  const notion = createNotionClient(token);
 
   try {
     let url: string | null = null;
