@@ -103,6 +103,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const requestUrl = new URL(request.url);
   // Discord通知は送信者の待ち時間に含めないよう、レスポンスを返した後に実行する
   const notifyInBackground = (content: string) => locals.cfContext.waitUntil(notifyDiscordSafely(content));
+  // ponytail: 送信が遅い原因を調べるための一時的な計測。原因を特定したら削除する
+  const timings: string[] = [];
+  async function timed<T>(name: string, task: Promise<T>): Promise<T> {
+    const start = Date.now();
+    try {
+      return await task;
+    } finally {
+      timings.push(`${name};dur=${Date.now() - start}`);
+    }
+  }
+  const timingHeader = () => ({ 'Server-Timing': timings.join(', ') });
 
   // --- リクエスト自体の検証 ---
 
@@ -112,7 +123,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
   // Turnstileの検証などの重い処理より前に、連続送信を弾く
   const remoteIp = request.headers.get('CF-Connecting-IP');
-  if (await isRateLimited(remoteIp)) {
+  if (await timed('ratelimit', isRateLimited(remoteIp))) {
     return json({ error: 'rate_limited' }, 429, { 'Retry-After': '60' });
   }
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) {
@@ -164,11 +175,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!turnstileToken) {
       return json({ error: 'turnstile_missing' }, 400);
     }
-    const verified = await verifyTurnstile(
-      turnstileToken,
-      remoteIp,
-      turnstileSecret,
-      requestUrl.hostname
+    const verified = await timed(
+      'turnstile',
+      verifyTurnstile(turnstileToken, remoteIp, turnstileSecret, requestUrl.hostname)
     );
     if (!verified) {
       return json({ error: 'turnstile_failed' }, 400);
@@ -213,15 +222,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: 'server_error', fallbackEmail }, 500);
   }
   try {
-    await sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL, adminAddress);
+    await timed('email', sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL, adminAddress));
   } catch (err) {
     // 詳細はサーバーログにのみ記録し、クライアントやDiscordへは個人情報・内部情報を含めない
     const code = (err as { code?: string }).code ?? 'unknown';
     console.error('[api/contact] 管理者宛メールの送信に失敗しました:', code, err);
     notifyInBackground(`⚠️ お問い合わせメールの送信に失敗しました(エラー: ${code})`);
-    return json({ error: 'server_error', fallbackEmail }, 500);
+    return json({ error: 'server_error', fallbackEmail }, 500, timingHeader());
   }
 
   notifyInBackground('📩 新しいお問い合わせがありました。メールをご確認ください。');
-  return json({ ok: true, fallbackEmail });
+  return json({ ok: true, fallbackEmail }, 200, timingHeader());
 };
