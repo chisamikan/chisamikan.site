@@ -21,6 +21,13 @@ name = "CONTACT_RATE_LIMITER"
 namespace_id = "1001"
 simple = { limit = 5, period = 60 }
 
+# お問い合わせ内容を管理者(自分)宛にメールで送るためのバインディング
+# Email Routing で認証済みの宛先にしか送れないため、外部への迷惑メール送信には悪用できない
+# (宛先はリポジトリに載せないよう、シークレット CONTACT_ADMIN_EMAIL で指定する)
+[[send_email]]
+name = "CONTACT_EMAIL"
+allowed_sender_addresses = ["no-reply@chisamikan.site"]
+
 # 本番の環境変数(NOTION_TOKEN など)は Cloudflare Pages の
 # ダッシュボード > Settings > Environment variables で設定してください。
 # ローカル開発では .env ファイルを使用します(.env.example 参照)。

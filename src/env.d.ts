@@ -15,8 +15,7 @@ interface ImportMetaEnv {
   readonly TURNSTILE_SITE_KEY: string;
   readonly TURNSTILE_SECRET_KEY: string;
   readonly DISCORD_WEBHOOK_URL: string;
-  readonly ZAPIER_ADMIN_WEBHOOK_URL: string;
-  readonly ZAPIER_AUTOREPLY_WEBHOOK_URL: string;
+  readonly CONTACT_ADMIN_EMAIL: string;
 }
 
 interface ImportMeta {

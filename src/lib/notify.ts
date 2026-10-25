@@ -1,5 +1,6 @@
-// お問い合わせ通知(Discord Webhook / Zapier Webhook)。未設定なら何もせず、
-// 失敗しても呼び出し元は止めない(Notionへの保存が主で、通知はベストエフォートのため)。
+// お問い合わせの通知。
+// - 管理者宛メール(Cloudflare Email Routing の send_email): お問い合わせ内容の唯一の保管先
+// - Discord: 新着・送信失敗を知らせるだけで、個人情報(名前・メールアドレス・本文)は含めない
 
 export interface ContactNotifyPayload {
   name: string;
@@ -7,66 +8,49 @@ export interface ContactNotifyPayload {
   message: string;
 }
 
-// Discordのメッセージ本文(content)は2000文字までのため、超える場合は複数メッセージに分けて送る
-const DISCORD_CONTENT_MAX = 2000;
+const SENDER_ADDRESS = 'no-reply@chisamikan.site';
 
-function splitByLength(text: string, maxLength: number): string[] {
-  const chunks: string[] = [];
-  let current = '';
-  // Array.fromでコードポイント単位に分け、絵文字(サロゲートペア)の途中で切らない
-  for (const ch of Array.from(text)) {
-    if (current.length + ch.length > maxLength) {
-      chunks.push(current);
-      current = '';
-    }
-    current += ch;
-  }
-  if (current) chunks.push(current);
-  return chunks;
-}
-
-export async function notifyDiscord(
+/**
+ * お問い合わせ内容を管理者(自分)宛にメールで送ります。
+ * 送り先(adminAddress)は Email Routing で認証済みのアドレスでなければ送信できません。
+ * Reply-To に問い合わせ者のアドレスを入れるため、メールソフトの「返信」でそのまま返信できます。
+ * 送信に失敗した場合は例外を投げます(呼び出し元でエラーとして扱うため)。
+ */
+export async function sendAdminEmail(
   payload: ContactNotifyPayload,
-  webhookUrl: string
+  binding: SendEmail,
+  adminAddress: string
 ): Promise<void> {
-  const content = [
-    '📩 新しいお問い合わせがありました',
-    `**お名前**: ${payload.name}`,
-    `**メール**: ${payload.email}`,
-    '**内容**:',
-    payload.message,
-  ].join('\n');
-
-  // 順番が入れ替わらないよう、1通ずつ順番に送信する
-  for (const chunk of splitByLength(content, DISCORD_CONTENT_MAX)) {
-    const res = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: chunk }),
-    });
-    if (!res.ok) {
-      const detail = await res.text().catch(() => '');
-      throw new Error(`Discord Webhook error (${res.status}): ${detail}`);
-    }
-  }
+  const receivedAt = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  await binding.send({
+    from: { email: SENDER_ADDRESS, name: 'chisamikan.site お問い合わせフォーム' },
+    to: adminAddress,
+    replyTo: payload.email,
+    subject: `【お問い合わせ】${payload.name} 様より`,
+    text: [
+      'chisamikan.site のお問い合わせフォームから送信がありました。',
+      '',
+      `受信日時: ${receivedAt}`,
+      `お名前: ${payload.name}`,
+      `メールアドレス: ${payload.email}`,
+      '',
+      '--- お問い合わせ内容 ---',
+      payload.message,
+    ].join('\n'),
+  });
 }
 
 /**
- * Zapierの「Webhooks by Zapier(Catch Hook)」宛にお問い合わせ内容をPOSTします。
- * 実際のメール送信(Outlookアカウント連携など)はZapier側のZapで組み立てます。
- * 管理者宛通知用・送信者への自動返信用など、用途ごとに別のZapier Webhook URLを渡してください。
+ * Discordに定型文だけを送ります。問い合わせ者の入力内容は含めないでください。
  */
-export async function notifyZapier(
-  payload: ContactNotifyPayload,
-  webhookUrl: string
-): Promise<void> {
+export async function notifyDiscord(content: string, webhookUrl: string): Promise<void> {
   const res = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    // 定型文のみだが、念のためメンションは無効にしておく
+    body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
   });
   if (!res.ok) {
-    const detail = await res.text().catch(() => '');
-    throw new Error(`Zapier Webhook error (${res.status}): ${detail}`);
+    throw new Error(`Discord Webhook error (${res.status})`);
   }
 }
