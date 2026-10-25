@@ -194,6 +194,8 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           showError(`お名前は${CONTACT_LIMITS.name}文字以内でご入力ください。`);
         } else if (body.error === 'message_too_long') {
           showError(`お問い合わせ内容は${CONTACT_LIMITS.message}文字以内でご入力ください。`);
+        } else if (body.error === 'rate_limited') {
+          showError('短時間に続けて送信されたため、受け付けを一時停止しています。1分ほど待ってから再度お試しください。');
         } else if (body.error === 'privacy_consent_required') {
           showError('プライバシーポリシーへの同意が必要です。');
         } else if (body.error === 'server_error') {
