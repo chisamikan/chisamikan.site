@@ -108,7 +108,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 >
   <div class="text-center">
     <h2 id="contact-complete-title" class="font-mono text-base font-semibold text-accent">
-      <i class="fa-solid fa-circle-check pr-1" aria-hidden="true"></i>送信しました。ありがとうございます。
+      <i class="fa-solid fa-circle-check pr-1" aria-hidden="true"></i>送信しました
     </h2>
     <p class="mt-3 text-sm leading-relaxed text-ink-soft">
       5日以内にご返信します。<br />
@@ -134,12 +134,9 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     </dl>
   </div>
 
-  <div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-    <button type="button" id="complete-copy" class="btn-glass btn-glass-accent w-full px-6 sm:w-auto">
+  <div class="text-center">
+    <button type="button" id="complete-copy" class="btn-glass btn-glass-accent w-full px-6 md:w-1/3">
       <i class="fa-solid fa-copy pr-1" aria-hidden="true"></i>内容をコピー
-    </button>
-    <button type="button" id="complete-back" class="btn-glass w-full px-6 sm:w-auto">
-      <i class="fa-solid fa-pen pr-1" aria-hidden="true"></i>別のお問い合わせを書く
     </button>
   </div>
   <p id="complete-copy-status" role="status" class="text-center font-mono text-xs"></p>
@@ -189,7 +186,6 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   const completeEmail = document.querySelector<HTMLElement>('#complete-email');
   const completeMessage = document.querySelector<HTMLElement>('#complete-message');
   const copyBtn = document.querySelector<HTMLButtonElement>('#complete-copy');
-  const backBtn = document.querySelector<HTMLButtonElement>('#complete-back');
   const copyStatus = document.querySelector<HTMLParagraphElement>('#complete-copy-status');
 
   interface SentContent {
@@ -199,18 +195,14 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   }
   let sentContent: SentContent | null = null;
 
-  // 入力内容はHTMLとして解釈させないよう、必ず textContent で表示する
-  function setCompleteContent(content: SentContent | null) {
-    sentContent = content;
-    if (completeName) completeName.textContent = content?.name ?? '';
-    if (completeEmail) completeEmail.textContent = content?.email ?? '';
-    if (completeMessage) completeMessage.textContent = content?.message ?? '';
-    if (copyStatus) copyStatus.textContent = '';
-  }
-
+  // 連投を促さないよう、完了画面からフォームに戻る導線は設けない
   function showComplete(content: SentContent) {
     if (!form || !complete) return;
-    setCompleteContent(content);
+    sentContent = content;
+    // 入力内容はHTMLとして解釈させないよう、必ず textContent で表示する
+    if (completeName) completeName.textContent = content.name;
+    if (completeEmail) completeEmail.textContent = content.email;
+    if (completeMessage) completeMessage.textContent = content.message;
     form.hidden = true;
     complete.hidden = false;
     // 画面の読み上げ・キーボード操作の起点を完了画面に移す
@@ -234,16 +226,6 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       copyStatus.textContent = 'コピーできませんでした。お手数ですが、上の内容を選択してコピーしてください。';
       copyStatus.className = 'text-center font-mono text-xs text-red-600';
     }
-  });
-
-  backBtn?.addEventListener('click', () => {
-    if (!form || !complete) return;
-    // 共用端末などで他の人に見られないよう、控えの表示内容も消しておく
-    setCompleteContent(null);
-    complete.hidden = true;
-    form.hidden = false;
-    if (loadedAtInput) loadedAtInput.value = String(Date.now());
-    document.querySelector<HTMLInputElement>('#name')?.focus();
   });
 
   form?.addEventListener('submit', async (e) => {
