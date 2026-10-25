@@ -270,8 +270,9 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     }
 
     submitBtn?.setAttribute('disabled', 'true');
+    // 見た目はボタンの表示で伝えるため、文言はスクリーンリーダー向けにだけ読み上げる
     status.textContent = '送信中です…';
-    status.className = 'font-mono text-sm text-graphite';
+    status.className = 'sr-only';
 
     try {
       const res = await fetch('/api/contact', {
