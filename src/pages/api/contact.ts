@@ -204,13 +204,18 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'message_too_long' }, 400);
   }
 
+  // 予備の連絡先(Email Routingで作った転送用アドレス)。公開ページには載せず、
+  // Turnstileを通過した送信者にだけ、完了画面・送信失敗時の案内として返す。
+  // 迷惑メールが届くようになったら、別のアドレスに差し替えられるようシークレットで管理する
+  const fallbackEmail = pickEnv('CONTACT_FALLBACK_EMAIL', import.meta.env.CONTACT_FALLBACK_EMAIL);
+
   // お問い合わせ内容の保管先は管理者宛メールのみ。メールが送れた場合だけ成功を返す
   // (失敗時はフォームに入力内容が残るため、ユーザーが再送信できる)
   const adminAddress = pickEnv('CONTACT_ADMIN_EMAIL', import.meta.env.CONTACT_ADMIN_EMAIL);
   if (!adminAddress) {
     console.error('[api/contact] CONTACT_ADMIN_EMAIL が設定されていません');
     await notifyDiscordSafely('⚠️ お問い合わせを受け付けられません(CONTACT_ADMIN_EMAIL が未設定です)');
-    return json({ error: 'server_error' }, 500);
+    return json({ error: 'server_error', fallbackEmail }, 500);
   }
   try {
     await sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL, adminAddress);
@@ -219,9 +224,9 @@ export const POST: APIRoute = async ({ request }) => {
     const code = (err as { code?: string }).code ?? 'unknown';
     console.error('[api/contact] 管理者宛メールの送信に失敗しました:', code, err);
     await notifyDiscordSafely(`⚠️ お問い合わせメールの送信に失敗しました(エラー: ${code})`);
-    return json({ error: 'server_error' }, 500);
+    return json({ error: 'server_error', fallbackEmail }, 500);
   }
 
   await notifyDiscordSafely('📩 新しいお問い合わせがありました。メールをご確認ください。');
-  return json({ ok: true });
+  return json({ ok: true, fallbackEmail });
 };

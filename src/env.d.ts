@@ -16,6 +16,7 @@ interface ImportMetaEnv {
   readonly TURNSTILE_SECRET_KEY: string;
   readonly DISCORD_WEBHOOK_URL: string;
   readonly CONTACT_ADMIN_EMAIL: string;
+  readonly CONTACT_FALLBACK_EMAIL: string;
 }
 
 interface ImportMeta {

@@ -114,6 +114,13 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       5日以内にご返信します。<br />
       返信が届かない場合は、迷惑メールフォルダもご確認ください。
     </p>
+    <!-- 予備の連絡先はAPIの応答でのみ受け取り、公開ページのHTMLには含めない -->
+    <p id="complete-fallback" hidden class="mt-2 text-sm leading-relaxed text-ink-soft">
+      それでも届かない場合は、下記の控えでメールアドレスに誤りがないかご確認のうえ、<a
+        id="complete-fallback-link"
+        class="text-accent underline underline-offset-4 transition-colors hover:text-ink"
+      ></a>までご連絡ください。
+    </p>
   </div>
 
   <div>
@@ -196,13 +203,20 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   let sentContent: SentContent | null = null;
 
   // 連投を促さないよう、完了画面からフォームに戻る導線は設けない
-  function showComplete(content: SentContent) {
+  function showComplete(content: SentContent, fallbackEmail: string | undefined) {
     if (!form || !complete) return;
     sentContent = content;
     // 入力内容はHTMLとして解釈させないよう、必ず textContent で表示する
     if (completeName) completeName.textContent = content.name;
     if (completeEmail) completeEmail.textContent = content.email;
     if (completeMessage) completeMessage.textContent = content.message;
+    const fallback = document.querySelector<HTMLParagraphElement>('#complete-fallback');
+    const fallbackLink = document.querySelector<HTMLAnchorElement>('#complete-fallback-link');
+    if (fallback && fallbackLink && fallbackEmail) {
+      fallbackLink.textContent = fallbackEmail;
+      fallbackLink.href = `mailto:${fallbackEmail}?subject=${encodeURIComponent('お問い合わせフォームについて')}`;
+      fallback.hidden = false;
+    }
     form.hidden = true;
     complete.hidden = false;
     // 画面の読み上げ・キーボード操作の起点を完了画面に移す
@@ -268,17 +282,23 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
         }),
       });
 
+      const body = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        fallbackEmail?: string;
+      };
       if (res.ok) {
         status.textContent = '';
-        showComplete({
-          name: String(data.name ?? '').trim(),
-          email: String(data.email ?? '').trim(),
-          message: String(data.message ?? '').trim(),
-        });
+        showComplete(
+          {
+            name: String(data.name ?? '').trim(),
+            email: String(data.email ?? '').trim(),
+            message: String(data.message ?? '').trim(),
+          },
+          body.fallbackEmail
+        );
         form.reset();
         updateMessageCount();
       } else {
-        const body = (await res.json().catch(() => ({}))) as { error?: string };
         if (body.error === 'turnstile_missing' || body.error === 'turnstile_failed') {
           showError('認証に失敗しました。もう一度お試しください。');
         } else if (body.error === 'invalid_email') {
@@ -293,6 +313,10 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           showError('短時間に続けて送信されたため、受け付けを一時停止しています。1分ほど待ってから再度お試しください。');
         } else if (body.error === 'privacy_consent_required') {
           showError('プライバシーポリシーへの同意が必要です。');
+        } else if (body.error === 'server_error' && body.fallbackEmail) {
+          showError(
+            `送信に失敗しました。時間をおいて再度お試しいただき、それでも解決しない場合は ${body.fallbackEmail} までご連絡ください。`
+          );
         } else if (body.error === 'server_error') {
           showError('送信に失敗しました。時間をおいて再度お試しください。');
         } else {
