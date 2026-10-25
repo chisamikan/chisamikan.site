@@ -175,7 +175,7 @@ function isActive(href: string) {
   // フォント読み込みや端末回転での変化に追従できるようResizeObserverで監視する。
   const siteHeader = document.getElementById('site-header');
 
-  if (siteHeader && 'ResizeObserver' in window) {
+  if (siteHeader) {
     const updateHeaderHeight = () => {
       document.documentElement.style.setProperty('--mobile-header-h', `${siteHeader.offsetHeight}px`);
     };

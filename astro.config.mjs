@@ -3,16 +3,11 @@ import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 
-// サイト全体は静的生成(SSG)し、/api/contact のみ
-// 各ページ側で `export const prerender = false` を指定することで
-// Cloudflare Pages Functions 上のサーバー処理として動かします。
+// サイト全体は静的生成(SSG)し、/api/* のみ各ページ側で `export const prerender = false` を
+// 指定することで Cloudflare Workers 上のサーバー処理として動かします。
 export default defineConfig({
   site: 'https://chisamikan.site',
-  output: 'static', // 既定は静的生成(SSG)。/api/contact のみ prerender=false でサーバー実行
-  adapter: cloudflare({
-    imageService: 'compile',
-    platformProxy: { enabled: true },
-  }),
+  adapter: cloudflare({ imageService: 'compile' }),
   integrations: [
     sitemap({
       // /secret は隠しページ、/404 はエラーページのためサイトマップから除外する

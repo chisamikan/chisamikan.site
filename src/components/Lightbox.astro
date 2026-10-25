@@ -78,7 +78,7 @@
   }
 
   .nsfw-warning-dialog {
-    @apply fixed inset-0 m-auto p-7 border border-[rgb(var(--color-ink)/0.1)] rounded-[0.75rem] bg-paper text-ink opacity-0;
+    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-[0.75rem] bg-paper text-ink opacity-0;
     /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 420px);
     box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);

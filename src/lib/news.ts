@@ -5,7 +5,7 @@ import {
   getWorkHistory,
   getManualNewsItems,
 } from './notion';
-import { getFeedItems } from './rss';
+import { getFeedItems, type NewsItem } from './rss';
 import { zennFeedUrl } from './config';
 
 export type NewsCategory = 'site' | 'note' | 'zenn' | 'manual';
@@ -66,25 +66,14 @@ function toJstDateKey(iso: string): string {
 }
 
 function buildGroupedTitle(names: string[], label: string, unit: string): string {
-  if (names.length <= GROUPED_TITLE_LIMIT) {
-    return `${label}に${names.map((name) => `『${name}』`).join('')}を追加しました`;
-  }
   const shown = names.slice(0, GROUPED_TITLE_LIMIT).map((name) => `『${name}』`).join('');
-  return `${label}に${shown}など${names.length}${unit}を追加しました`;
+  const rest = names.length > GROUPED_TITLE_LIMIT ? `など${names.length}${unit}` : '';
+  return `${label}に${shown}${rest}を追加しました`;
 }
 
 // 同じ種類の項目を日本時間の同日でグルーピングし、複数件あれば1つのお知らせにまとめる
 function buildSiteNewsItems(items: GroupableSiteItem[], config: SiteNewsGroupConfig): RawNewsItem[] {
-  const groups = new Map<string, GroupableSiteItem[]>();
-  for (const item of items) {
-    const key = toJstDateKey(item.createdTime);
-    const group = groups.get(key);
-    if (group) {
-      group.push(item);
-    } else {
-      groups.set(key, [item]);
-    }
-  }
+  const groups = Map.groupBy(items, (item) => toJstDateKey(item.createdTime));
 
   return Array.from(groups.values()).map((group) => {
     if (group.length === 1) {
@@ -110,6 +99,18 @@ function buildSiteNewsItems(items: GroupableSiteItem[], config: SiteNewsGroupCon
       external: false,
     };
   });
+}
+
+function toFeedNewsItems(items: NewsItem[], category: 'note' | 'zenn'): RawNewsItem[] {
+  return items.map((item, index) => ({
+    id: `${category}-${index}-${item.link}`,
+    category,
+    title: item.title,
+    body: null,
+    date: item.date,
+    link: item.link,
+    external: true,
+  }));
 }
 
 /**
@@ -156,24 +157,8 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       link: item.url,
       external: Boolean(item.url?.startsWith('http')),
     })),
-    ...noteItems.map((item, index) => ({
-      id: `note-${index}-${item.link}`,
-      category: 'note' as const,
-      title: item.title,
-      body: null,
-      date: item.date,
-      link: item.link,
-      external: true,
-    })),
-    ...zennItems.map((item, index) => ({
-      id: `zenn-${index}-${item.link}`,
-      category: 'zenn' as const,
-      title: item.title,
-      body: null,
-      date: item.date,
-      link: item.link,
-      external: true,
-    })),
+    ...toFeedNewsItems(noteItems, 'note'),
+    ...toFeedNewsItems(zennItems, 'zenn'),
   ];
 
   return items

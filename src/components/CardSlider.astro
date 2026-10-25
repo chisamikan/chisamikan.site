@@ -125,13 +125,6 @@ const isSlider = count > 3;
         #000 calc(100% - var(--card-slider-fade)),
         transparent
       );
-      -webkit-mask-image: linear-gradient(
-        to right,
-        transparent,
-        #000 var(--card-slider-fade),
-        #000 calc(100% - var(--card-slider-fade)),
-        transparent
-      );
     }
   }
 
@@ -220,15 +213,9 @@ const isSlider = count > 3;
           return clone;
         });
 
-      const headClones = cloneAll();
-      const headFrag = document.createDocumentFragment();
-      headClones.forEach((clone) => headFrag.appendChild(clone));
-      slider.insertBefore(headFrag, slider.firstChild);
-
+      slider.prepend(...cloneAll());
       const tailClones = cloneAll();
-      const tailFrag = document.createDocumentFragment();
-      tailClones.forEach((clone) => tailFrag.appendChild(clone));
-      slider.appendChild(tailFrag);
+      slider.append(...tailClones);
 
       // 初期状態は1枚目のカードが画面端に寄るのではなく、スライダーの中央に来るようにする。
       // anchorは「1枚目のカードを中央に置いたときのscrollLeft」で、ループ補正の基準位置も
@@ -356,21 +343,17 @@ const isSlider = count > 3;
       });
     };
 
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              checkAndWait();
-              observer.unobserve(entry.target);
-            }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            checkAndWait();
+            observer.unobserve(entry.target);
           }
-        },
-        { rootMargin: '200px 0px' },
-      );
-      observer.observe(slider);
-    } else {
-      checkAndWait();
-    }
+        }
+      },
+      { rootMargin: '200px 0px' },
+    );
+    observer.observe(slider);
   });
 </script>

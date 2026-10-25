@@ -25,8 +25,8 @@ function decodeHtmlEntities(text: string): string {
 export async function getBoothItems(limit = 3): Promise<BoothItem[]> {
   const shopUrl = import.meta.env.BOOTH_SHOP_URL;
   if (!shopUrl) {
-    console.warn('[booth] BOOTH_SHOP_URL が設定されていないため、ダミーデータを表示します。');
-    return sampleItems.slice(0, limit);
+    console.warn('[booth] BOOTH_SHOP_URL が設定されていないため、商品は表示しません。');
+    return [];
   }
 
   try {
@@ -60,14 +60,3 @@ export async function getBoothItems(limit = 3): Promise<BoothItem[]> {
     return [];
   }
 }
-
-const sampleItems: BoothItem[] = [
-  {
-    id: 0,
-    title: '(サンプル) BOOTH_SHOP_URL を設定するとショップの商品がここに並びます',
-    price: '¥ 0',
-    category: 'サンプル',
-    imageUrl: null,
-    url: '#',
-  },
-];
