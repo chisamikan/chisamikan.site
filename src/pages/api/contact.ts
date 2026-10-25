@@ -99,8 +99,10 @@ async function notifyDiscordSafely(content: string): Promise<void> {
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const requestUrl = new URL(request.url);
+  // Discord通知は送信者の待ち時間に含めないよう、レスポンスを返した後に実行する
+  const notifyInBackground = (content: string) => locals.cfContext.waitUntil(notifyDiscordSafely(content));
 
   // --- リクエスト自体の検証 ---
 
@@ -207,7 +209,7 @@ export const POST: APIRoute = async ({ request }) => {
   const adminAddress = pickEnv('CONTACT_ADMIN_EMAIL', import.meta.env.CONTACT_ADMIN_EMAIL);
   if (!adminAddress) {
     console.error('[api/contact] CONTACT_ADMIN_EMAIL が設定されていません');
-    await notifyDiscordSafely('⚠️ お問い合わせを受け付けられません(CONTACT_ADMIN_EMAIL が未設定です)');
+    notifyInBackground('⚠️ お問い合わせを受け付けられません(CONTACT_ADMIN_EMAIL が未設定です)');
     return json({ error: 'server_error', fallbackEmail }, 500);
   }
   try {
@@ -216,10 +218,10 @@ export const POST: APIRoute = async ({ request }) => {
     // 詳細はサーバーログにのみ記録し、クライアントやDiscordへは個人情報・内部情報を含めない
     const code = (err as { code?: string }).code ?? 'unknown';
     console.error('[api/contact] 管理者宛メールの送信に失敗しました:', code, err);
-    await notifyDiscordSafely(`⚠️ お問い合わせメールの送信に失敗しました(エラー: ${code})`);
+    notifyInBackground(`⚠️ お問い合わせメールの送信に失敗しました(エラー: ${code})`);
     return json({ error: 'server_error', fallbackEmail }, 500);
   }
 
-  await notifyDiscordSafely('📩 新しいお問い合わせがありました。メールをご確認ください。');
+  notifyInBackground('📩 新しいお問い合わせがありました。メールをご確認ください。');
   return json({ ok: true, fallbackEmail });
 };
