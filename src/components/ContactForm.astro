@@ -45,14 +45,13 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       rows="6"
       required
       maxlength={CONTACT_LIMITS.message}
-      aria-describedby="message-hint"
+      aria-describedby="message-count"
       class="glass-textarea"
     ></textarea>
-    <div class="mt-1 flex justify-between gap-4 font-mono text-xs text-graphite">
-      <p id="message-hint">{CONTACT_LIMITS.message}文字以内でご入力ください。</p>
-      <!-- 入力のたびに読み上げられないよう、残り文字数の表示は aria-live にしない -->
-      <p id="message-count" class="shrink-0 tabular-nums">0 / {CONTACT_LIMITS.message}</p>
-    </div>
+    <!-- 入力のたびに読み上げられないよう、残り文字数の表示は aria-live にしない -->
+    <p id="message-count" class="mt-1 text-right font-mono text-xs tabular-nums text-graphite">
+      0 / {CONTACT_LIMITS.message}
+    </p>
   </div>
 
   <!-- ハニーポット: スパム対策(人には見えないがボットは埋めてしまう)。サーバー側でも検証する -->
