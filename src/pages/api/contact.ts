@@ -8,18 +8,37 @@ export const prerender = false;
 // フォーム表示からこの時間(ミリ秒)未満での送信はボットとみなす
 const MIN_SUBMIT_MS = 3000;
 
+// リクエスト本文の上限(バイト)。本文5000文字(全角でも約15KB)に余裕を持たせた値
+const MAX_BODY_BYTES = 32 * 1024;
+
+/**
+ * JSONレスポンスを返します。お問い合わせの結果はキャッシュさせないため no-store を付けます。
+ */
+function json(body: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
+}
+
+// 文字列以外(数値・配列・オブジェクト等)が送られてきた場合は未入力として扱う
+function asString(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 /**
  * Cloudflare Turnstileのトークンをサーバー側で検証します。
- * secretが未設定の場合は検証をスキップします(未導入でも動作するように)。
+ * 本番では、トークンが自サイト(expectedHostname)で発行されたものかも確認します。
  */
 async function verifyTurnstile(
   token: string,
   remoteIp: string | null,
-  secret: string
+  secret: string,
+  expectedHostname: string
 ): Promise<boolean> {
   const form = new URLSearchParams();
   form.set('secret', secret);
@@ -31,8 +50,14 @@ async function verifyTurnstile(
       method: 'POST',
       body: form,
     });
-    const data = (await res.json()) as { success: boolean };
-    return data.success === true;
+    const data = (await res.json()) as { success: boolean; hostname?: string };
+    if (data.success !== true) return false;
+    // ローカル開発ではテスト用キーの hostname が自サイトと一致しないため確認しない
+    if (!import.meta.env.DEV && data.hostname !== expectedHostname) {
+      console.error('[api/contact] Turnstileのhostnameが一致しません:', data.hostname);
+      return false;
+    }
+    return true;
   } catch (err) {
     console.error('[api/contact] Turnstileの検証に失敗しました:', err);
     return false;
@@ -88,69 +113,91 @@ async function sendNotifications(payload: {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  let body: {
-    name?: string;
-    email?: string;
-    message?: string;
-    company?: string;
-    privacyConsent?: boolean;
-    loadedAt?: string;
-    turnstileToken?: string;
-  };
+  const requestUrl = new URL(request.url);
+
+  // --- リクエスト自体の検証 ---
+
+  // 他サイトのページから送信させる攻撃(CSRF)を防ぐため、自サイト以外からの送信は拒否する
+  if (request.headers.get('Origin') !== requestUrl.origin) {
+    return json({ error: 'forbidden' }, 403);
+  }
+  if (!request.headers.get('Content-Type')?.startsWith('application/json')) {
+    return json({ error: 'unsupported_media_type' }, 415);
+  }
+  // Content-Lengthは省略・詐称できるため、実際に読み込んだ本文の大きさでも確認する
+  if (Number(request.headers.get('Content-Length') ?? 0) > MAX_BODY_BYTES) {
+    return json({ error: 'payload_too_large' }, 413);
+  }
+  const rawBody = await request.text();
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return json({ error: 'payload_too_large' }, 413);
+  }
+
+  let body: Record<string, unknown>;
   try {
-    body = await request.json();
+    const parsed: unknown = JSON.parse(rawBody);
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      return json({ error: 'invalid_json' }, 400);
+    }
+    body = parsed as Record<string, unknown>;
   } catch {
-    return new Response(JSON.stringify({ error: 'invalid_json' }), { status: 400 });
+    return json({ error: 'invalid_json' }, 400);
   }
 
   // --- スパム対策(いずれもボット判定時は偽の成功レスポンスを返し、それ以上処理しない) ---
 
   // 1. ハニーポット: 人には見えない項目が埋まっていたらボット
   if (body.company) {
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ ok: true });
   }
 
   // 2. タイムトラップ: フォーム表示から間もない送信、またはJS未実行(値が無い)はボット
   const loadedAt = Number(body.loadedAt);
   if (!loadedAt || Date.now() - loadedAt < MIN_SUBMIT_MS) {
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ ok: true });
   }
 
-  // 3. Cloudflare Turnstile(secretが設定されている場合のみ検証)
+  // 3. Cloudflare Turnstile
+  // 本番でsecretが未設定の場合は、検証が素通りにならないようエラーにする(設定漏れに気づけるように)。
+  // ローカル開発時のみ、secret未設定なら検証をスキップする。
   const turnstileSecret = pickEnv('TURNSTILE_SECRET_KEY', import.meta.env.TURNSTILE_SECRET_KEY);
+  if (!turnstileSecret && !import.meta.env.DEV) {
+    console.error('[api/contact] TURNSTILE_SECRET_KEY が設定されていません');
+    return json({ error: 'server_error' }, 500);
+  }
   if (turnstileSecret) {
-    if (!body.turnstileToken) {
-      return new Response(JSON.stringify({ error: 'turnstile_missing' }), { status: 400 });
+    const turnstileToken = asString(body.turnstileToken);
+    if (!turnstileToken) {
+      return json({ error: 'turnstile_missing' }, 400);
     }
     const remoteIp = request.headers.get('CF-Connecting-IP');
-    const verified = await verifyTurnstile(body.turnstileToken, remoteIp, turnstileSecret);
+    const verified = await verifyTurnstile(
+      turnstileToken,
+      remoteIp,
+      turnstileSecret,
+      requestUrl.hostname
+    );
     if (!verified) {
-      return new Response(JSON.stringify({ error: 'turnstile_failed' }), { status: 400 });
+      return json({ error: 'turnstile_failed' }, 400);
     }
   }
 
   // --- 通常のバリデーション ---
-  const name = (body.name ?? '').trim();
-  const email = (body.email ?? '').trim();
-  const message = (body.message ?? '').trim();
+  const name = asString(body.name).trim();
+  const email = asString(body.email).trim();
+  const message = asString(body.message).trim();
 
   if (!name || !email || !message) {
-    return new Response(JSON.stringify({ error: 'missing_fields' }), { status: 400 });
+    return json({ error: 'missing_fields' }, 400);
   }
-  if (!body.privacyConsent) {
-    return new Response(JSON.stringify({ error: 'privacy_consent_required' }), { status: 400 });
+  if (body.privacyConsent !== true) {
+    return json({ error: 'privacy_consent_required' }, 400);
   }
   if (!isValidEmail(email)) {
-    return new Response(JSON.stringify({ error: 'invalid_email' }), { status: 400 });
+    return json({ error: 'invalid_email' }, 400);
   }
   if (message.length > 5000) {
-    return new Response(JSON.stringify({ error: 'message_too_long' }), { status: 400 });
+    return json({ error: 'message_too_long' }, 400);
   }
 
   try {
@@ -160,16 +207,13 @@ export const POST: APIRoute = async ({ request }) => {
     // (成功を返すとお問い合わせ内容がどこにも残らず失われるため)
     if (attempted === 0 || succeeded === 0) {
       console.error('[api/contact] お問い合わせを届けられませんでした:', { attempted, succeeded });
-      return new Response(JSON.stringify({ error: 'server_error' }), { status: 500 });
+      return json({ error: 'server_error' }, 500);
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ ok: true });
   } catch (err) {
     // 詳細はサーバーログにのみ記録し、クライアントへは内部情報を含めない
     console.error('[api/contact] 送信処理に失敗しました:', err);
-    return new Response(JSON.stringify({ error: 'server_error' }), { status: 500 });
+    return json({ error: 'server_error' }, 500);
   }
 };
