@@ -206,8 +206,14 @@ export const POST: APIRoute = async ({ request }) => {
 
   // お問い合わせ内容の保管先は管理者宛メールのみ。メールが送れた場合だけ成功を返す
   // (失敗時はフォームに入力内容が残るため、ユーザーが再送信できる)
+  const adminAddress = pickEnv('CONTACT_ADMIN_EMAIL', import.meta.env.CONTACT_ADMIN_EMAIL);
+  if (!adminAddress) {
+    console.error('[api/contact] CONTACT_ADMIN_EMAIL が設定されていません');
+    await notifyDiscordSafely('⚠️ お問い合わせを受け付けられません(CONTACT_ADMIN_EMAIL が未設定です)');
+    return json({ error: 'server_error' }, 500);
+  }
   try {
-    await sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL);
+    await sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL, adminAddress);
   } catch (err) {
     // 詳細はサーバーログにのみ記録し、クライアントやDiscordへは個人情報・内部情報を含めない
     const code = (err as { code?: string }).code ?? 'unknown';

@@ -9,22 +9,22 @@ export interface ContactNotifyPayload {
 }
 
 const SENDER_ADDRESS = 'no-reply@chisamikan.site';
-const ADMIN_ADDRESS = 'chisamikan@live.jp';
 
 /**
  * お問い合わせ内容を管理者(自分)宛にメールで送ります。
- * 送り先は wrangler.toml の CONTACT_EMAIL バインディングで認証済みアドレスに固定されています。
+ * 送り先(adminAddress)は Email Routing で認証済みのアドレスでなければ送信できません。
  * Reply-To に問い合わせ者のアドレスを入れるため、メールソフトの「返信」でそのまま返信できます。
  * 送信に失敗した場合は例外を投げます(呼び出し元でエラーとして扱うため)。
  */
 export async function sendAdminEmail(
   payload: ContactNotifyPayload,
-  binding: SendEmail
+  binding: SendEmail,
+  adminAddress: string
 ): Promise<void> {
   const receivedAt = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
   await binding.send({
     from: { email: SENDER_ADDRESS, name: 'chisamikan.site お問い合わせフォーム' },
-    to: ADMIN_ADDRESS,
+    to: adminAddress,
     replyTo: payload.email,
     subject: `【お問い合わせ】${payload.name} 様より`,
     text: [
