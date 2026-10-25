@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { notifyDiscord, notifyZapier } from '../../lib/notify';
 import { pickEnv } from '../../lib/env';
+import { CONTACT_LIMITS, normalizeNewlines } from '../../lib/contactLimits';
 
 // このエンドポイントだけは事前ビルド(静的化)せず、Cloudflare上でリクエストごとに実行します。
 export const prerender = false;
@@ -185,7 +186,7 @@ export const POST: APIRoute = async ({ request }) => {
   // --- 通常のバリデーション ---
   const name = asString(body.name).trim();
   const email = asString(body.email).trim();
-  const message = asString(body.message).trim();
+  const message = normalizeNewlines(asString(body.message)).trim();
 
   if (!name || !email || !message) {
     return json({ error: 'missing_fields' }, 400);
@@ -193,10 +194,13 @@ export const POST: APIRoute = async ({ request }) => {
   if (body.privacyConsent !== true) {
     return json({ error: 'privacy_consent_required' }, 400);
   }
-  if (!isValidEmail(email)) {
+  if (name.length > CONTACT_LIMITS.name) {
+    return json({ error: 'name_too_long' }, 400);
+  }
+  if (email.length > CONTACT_LIMITS.email || !isValidEmail(email)) {
     return json({ error: 'invalid_email' }, 400);
   }
-  if (message.length > 5000) {
+  if (message.length > CONTACT_LIMITS.message) {
     return json({ error: 'message_too_long' }, 400);
   }
 

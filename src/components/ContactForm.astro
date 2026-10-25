@@ -1,4 +1,6 @@
 ---
+import { CONTACT_LIMITS } from '../lib/contactLimits';
+
 const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 ---
 
@@ -12,6 +14,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       name="name"
       type="text"
       required
+      maxlength={CONTACT_LIMITS.name}
       autocomplete="name"
       class="glass-input"
     />
@@ -26,6 +29,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       name="email"
       type="email"
       required
+      maxlength={CONTACT_LIMITS.email}
       autocomplete="email"
       class="glass-input"
     />
@@ -40,9 +44,14 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       name="message"
       rows="6"
       required
-      maxlength="5000"
+      maxlength={CONTACT_LIMITS.message}
+      aria-describedby="message-count"
       class="glass-textarea"
     ></textarea>
+    <!-- 入力のたびに読み上げられないよう、残り文字数の表示は aria-live にしない -->
+    <p id="message-count" class="mt-1 text-right font-mono text-xs tabular-nums text-graphite">
+      0 / {CONTACT_LIMITS.message}
+    </p>
   </div>
 
   <!-- ハニーポット: スパム対策(人には見えないがボットは埋めてしまう)。サーバー側でも検証する -->
@@ -94,11 +103,26 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 )}
 
 <script>
+  import { CONTACT_LIMITS } from '../lib/contactLimits';
+
   const form = document.querySelector<HTMLFormElement>('#contact-form');
   const status = document.querySelector<HTMLParagraphElement>('#form-status');
   const submitBtn = document.querySelector<HTMLButtonElement>('#contact-submit');
   const loadedAtInput = document.querySelector<HTMLInputElement>('#loaded-at');
   const turnstileWidget = document.querySelector<HTMLElement>('.cf-turnstile');
+  const messageInput = document.querySelector<HTMLTextAreaElement>('#message');
+  const messageCount = document.querySelector<HTMLParagraphElement>('#message-count');
+
+  // 残り文字数の表示。value.length はブラウザの maxlength と同じ数え方(改行は1文字)になる
+  function updateMessageCount() {
+    if (!messageInput || !messageCount) return;
+    const length = messageInput.value.length;
+    messageCount.textContent = `${length} / ${CONTACT_LIMITS.message}`;
+    messageCount.classList.toggle('text-accent', length >= CONTACT_LIMITS.message);
+  }
+  messageInput?.addEventListener('input', updateMessageCount);
+  // 戻る操作などでブラウザが入力内容を復元した場合にも表示を合わせる
+  updateMessageCount();
 
   // フォームが実際に表示された時刻を記録する(タイムトラップ用)。
   // JSを実行しない単純なボットは、この値が空のまま送信することになる。
@@ -156,6 +180,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
         status.textContent = '送信しました。ご入力いただいたメールアドレス宛に自動返信メールをお送りしましたので、ご確認ください。';
         status.className = 'font-mono text-sm text-accent';
         form.reset();
+        updateMessageCount();
         if (loadedAtInput) loadedAtInput.value = String(Date.now());
       } else {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
@@ -165,8 +190,10 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           showError('メールアドレスの形式をご確認ください。');
         } else if (body.error === 'missing_fields') {
           showError('未入力の項目があります。ご確認ください。');
+        } else if (body.error === 'name_too_long') {
+          showError(`お名前は${CONTACT_LIMITS.name}文字以内でご入力ください。`);
         } else if (body.error === 'message_too_long') {
-          showError('お問い合わせ内容が長すぎます。5000文字以内でご入力ください。');
+          showError(`お問い合わせ内容は${CONTACT_LIMITS.message}文字以内でご入力ください。`);
         } else if (body.error === 'privacy_consent_required') {
           showError('プライバシーポリシーへの同意が必要です。');
         } else if (body.error === 'server_error') {
