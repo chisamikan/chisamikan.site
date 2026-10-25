@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { notifyDiscord, notifyZapier } from '../../lib/notify';
 import { pickEnv } from '../../lib/env';
 import { CONTACT_LIMITS, normalizeNewlines } from '../../lib/contactLimits';
@@ -25,6 +26,20 @@ function json(body: Record<string, unknown>, status = 200): Response {
 // 文字列以外(数値・配列・オブジェクト等)が送られてきた場合は未入力として扱う
 function asString(value: unknown): string {
   return typeof value === 'string' ? value : '';
+}
+
+/**
+ * 同じIPアドレスからの短時間の連続送信を制限します(上限は wrangler.toml の CONTACT_RATE_LIMITER)。
+ * レート制限の仕組み自体が失敗した場合は、お問い合わせを取りこぼさないよう通過させます。
+ */
+async function isRateLimited(ip: string | null): Promise<boolean> {
+  try {
+    const { success } = await env.CONTACT_RATE_LIMITER.limit({ key: ip ?? 'unknown' });
+    return !success;
+  } catch (err) {
+    console.error('[api/contact] レート制限の確認に失敗しました:', err);
+    return false;
+  }
 }
 
 function isValidEmail(value: string): boolean {
@@ -122,6 +137,18 @@ export const POST: APIRoute = async ({ request }) => {
   if (request.headers.get('Origin') !== requestUrl.origin) {
     return json({ error: 'forbidden' }, 403);
   }
+  // Turnstileの検証などの重い処理より前に、連続送信を弾く
+  const remoteIp = request.headers.get('CF-Connecting-IP');
+  if (await isRateLimited(remoteIp)) {
+    return new Response(JSON.stringify({ error: 'rate_limited' }), {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+        'Retry-After': '60',
+      },
+    });
+  }
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) {
     return json({ error: 'unsupported_media_type' }, 415);
   }
@@ -171,7 +198,6 @@ export const POST: APIRoute = async ({ request }) => {
     if (!turnstileToken) {
       return json({ error: 'turnstile_missing' }, 400);
     }
-    const remoteIp = request.headers.get('CF-Connecting-IP');
     const verified = await verifyTurnstile(
       turnstileToken,
       remoteIp,
