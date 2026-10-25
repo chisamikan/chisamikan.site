@@ -1,5 +1,4 @@
 import type { APIRoute } from 'astro';
-import { createContactEntry } from '../../lib/notion';
 import { notifyDiscord, notifyZapier } from '../../lib/notify';
 import { pickEnv } from '../../lib/env';
 
@@ -42,13 +41,16 @@ async function verifyTurnstile(
 
 /**
  * Discord通知 / Zapier経由の管理者宛通知・送信者への自動返信をまとめて行います。
- * 対応する環境変数が未設定の通知はスキップし、1件失敗しても他は続行してログのみに記録します。
+ * 対応する環境変数が未設定の通知はスキップし、1件失敗しても他は続行してログに記録します。
+ *
+ * お問い合わせ内容の保存先は通知のみのため、「1件も送信できなかった場合」は
+ * 呼び出し元でエラーとして扱えるよう、設定済みの通知先の数と成功数を返します。
  */
 async function sendNotifications(payload: {
   name: string;
   email: string;
   message: string;
-}): Promise<void> {
+}): Promise<{ attempted: number; succeeded: number }> {
   const discordWebhookUrl = pickEnv('DISCORD_WEBHOOK_URL', import.meta.env.DISCORD_WEBHOOK_URL);
   // 管理者宛通知用のZap(Catch Hook → Outlookで自分宛に送信)
   const zapierAdminWebhookUrl = pickEnv(
@@ -74,14 +76,18 @@ async function sendNotifications(payload: {
   }
 
   const results = await Promise.allSettled(tasks);
+  let succeeded = 0;
   for (const result of results) {
     if (result.status === 'rejected') {
       console.error('[api/contact] 通知の送信に失敗しました:', result.reason);
+    } else {
+      succeeded++;
     }
   }
+  return { attempted: tasks.length, succeeded };
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   let body: {
     name?: string;
     email?: string;
@@ -148,41 +154,22 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   try {
-    await createContactEntry(
-      { name, email, message },
-      {
-        NOTION_TOKEN: pickEnv('NOTION_TOKEN', import.meta.env.NOTION_TOKEN),
-        NOTION_CONTACT_DB_ID: pickEnv(
-          'NOTION_CONTACT_DB_ID',
-          import.meta.env.NOTION_CONTACT_DB_ID
-        ),
-      }
-    );
+    const { attempted, succeeded } = await sendNotifications({ name, email, message });
 
-    // 通知はベストエフォート: Notionへの保存は既に成功しているため、
-    // ここで失敗してもユーザーへは成功として返し、ログにのみ記録する。
-    await sendNotifications({ name, email, message });
+    // 保存先が通知のみなので、通知先が未設定、または全て失敗した場合は成功扱いにしない
+    // (成功を返すとお問い合わせ内容がどこにも残らず失われるため)
+    if (attempted === 0 || succeeded === 0) {
+      console.error('[api/contact] お問い合わせを届けられませんでした:', { attempted, succeeded });
+      return new Response(JSON.stringify({ error: 'server_error' }), { status: 500 });
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    // 実際の原因(トークン未設定/DB未共有/プロパティ名不一致など)はサーバーログにのみ記録し、
-    // クライアントへは詳細を含めない(スタックトレース等の内部情報を露出させないため)。
-    const detail = err instanceof Error ? err.message : String(err);
-    const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })?.runtime?.env;
-    const diagnostics = {
-      hasLocalsRuntime: Boolean((locals as { runtime?: unknown })?.runtime),
-      hasRuntimeEnv: Boolean(runtimeEnv),
-      runtimeHasNotionToken: Boolean(runtimeEnv?.NOTION_TOKEN),
-      runtimeHasContactDbId: Boolean(runtimeEnv?.NOTION_CONTACT_DB_ID),
-      buildTimeHasNotionToken: Boolean(import.meta.env.NOTION_TOKEN),
-      buildTimeHasContactDbId: Boolean(import.meta.env.NOTION_CONTACT_DB_ID),
-    };
-    console.error('[api/contact] Notionへの書き込みに失敗しました:', detail, diagnostics);
-    return new Response(JSON.stringify({ error: 'server_error' }), {
-      status: 500,
-    });
+    // 詳細はサーバーログにのみ記録し、クライアントへは内部情報を含めない
+    console.error('[api/contact] 送信処理に失敗しました:', err);
+    return new Response(JSON.stringify({ error: 'server_error' }), { status: 500 });
   }
 };
