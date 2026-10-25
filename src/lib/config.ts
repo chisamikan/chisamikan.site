@@ -1,7 +1,6 @@
 export const site = {
-  title: import.meta.env.SITE_TITLE || 'Your Name | Illustration Portfolio',
-  description:
-    import.meta.env.SITE_DESCRIPTION || 'イラストレーターのポートフォリオサイトです。',
+  title: 'chisamikan.site - 千紗みかんウェブサイト',
+  description: '千紗みかんのポートフォリオサイトです。',
 };
 
 // 構造化データ(JSON-LD)のPersonスキーマで使うサイト運営者情報

@@ -1,7 +1,7 @@
 import { Client, isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
 import type { PageObjectResponse, QueryDataSourceParameters } from '@notionhq/client/build/src/api-endpoints';
 
-// トークンが無い場合はエラーで止めずダミーデータを返す(ローカルでもUI確認できるように)
+// トークンが無い場合はエラーで止めず空の一覧を返す
 const token = import.meta.env.NOTION_TOKEN;
 
 /**
@@ -24,20 +24,11 @@ export function createNotionClient(auth: string): Client {
 export const notion = token ? createNotionClient(token) : null;
 
 function warnMissingToken(context: string) {
-  console.warn(
-    `[notion] NOTION_TOKEN が設定されていないため "${context}" はダミーデータで表示します。`
-  );
+  console.warn(`[notion] NOTION_TOKEN が設定されていないため "${context}" は空で表示します。`);
 }
 
-// Notionへアップロードした画像(file.type === 'file')のURLは数時間で失効するため、
-// リクエストの都度最新URLを取得し直す /api/image/[kind]/[id] 経由に差し替える。
-// 外部URL(file.type === 'external')は失効しないためそのまま使用する。
-function imageProxyUrl(
-  kind: 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels',
-  id: string
-): string {
-  return `/api/image/${kind}/${id}`;
-}
+export const IMAGE_KINDS = ['gallery', 'works', 'toolbox', 'novels'] as const;
+export type ImageKind = (typeof IMAGE_KINDS)[number];
 
 // --- 型定義 -----------------------------------------------------------------
 
@@ -96,13 +87,50 @@ export interface ManualNewsItem {
   createdTime: string;
 }
 
+type Props = PageObjectResponse['properties'];
+
 function richTextToPlain(richText: { plain_text: string }[]): string {
   return richText.map((t) => t.plain_text).join('');
 }
 
-function richTextProp(props: PageObjectResponse['properties'], key: string): string {
+function titleProp(props: Props, key: string, fallback = '(無題)'): string {
+  const prop = props[key];
+  return prop?.type === 'title' ? richTextToPlain(prop.title) : fallback;
+}
+
+function richTextProp(props: Props, key: string): string {
   const prop = props[key];
   return prop?.type === 'rich_text' ? richTextToPlain(prop.rich_text) : '';
+}
+
+function urlProp(props: Props, key: string): string | null {
+  const prop = props[key];
+  return prop?.type === 'url' ? prop.url : null;
+}
+
+function dateProp(props: Props, key: string) {
+  const prop = props[key];
+  return prop?.type === 'date' ? prop.date : null;
+}
+
+function checkboxProp(props: Props, key: string): boolean {
+  const prop = props[key];
+  return prop?.type === 'checkbox' ? prop.checkbox : false;
+}
+
+function tagsProp(props: Props): string[] {
+  const prop = props.Tags;
+  return prop?.type === 'multi_select' ? prop.multi_select.map((t) => t.name) : [];
+}
+
+// Notionへアップロードした画像(file.type === 'file')のURLは数時間で失効するため、
+// リクエストの都度最新URLを取得し直す /api/image/[kind]/[id] 経由に差し替える。
+// 外部URL(file.type === 'external')は失効しないためそのまま使用する。
+function imageProp(page: PageObjectResponse, kind: ImageKind): string | null {
+  const prop = page.properties.Image;
+  if (prop?.type !== 'files' || prop.files.length === 0) return null;
+  const file = prop.files[0];
+  return file.type === 'external' ? file.external.url : `/api/image/${kind}/${page.id}`;
 }
 
 // Notion APIはデータベースを直接クエリできないため、まずデータソースIDを取得してからクエリする。
@@ -153,58 +181,26 @@ export async function getGalleryItems(): Promise<ArtworkItem[]> {
   const dbId = import.meta.env.NOTION_GALLERY_DB_ID;
   if (!notion || !dbId) {
     warnMissingToken('ギャラリー');
-    return sampleGallery;
+    return [];
   }
 
   const pages = await queryPublishedDatabase(dbId, 'Date');
-
-  return pages.map(pageToArtwork);
+  return pages.map((page) => {
+    const props = page.properties;
+    return {
+      id: page.id,
+      title: titleProp(props, 'Name'),
+      imageUrl: imageProp(page, 'gallery'),
+      tags: tagsProp(props),
+      description: richTextProp(props, 'Description'),
+      date: dateProp(props, 'Date')?.start ?? null,
+      nsfw: checkboxProp(props, 'NSFW'),
+      slideshow: checkboxProp(props, 'Slideshow'),
+      url: urlProp(props, 'URL'),
+      createdTime: page.created_time,
+    };
+  });
 }
-
-function pageToArtwork(page: PageObjectResponse): ArtworkItem {
-  const props = page.properties;
-
-  const title =
-    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
-
-  let imageUrl: string | null = null;
-  if (props.Image?.type === 'files' && props.Image.files.length > 0) {
-    const file = props.Image.files[0];
-    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('gallery', page.id);
-  }
-
-  const tags =
-    props.Tags?.type === 'multi_select' ? props.Tags.multi_select.map((t) => t.name) : [];
-
-  const description =
-    props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
-
-  const date = props.Date?.type === 'date' ? (props.Date.date?.start ?? null) : null;
-
-  const nsfw = props.NSFW?.type === 'checkbox' ? props.NSFW.checkbox : false;
-
-  const slideshow =
-    props.Slideshow?.type === 'checkbox' ? props.Slideshow.checkbox : false;
-
-  const url = props.URL?.type === 'url' ? props.URL.url : null;
-
-  return { id: page.id, title, imageUrl, tags, description, date, nsfw, slideshow, url, createdTime: page.created_time };
-}
-
-const sampleGallery: ArtworkItem[] = [
-  {
-    id: 'sample-1',
-    title: '(サンプル) 朝の光',
-    imageUrl: null,
-    tags: ['キャラクター', '朝'],
-    description: 'NOTION_GALLERY_DB_ID を設定するとNotionの作品がここに並びます。',
-    date: '2026-01-01',
-    nsfw: false,
-    slideshow: true,
-    url: null,
-    createdTime: '2026-01-01T00:00:00.000Z',
-  },
-];
 
 // --- 小説 ---------------------------------------------------------------------
 
@@ -219,63 +215,25 @@ export async function getNovelItems(): Promise<NovelItem[]> {
   const dbId = import.meta.env.NOTION_NOVELS_DB_ID;
   if (!notion || !dbId) {
     warnMissingToken('小説');
-    return sampleNovels;
+    return [];
   }
 
   const pages = await queryByCreatedTime(dbId);
-  return pages.map(pageToNovel);
+  return pages.map((page) => {
+    const props = page.properties;
+    return {
+      id: page.id,
+      title: titleProp(props, 'Name'),
+      imageUrl: imageProp(page, 'novels'),
+      tags: tagsProp(props),
+      description: richTextProp(props, 'Description'),
+      kakuyomuUrl: urlProp(props, 'kakuyomu'),
+      pixivUrl: urlProp(props, 'pixiv'),
+      shopUrl: urlProp(props, 'shop'),
+      createdTime: page.created_time,
+    };
+  });
 }
-
-function pageToNovel(page: PageObjectResponse): NovelItem {
-  const props = page.properties;
-
-  const title =
-    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
-
-  let imageUrl: string | null = null;
-  if (props.Image?.type === 'files' && props.Image.files.length > 0) {
-    const file = props.Image.files[0];
-    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('novels', page.id);
-  }
-
-  const tags =
-    props.Tags?.type === 'multi_select' ? props.Tags.multi_select.map((t) => t.name) : [];
-
-  const description =
-    props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
-
-  const kakuyomuUrl = props.kakuyomu?.type === 'url' ? props.kakuyomu.url : null;
-
-  const pixivUrl = props.pixiv?.type === 'url' ? props.pixiv.url : null;
-
-  const shopUrl = props.shop?.type === 'url' ? props.shop.url : null;
-
-  return {
-    id: page.id,
-    title,
-    imageUrl,
-    tags,
-    description,
-    kakuyomuUrl,
-    pixivUrl,
-    shopUrl,
-    createdTime: page.created_time,
-  };
-}
-
-const sampleNovels: NovelItem[] = [
-  {
-    id: 'sample-novel-1',
-    title: '(サンプル) 星の欠片',
-    imageUrl: null,
-    tags: ['ファンタジー'],
-    description: 'NOTION_NOVELS_DB_ID を設定するとNotionの小説作品がここに並びます。',
-    kakuyomuUrl: null,
-    pixivUrl: null,
-    shopUrl: null,
-    createdTime: '2026-01-01T00:00:00.000Z',
-  },
-];
 
 // --- 仕事履歴 -----------------------------------------------------------------
 
@@ -289,61 +247,26 @@ export async function getWorkHistory(): Promise<WorkItem[]> {
   const dbId = import.meta.env.NOTION_WORKS_DB_ID;
   if (!notion || !dbId) {
     warnMissingToken('仕事履歴');
-    return sampleWorks;
+    return [];
   }
 
   const pages = await queryPublishedDatabase(dbId, 'Period');
-
-  return pages.map(pageToWork);
+  return pages.map((page) => {
+    const props = page.properties;
+    const period = dateProp(props, 'Period');
+    return {
+      id: page.id,
+      client: titleProp(props, 'Client', '(無題の案件)'),
+      role: richTextProp(props, 'Role'),
+      periodStart: period?.start ?? null,
+      periodEnd: period?.end ?? null,
+      url: urlProp(props, 'URL'),
+      imageUrl: imageProp(page, 'works'),
+      tags: tagsProp(props),
+      createdTime: page.created_time,
+    };
+  });
 }
-
-function pageToWork(page: PageObjectResponse): WorkItem {
-  const props = page.properties;
-
-  const client =
-    props.Client?.type === 'title' ? richTextToPlain(props.Client.title) : '(無題の案件)';
-
-  const role = props.Role?.type === 'rich_text' ? richTextToPlain(props.Role.rich_text) : '';
-
-  const period = props.Period?.type === 'date' ? props.Period.date : null;
-
-  const url = props.URL?.type === 'url' ? props.URL.url : null;
-
-  let imageUrl: string | null = null;
-  if (props.Image?.type === 'files' && props.Image.files.length > 0) {
-    const file = props.Image.files[0];
-    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('works', page.id);
-  }
-
-  const tags =
-    props.Tags?.type === 'multi_select' ? props.Tags.multi_select.map((t) => t.name) : [];
-
-  return {
-    id: page.id,
-    client,
-    role,
-    periodStart: period?.start ?? null,
-    periodEnd: period?.end ?? null,
-    url,
-    imageUrl,
-    tags,
-    createdTime: page.created_time,
-  };
-}
-
-const sampleWorks: WorkItem[] = [
-  {
-    id: 'sample-work-1',
-    client: '(サンプル) 出版社A 書籍装画',
-    role: 'カバーイラスト',
-    periodStart: '2025-04-01',
-    periodEnd: '2025-06-01',
-    url: null,
-    imageUrl: null,
-    tags: ['装画', '書籍'],
-    createdTime: '2025-04-01T00:00:00.000Z',
-  },
-];
 
 // --- ツールボックス -------------------------------------------------------------
 
@@ -357,43 +280,22 @@ export async function getToolboxItems(): Promise<ToolboxItem[]> {
   const dbId = import.meta.env.NOTION_TOOLBOX_DB_ID;
   if (!notion || !dbId) {
     warnMissingToken('ツールボックス');
-    return sampleToolbox;
+    return [];
   }
 
   const pages = await queryByCreatedTime(dbId);
-  return pages.map(pageToToolbox);
+  return pages.map((page) => {
+    const props = page.properties;
+    return {
+      id: page.id,
+      title: titleProp(props, 'Name'),
+      url: urlProp(props, 'URL'),
+      imageUrl: imageProp(page, 'toolbox'),
+      description: richTextProp(props, 'Description'),
+      createdTime: page.created_time,
+    };
+  });
 }
-
-function pageToToolbox(page: PageObjectResponse): ToolboxItem {
-  const props = page.properties;
-
-  const title =
-    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
-
-  const url = props.URL?.type === 'url' ? props.URL.url : null;
-
-  let imageUrl: string | null = null;
-  if (props.Image?.type === 'files' && props.Image.files.length > 0) {
-    const file = props.Image.files[0];
-    imageUrl = file.type === 'external' ? file.external.url : imageProxyUrl('toolbox', page.id);
-  }
-
-  const description =
-    props.Description?.type === 'rich_text' ? richTextToPlain(props.Description.rich_text) : '';
-
-  return { id: page.id, title, url, imageUrl, description, createdTime: page.created_time };
-}
-
-const sampleToolbox: ToolboxItem[] = [
-  {
-    id: 'sample-toolbox-1',
-    title: '(サンプル) おすすめツール',
-    url: null,
-    imageUrl: null,
-    description: 'NOTION_TOOLBOX_DB_ID を設定するとNotionのツールがここに並びます。',
-    createdTime: '2026-01-01T00:00:00.000Z',
-  },
-];
 
 // --- お知らせ(手動投稿) ---------------------------------------------------------
 
@@ -406,38 +308,22 @@ export async function getManualNewsItems(): Promise<ManualNewsItem[]> {
   const dbId = import.meta.env.NOTION_NEWS_DB_ID;
   if (!notion || !dbId) {
     warnMissingToken('お知らせ(手動投稿)');
-    return sampleManualNews;
+    return [];
   }
 
   const pages = await queryPublishedDatabase(dbId, 'Date');
-  return pages.map(pageToManualNews);
+  return pages.map((page) => {
+    const props = page.properties;
+    return {
+      id: page.id,
+      title: titleProp(props, 'Name'),
+      body: richTextProp(props, 'Body'),
+      date: dateProp(props, 'Date')?.start ?? null,
+      url: urlProp(props, 'URL'),
+      createdTime: page.created_time,
+    };
+  });
 }
-
-function pageToManualNews(page: PageObjectResponse): ManualNewsItem {
-  const props = page.properties;
-
-  const title =
-    props.Name?.type === 'title' ? richTextToPlain(props.Name.title) : '(無題)';
-
-  const body = props.Body?.type === 'rich_text' ? richTextToPlain(props.Body.rich_text) : '';
-
-  const date = props.Date?.type === 'date' ? (props.Date.date?.start ?? null) : null;
-
-  const url = props.URL?.type === 'url' ? props.URL.url : null;
-
-  return { id: page.id, title, body, date, url, createdTime: page.created_time };
-}
-
-const sampleManualNews: ManualNewsItem[] = [
-  {
-    id: 'sample-news-1',
-    title: '(サンプル) サイトをリニューアルしました',
-    body: 'NOTION_NEWS_DB_ID を設定するとNotionのお知らせがここに並びます。',
-    date: '2026-01-01',
-    url: null,
-    createdTime: '2026-01-01T00:00:00.000Z',
-  },
-];
 
 // --- おみくじ -----------------------------------------------------------------
 
@@ -467,65 +353,26 @@ export async function getOmikujiItems(): Promise<OmikujiItem[]> {
   const dbId = import.meta.env.NOTION_OMIKUJI_DB_ID;
   if (!notion || !dbId) {
     warnMissingToken('おみくじ');
-    return sampleOmikuji;
+    return [];
   }
 
   const pages = await queryDatabase(dbId);
-  return pages.map(pageToOmikuji);
+  return pages.map((page) => {
+    const props = page.properties;
+    return {
+      id: page.id,
+      fortune: titleProp(props, '運勢'),
+      overall: richTextProp(props, '全体運'),
+      wish: richTextProp(props, '願望'),
+      waitingPerson: richTextProp(props, '待人'),
+      lostItem: richTextProp(props, '失物'),
+      travel: richTextProp(props, '旅行'),
+      business: richTextProp(props, '商売'),
+      study: richTextProp(props, '学問'),
+      love: richTextProp(props, '恋愛'),
+      moving: richTextProp(props, '転居'),
+      illness: richTextProp(props, '病気'),
+      direction: richTextProp(props, '方位'),
+    };
+  });
 }
-
-function pageToOmikuji(page: PageObjectResponse): OmikujiItem {
-  const props = page.properties;
-
-  const fortune =
-    props['運勢']?.type === 'title' ? richTextToPlain(props['運勢'].title) : '(無題)';
-
-  return {
-    id: page.id,
-    fortune,
-    overall: richTextProp(props, '全体運'),
-    wish: richTextProp(props, '願望'),
-    waitingPerson: richTextProp(props, '待人'),
-    lostItem: richTextProp(props, '失物'),
-    travel: richTextProp(props, '旅行'),
-    business: richTextProp(props, '商売'),
-    study: richTextProp(props, '学問'),
-    love: richTextProp(props, '恋愛'),
-    moving: richTextProp(props, '転居'),
-    illness: richTextProp(props, '病気'),
-    direction: richTextProp(props, '方位'),
-  };
-}
-
-const sampleOmikuji: OmikujiItem[] = [
-  {
-    id: 'sample-omikuji-1',
-    fortune: '大吉',
-    overall: '(サンプル) NOTION_OMIKUJI_DB_ID を設定するとNotionのおみくじ結果が抽選されます。',
-    wish: '叶うでしょう',
-    waitingPerson: '来るでしょう',
-    lostItem: '出るでしょう',
-    travel: '良し',
-    business: '繁栄する',
-    study: '励めば成る',
-    love: '良縁あり',
-    moving: '吉',
-    illness: '治る',
-    direction: '東',
-  },
-  {
-    id: 'sample-omikuji-2',
-    fortune: '中吉',
-    overall: '(サンプル) NOTION_OMIKUJI_DB_ID を設定するとNotionのおみくじ結果が抽選されます。',
-    wish: '叶うでしょう',
-    waitingPerson: '来るでしょう',
-    lostItem: '出るでしょう',
-    travel: '良し',
-    business: '繁栄する',
-    study: '励めば成る',
-    love: '良縁あり',
-    moving: '吉',
-    illness: '治る',
-    direction: '南',
-  },
-];

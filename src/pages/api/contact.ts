@@ -16,10 +16,10 @@ const MAX_BODY_BYTES = 32 * 1024;
 /**
  * JSONレスポンスを返します。お問い合わせの結果はキャッシュさせないため no-store を付けます。
  */
-function json(body: Record<string, unknown>, status = 200): Response {
+function json(body: Record<string, unknown>, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...headers },
   });
 }
 
@@ -111,14 +111,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Turnstileの検証などの重い処理より前に、連続送信を弾く
   const remoteIp = request.headers.get('CF-Connecting-IP');
   if (await isRateLimited(remoteIp)) {
-    return new Response(JSON.stringify({ error: 'rate_limited' }), {
-      status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
-        'Retry-After': '60',
-      },
-    });
+    return json({ error: 'rate_limited' }, 429, { 'Retry-After': '60' });
   }
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) {
     return json({ error: 'unsupported_media_type' }, 415);

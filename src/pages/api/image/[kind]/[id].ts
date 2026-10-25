@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { isFullBlock, isFullPage } from '@notionhq/client';
-import { createNotionClient } from '../../../../lib/notion';
+import { isFullPage } from '@notionhq/client';
+import { createNotionClient, IMAGE_KINDS, type ImageKind } from '../../../../lib/notion';
 import { pickEnv } from '../../../../lib/env';
 
 // Notionへアップロードした画像のURLは数時間で失効するため、ビルド時に埋め込まず、
@@ -11,29 +11,9 @@ export const prerender = false;
 // ブラウザ/CDNに失効済みURLへのリダイレクトがキャッシュされたまま残るのを防ぐ。
 const CACHE_SECONDS = 3000;
 
-type Kind = 'gallery' | 'works' | 'profile' | 'toolbox' | 'novels';
-
-function isKind(value: string | undefined): value is Kind {
-  return (
-    value === 'gallery' ||
-    value === 'works' ||
-    value === 'profile' ||
-    value === 'toolbox' ||
-    value === 'novels'
-  );
-}
-
-// kind === 'profile' はブロック直下のimageのため対象外。他のkindは共通で Image プロパティを使う。
-const IMAGE_PROPERTY_NAME: Record<Exclude<Kind, 'profile'>, string> = {
-  gallery: 'Image',
-  works: 'Image',
-  toolbox: 'Image',
-  novels: 'Image',
-};
-
 export const GET: APIRoute = async ({ params }) => {
   const { kind, id } = params;
-  if (!id || !isKind(kind)) {
+  if (!id || !IMAGE_KINDS.includes(kind as ImageKind)) {
     return new Response('Not Found', { status: 404 });
   }
 
@@ -47,20 +27,12 @@ export const GET: APIRoute = async ({ params }) => {
   try {
     let url: string | null = null;
 
-    if (kind === 'profile') {
-      const block = await notion.blocks.retrieve({ block_id: id });
-      if (isFullBlock(block) && block.type === 'image') {
-        const img = block.image;
-        url = img.type === 'external' ? img.external.url : img.file.url;
-      }
-    } else {
-      const page = await notion.pages.retrieve({ page_id: id });
-      if (isFullPage(page)) {
-        const prop = page.properties[IMAGE_PROPERTY_NAME[kind]];
-        if (prop?.type === 'files' && prop.files.length > 0) {
-          const file = prop.files[0];
-          url = file.type === 'external' ? file.external.url : file.file.url;
-        }
+    const page = await notion.pages.retrieve({ page_id: id });
+    if (isFullPage(page)) {
+      const prop = page.properties.Image;
+      if (prop?.type === 'files' && prop.files.length > 0) {
+        const file = prop.files[0];
+        url = file.type === 'external' ? file.external.url : file.file.url;
       }
     }
 

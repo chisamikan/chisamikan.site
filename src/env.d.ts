@@ -10,8 +10,6 @@ interface ImportMetaEnv {
   readonly NOTION_NEWS_DB_ID: string;
   readonly RSS_FEED_URL: string;
   readonly BOOTH_SHOP_URL: string;
-  readonly SITE_TITLE: string;
-  readonly SITE_DESCRIPTION: string;
   readonly TURNSTILE_SITE_KEY: string;
   readonly TURNSTILE_SECRET_KEY: string;
   readonly DISCORD_WEBHOOK_URL: string;

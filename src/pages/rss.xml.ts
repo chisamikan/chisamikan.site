@@ -10,7 +10,6 @@ export async function GET(context: APIContext) {
     title: site.title,
     description: site.description,
     site: context.site ?? 'https://chisamikan.site',
-    xmlns: { content: 'http://purl.org/rss/1.0/modules/content/' },
     // trailingSlash(既定true)は#gallery-xxxのようなハッシュ付きリンクの末尾にも
     // スラッシュを付けてしまい、アンカー(id)と一致しなくなるため無効化する
     trailingSlash: false,

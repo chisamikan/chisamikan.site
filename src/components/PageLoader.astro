@@ -38,7 +38,7 @@
     @apply fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 bg-paper bg-size-[22px_22px] duration-[420ms] ease-[ease];
     /* radial-gradient()のコンマ、および複数プロパティ分のtransition-propertyの
        コンマがscoped styleの@apply内では正しく処理できないため、この2行のみプレーンCSSのまま残す */
-    background-image: radial-gradient(circle at 1px 1px, rgb(var(--color-ink) / 0.055) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, --alpha(var(--color-ink) / 5.5%) 1px, transparent 0);
     transition-property: opacity, visibility;
   }
 
@@ -65,15 +65,15 @@
 
   /* stop-colorに対応するTailwindユーティリティが無いため、プレーンCSSのまま残す */
   .page-loader-gradient-stop-1 {
-    stop-color: rgb(var(--color-accent));
+    stop-color: var(--color-accent);
   }
 
   .page-loader-gradient-stop-2 {
-    stop-color: rgb(var(--color-accent-violet));
+    stop-color: var(--color-accent-violet);
   }
 
   .page-loader-gradient-stop-3 {
-    stop-color: rgb(var(--color-accent-rose));
+    stop-color: var(--color-accent-rose);
   }
 
   .page-loader-mask-path {
