@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { notifyDiscord, notifyZapier } from '../../lib/notify';
+import { notifyDiscord, sendAdminEmail } from '../../lib/notify';
 import { pickEnv } from '../../lib/env';
 import { CONTACT_LIMITS, normalizeNewlines } from '../../lib/contactLimits';
 
@@ -80,52 +80,23 @@ async function verifyTurnstile(
   }
 }
 
+// 改行・タブ以外の制御文字(メールのヘッダーや表示を崩す原因になる)
+const CONTROL_CHARS_EXCEPT_NEWLINE = /[\u0000-\u0008\u000B-\u001F\u007F]/g;
+const CONTROL_CHARS = /[\u0000-\u001F\u007F]/g;
+// 判定用(g フラグ付きの正規表現を test() で使うと前回の位置を引き継いでしまうため分ける)
+const HAS_CONTROL_CHAR = /[\u0000-\u001F\u007F]/;
+
 /**
- * Discord通知 / Zapier経由の管理者宛通知・送信者への自動返信をまとめて行います。
- * 対応する環境変数が未設定の通知はスキップし、1件失敗しても他は続行してログに記録します。
- *
- * お問い合わせ内容の保存先は通知のみのため、「1件も送信できなかった場合」は
- * 呼び出し元でエラーとして扱えるよう、設定済みの通知先の数と成功数を返します。
+ * Discordに定型文で知らせます。未設定・失敗してもお問い合わせの処理は止めません。
  */
-async function sendNotifications(payload: {
-  name: string;
-  email: string;
-  message: string;
-}): Promise<{ attempted: number; succeeded: number }> {
-  const discordWebhookUrl = pickEnv('DISCORD_WEBHOOK_URL', import.meta.env.DISCORD_WEBHOOK_URL);
-  // 管理者宛通知用のZap(Catch Hook → Outlookで自分宛に送信)
-  const zapierAdminWebhookUrl = pickEnv(
-    'ZAPIER_ADMIN_WEBHOOK_URL',
-    import.meta.env.ZAPIER_ADMIN_WEBHOOK_URL
-  );
-  // 自動返信用のZap(Catch Hook → Outlookで問い合わせ者宛に送信)
-  const zapierAutoreplyWebhookUrl = pickEnv(
-    'ZAPIER_AUTOREPLY_WEBHOOK_URL',
-    import.meta.env.ZAPIER_AUTOREPLY_WEBHOOK_URL
-  );
-
-  const tasks: Promise<void>[] = [];
-
-  if (discordWebhookUrl) {
-    tasks.push(notifyDiscord(payload, discordWebhookUrl));
+async function notifyDiscordSafely(content: string): Promise<void> {
+  const webhookUrl = pickEnv('DISCORD_WEBHOOK_URL', import.meta.env.DISCORD_WEBHOOK_URL);
+  if (!webhookUrl) return;
+  try {
+    await notifyDiscord(content, webhookUrl);
+  } catch (err) {
+    console.error('[api/contact] Discordへの通知に失敗しました:', err);
   }
-  if (zapierAdminWebhookUrl) {
-    tasks.push(notifyZapier(payload, zapierAdminWebhookUrl));
-  }
-  if (zapierAutoreplyWebhookUrl) {
-    tasks.push(notifyZapier(payload, zapierAutoreplyWebhookUrl));
-  }
-
-  const results = await Promise.allSettled(tasks);
-  let succeeded = 0;
-  for (const result of results) {
-    if (result.status === 'rejected') {
-      console.error('[api/contact] 通知の送信に失敗しました:', result.reason);
-    } else {
-      succeeded++;
-    }
-  }
-  return { attempted: tasks.length, succeeded };
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -210,9 +181,11 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   // --- 通常のバリデーション ---
-  const name = asString(body.name).trim();
+  const name = asString(body.name).replace(CONTROL_CHARS, '').trim();
   const email = asString(body.email).trim();
-  const message = normalizeNewlines(asString(body.message)).trim();
+  const message = normalizeNewlines(asString(body.message))
+    .replace(CONTROL_CHARS_EXCEPT_NEWLINE, '')
+    .trim();
 
   if (!name || !email || !message) {
     return json({ error: 'missing_fields' }, 400);
@@ -223,27 +196,26 @@ export const POST: APIRoute = async ({ request }) => {
   if (name.length > CONTACT_LIMITS.name) {
     return json({ error: 'name_too_long' }, 400);
   }
-  if (email.length > CONTACT_LIMITS.email || !isValidEmail(email)) {
+  // メールアドレスは Reply-To に使うため、制御文字を含むものは除去せず不正として扱う
+  if (email.length > CONTACT_LIMITS.email || HAS_CONTROL_CHAR.test(email) || !isValidEmail(email)) {
     return json({ error: 'invalid_email' }, 400);
   }
   if (message.length > CONTACT_LIMITS.message) {
     return json({ error: 'message_too_long' }, 400);
   }
 
+  // お問い合わせ内容の保管先は管理者宛メールのみ。メールが送れた場合だけ成功を返す
+  // (失敗時はフォームに入力内容が残るため、ユーザーが再送信できる)
   try {
-    const { attempted, succeeded } = await sendNotifications({ name, email, message });
-
-    // 保存先が通知のみなので、通知先が未設定、または全て失敗した場合は成功扱いにしない
-    // (成功を返すとお問い合わせ内容がどこにも残らず失われるため)
-    if (attempted === 0 || succeeded === 0) {
-      console.error('[api/contact] お問い合わせを届けられませんでした:', { attempted, succeeded });
-      return json({ error: 'server_error' }, 500);
-    }
-
-    return json({ ok: true });
+    await sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL);
   } catch (err) {
-    // 詳細はサーバーログにのみ記録し、クライアントへは内部情報を含めない
-    console.error('[api/contact] 送信処理に失敗しました:', err);
+    // 詳細はサーバーログにのみ記録し、クライアントやDiscordへは個人情報・内部情報を含めない
+    const code = (err as { code?: string }).code ?? 'unknown';
+    console.error('[api/contact] 管理者宛メールの送信に失敗しました:', code, err);
+    await notifyDiscordSafely(`⚠️ お問い合わせメールの送信に失敗しました(エラー: ${code})`);
     return json({ error: 'server_error' }, 500);
   }
+
+  await notifyDiscordSafely('📩 新しいお問い合わせがありました。メールをご確認ください。');
+  return json({ ok: true });
 };
