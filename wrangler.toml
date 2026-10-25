@@ -1,7 +1,13 @@
 name = "chisamikan-site"
 compatibility_date = "2026-07-15"
 compatibility_flags = ["nodejs_compat"]
-main = "@astrojs/cloudflare/entrypoints/server"
+# Astroの処理に加えて定期再ビルド(Cron Trigger)を扱うため、自前のエントリを使う
+main = "./src/worker.ts"
+
+# Notion/RSSの更新を反映するため、30分おきにDeploy Hookを叩いて再ビルドする(src/worker.ts)
+# Deploy Hook URLはシークレット CF_DEPLOY_HOOK_URL で指定する
+[triggers]
+crons = ["*/30 * * * *"]
 
 [assets]
 directory = "./dist"
