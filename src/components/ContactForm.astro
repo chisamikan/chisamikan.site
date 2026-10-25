@@ -40,6 +40,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       name="message"
       rows="6"
       required
+      maxlength="5000"
       class="glass-textarea"
     ></textarea>
   </div>
@@ -164,6 +165,8 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
           showError('メールアドレスの形式をご確認ください。');
         } else if (body.error === 'missing_fields') {
           showError('未入力の項目があります。ご確認ください。');
+        } else if (body.error === 'message_too_long') {
+          showError('お問い合わせ内容が長すぎます。5000文字以内でご入力ください。');
         } else if (body.error === 'privacy_consent_required') {
           showError('プライバシーポリシーへの同意が必要です。');
         } else if (body.error === 'server_error') {

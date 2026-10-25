@@ -447,6 +447,29 @@ export interface ContactPayload {
   message: string;
 }
 
+// Notion APIの rich_text 1要素(text.content)あたりの上限文字数
+const NOTION_RICH_TEXT_MAX = 2000;
+
+/**
+ * 文字列を指定文字数以下のかたまりに分割します。
+ * Array.from でコードポイント単位に分けるため、絵文字などのサロゲートペアの途中では切れません。
+ * (Notionの上限はUTF-16の長さで数えられる可能性があるため、安全側に1要素あたり
+ *  UTF-16換算でmaxLength以下になるようにしています。)
+ */
+function splitByLength(text: string, maxLength: number): string[] {
+  const chunks: string[] = [];
+  let current = '';
+  for (const ch of Array.from(text)) {
+    if (current.length + ch.length > maxLength) {
+      chunks.push(current);
+      current = '';
+    }
+    current += ch;
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
 /**
  * お問い合わせ内容をNotionデータベースに1件のページとして追加します。
  * Notion側のプロパティ名(想定):
@@ -475,7 +498,12 @@ export async function createContactEntry(
     properties: {
       Name: { title: [{ text: { content: payload.name } }] },
       Email: { email: payload.email },
-      Message: { rich_text: [{ text: { content: payload.message } }] },
+      // Notion APIはrich_text 1要素あたり2000文字までのため、超える場合は分割して複数要素にする
+      Message: {
+        rich_text: splitByLength(payload.message, NOTION_RICH_TEXT_MAX).map((content) => ({
+          text: { content },
+        })),
+      },
       ReceivedAt: { date: { start: new Date().toISOString() } },
       Status: { select: { name: '未対応' } },
     },
