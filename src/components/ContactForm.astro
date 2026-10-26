@@ -89,11 +89,11 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     <button
       type="submit"
       id="contact-submit"
-      class="group btn-glass btn-glass-accent px-6 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 btn-wide"
+      class="group btn-glass btn-glass-accent px-6 disabled:cursor-not-allowed disabled:opacity-50 btn-wide"
     >
       <!-- 送信中はボタンが disabled になるので、表示の切り替えはCSSだけで行う -->
-      <span class="group-disabled:hidden"><i class="fa-solid fa-circle-chevron-right pr-1"></i>送信する</span>
-      <span class="hidden group-disabled:inline"><i class="fa-solid fa-spinner fa-spin pr-1"></i>送信中……</span>
+      <span class="inline-flex items-center gap-1.5 group-disabled:hidden">送信する<i class="fa-solid fa-paper-plane" aria-hidden="true"></i></span>
+      <span class="hidden items-center gap-1.5 group-disabled:inline-flex"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>送信中……</span>
     </button>
   </div>
 
@@ -148,7 +148,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 
   <div class="text-center">
     <button type="button" id="complete-copy" class="btn-glass btn-glass-accent btn-wide px-6">
-      <i class="fa-solid fa-copy pr-1" aria-hidden="true"></i>内容をコピー
+      <i class="fa-solid fa-copy" aria-hidden="true"></i>内容をコピー
     </button>
   </div>
   <p id="complete-copy-status" role="status" class="text-center text-xs"></p>

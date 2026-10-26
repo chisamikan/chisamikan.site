@@ -126,6 +126,8 @@ const isTop = currentPath === '/';
   /* トップページでファーストビューに重なっている間は、帯を消してイラストを見せる */
   .site-header.is-overlay:not(.is-solid) {
     @apply border-transparent bg-transparent text-white backdrop-blur-none;
+    /* 明るいイラストの上でも白文字が読めるよう、ごく薄い影を添える */
+    text-shadow: 0 1px 8px rgba(4, 18, 36, 0.45);
   }
 
   /* メニュー展開中は紙色のメニューの上に重なるため、トップページでも通常の帯に戻す */
