@@ -10,6 +10,7 @@ interface Props {
   layout?: 'center' | 'split';
 }
 const { showSkills = true, layout = 'center' } = Astro.props;
+const split = layout === 'split';
 
 const bioLines = [
   'インターネット絵とデザインと文マン。要するに器用貧乏。',
@@ -51,67 +52,41 @@ const skills = [
 <!-- split: トップページ用。狭い画面でも左揃えの縦積み
   center: プロフィールページ用。狭い画面では中央揃えの縦積み、md以上ではsplitと同じく
   アイコンを左・本文を右に置く2カラムにする -->
-{layout === 'split' ? (
-  <div class="grid items-center gap-8 md:grid-cols-[auto_1fr] md:gap-14">
-    <img
-      src="/images/profile-icon.webp"
-      alt="千紗みかん"
-      width="192"
-      height="192"
-      class="h-28 w-28 rounded-full object-cover shadow-pin md:h-48 md:w-48"
-    />
-    <div>
-      <h3 class="flex items-baseline gap-3 text-3xl font-bold text-ink sm:text-4xl">
-        千紗みかん
-        <span class="text-sm font-medium tracking-normal text-graphite">Chisa Mikan</span>
-      </h3>
-      <p class="mt-4 leading-relaxed text-ink/80">
-        {bioLines.map((line, i) => (
-          <>{i > 0 && <br />}{line}</>
-        ))}
-      </p>
-      <SnsLinks align="start" />
-    </div>
-  </div>
-) : (
-<div class="prose-custom md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-14 md:text-left">
+<div class:list={[split ? 'grid items-center gap-8' : 'prose-custom md:grid md:items-start', 'md:grid-cols-[auto_1fr] md:gap-14 md:text-left']}>
   <img
     src="/images/profile-icon.webp"
     alt="千紗みかん"
     width="192"
     height="192"
-    class="mx-auto h-24 w-24 rounded-full object-cover shadow-pin sm:h-32 sm:w-32 md:mx-0 md:h-48 md:w-48"
+    class:list={['rounded-full object-cover shadow-pin md:h-48 md:w-48', split ? 'h-28 w-28' : 'mx-auto h-24 w-24 sm:h-32 sm:w-32 md:mx-0']}
   />
-  <div class="space-y-6">
-    <div class="md:flex md:items-baseline md:gap-3">
-      <h3 class="whitespace-pre-line font-display text-3xl font-semibold leading-snug text-ink sm:text-4xl md:font-bold">
-        千紗みかん
-      </h3>
-      <p class="mt-1 text-sm text-graphite md:mt-0">Chisa Mikan</p>
+  <div class={split ? 'space-y-4' : 'space-y-6'}>
+    <div class:list={[split ? 'flex' : 'md:flex', 'items-baseline gap-3']}>
+      <h3 class:list={['text-3xl text-ink sm:text-4xl', split ? 'font-bold' : 'font-semibold leading-snug md:font-bold']}>千紗みかん</h3>
+      <p class:list={['text-sm text-graphite', !split && 'mt-1 md:mt-0']}>Chisa Mikan</p>
     </div>
     <p class="leading-relaxed text-ink/80">
       {bioLines.map((line, i) => (
         <>{i > 0 && <br />}{line}</>
       ))}
     </p>
-    <SnsLinks align="responsive" />
+    <SnsLinks align={split ? 'start' : 'responsive'} />
     {showSkills && (
-    <div class="space-y-8">
-      {skills.map((group) => (
-        <div>
-          <p class="text-center font-bold text-ink md:text-left">{group.label}</p>
-          <ul class="mt-3 flex flex-wrap justify-center gap-1.5 md:justify-start">
-            {group.items.map((item) => (
-              <li class="glass-tag">
-                {item.icon && <i class:list={[item.icon, 'mr-1']} aria-hidden="true"></i>}
-                {item.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+      <div class="space-y-8">
+        {skills.map((group) => (
+          <div>
+            <p class="text-center font-bold text-ink md:text-left">{group.label}</p>
+            <ul class="mt-3 flex flex-wrap justify-center gap-1.5 md:justify-start">
+              {group.items.map((item) => (
+                <li class="glass-tag">
+                  {item.icon && <i class:list={[item.icon, 'mr-1']} aria-hidden="true"></i>}
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     )}
   </div>
 </div>
-)}

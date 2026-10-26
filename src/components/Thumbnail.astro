@@ -14,7 +14,7 @@ const hasImage = Boolean(imageUrl);
 const src = imageUrl ?? PLACEHOLDER;
 
 // List.astro専用の枠スタイル(.thumbnail-frame/.thumbnail-frame-static)を使う。
-// Card UI(.glass-card/.glass-panel)とは角丸の値が異なるため、CSSを共有しない
+// Card UI(.glass-panel)とは角丸の値が異なるため、CSSを共有しない
 const frameClass = bare ? '' : 'thumbnail-frame';
 const placeholderFrameClass = bare ? '' : 'thumbnail-frame-static';
 ---

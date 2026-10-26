@@ -47,7 +47,7 @@ const heroImages =
 <BaseLayout>
   <!-- ファーストビュー: 全画面イラスト。ヘッダーは背景を持たない浮かぶ部品なので、
     その高さぶん上に引き上げてイラストをヘッダーの裏まで敷く -->
-  <section class="relative mt-[calc(-1*var(--mobile-header-h,4.5rem))] h-svh min-h-140 w-full overflow-hidden">
+  <section class="relative -mt-18 h-svh min-h-140 w-full overflow-hidden">
     <HeroSlideshow images={heroImages} />
     <!-- イラストに重ねる常時ダークな覆い。ページのテーマではなく固定の紺色を使い、文字の下だけを暗くする -->
     <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(4,18,36,0.75)_0%,rgba(4,18,36,0.25)_40%,rgba(4,18,36,0)_62%),linear-gradient(to_bottom,rgba(4,18,36,0.5),rgba(4,18,36,0)_26%)]"></div>
@@ -84,7 +84,7 @@ const heroImages =
     <SectionHeading eyebrow="Gallery" title="ギャラリー" href="/gallery" />
     <CardSlider id="home-gallery-slider" count={featuredGallery.length}>
       {featuredGallery.map((item) => (
-        <div class="card-reveal h-full">
+        <div class="h-full">
           <Card type="artwork" item={item} />
         </div>
       ))}
@@ -97,7 +97,7 @@ const heroImages =
     {featuredNovels.length > 0 ? (
       <CardSlider id="home-novels-slider" count={featuredNovels.length}>
         {featuredNovels.map((item) => (
-          <div class="card-reveal h-full">
+          <div class="h-full">
             <Card type="novel" item={item} />
           </div>
         ))}
@@ -113,7 +113,7 @@ const heroImages =
     {featuredToolbox.length > 0 ? (
       <CardSlider id="home-toolbox-slider" count={featuredToolbox.length}>
         {featuredToolbox.map((item) => (
-          <div class="card-reveal h-full">
+          <div class="h-full">
             <Card type="toolbox" item={item} />
           </div>
         ))}
@@ -129,7 +129,7 @@ const heroImages =
     {shopItems.length > 0 ? (
       <CardSlider id="home-shop-slider" count={shopItems.length}>
         {shopItems.map((item) => (
-          <div class="card-reveal h-full">
+          <div class="h-full">
             <Card type="shop" item={item} />
           </div>
         ))}

@@ -3,17 +3,13 @@ import { snsLinks } from '../lib/config';
 import MisskeyIcon from './icons/MisskeyIcon.astro';
 
 interface Props {
-  // start: 左寄せ(トップページのプロフィール2カラム用)
+  // start: 左寄せ(トップページのプロフィール・フッター用)
   // responsive: 狭い画面では中央、md以上では左寄せ(プロフィールページ用)
-  align?: 'center' | 'start' | 'responsive';
+  align?: 'start' | 'responsive';
 }
-const { align = 'center' } = Astro.props;
+const { align = 'start' } = Astro.props;
 
-const alignClass = {
-  center: 'mt-8 justify-center',
-  start: 'mt-6 justify-start',
-  responsive: 'mt-8 justify-center md:justify-start',
-}[align];
+const alignClass = align === 'responsive' ? 'mt-8 justify-center md:justify-start' : 'mt-6 justify-start';
 ---
 
 <div class:list={['flex flex-wrap gap-3', alignClass]}>

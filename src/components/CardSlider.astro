@@ -195,25 +195,12 @@ const isSlider = count > 3;
       return card ? card.getBoundingClientRect().width + currentGap() : slider.clientWidth;
     };
 
-    // 複製を前に挿入すると本物カードのDOM位置(sibling-index())がずれ、global.cssの
-    // .card-revealが参照する --card-reveal-index も連動してずれてしまう(スタッガー演出の
-    // 遅延がほぼ揃ってしまい、点滅したように見える不具合の原因)。複製前の並び順を
-    // 明示的に指定して打ち消す
-    originals.forEach((el, i) => {
-      el.style.setProperty('--card-reveal-index', String(i));
-    });
-
     if (originals.length > 1) {
       // 複製は見た目・内容が本物と同一なので、そのまま操作可能にしておく(ホバー/クリック/
       // Lightboxなどは.lightbox-triggerクラス等への委任なので複製にも自然に効く)。
       // 左端のカードが端(1枚目・最後)にある間は、左右どちらかに見えている隣のカードが
       // 複製側になるため、inertにすると「見えているのに反応しない」カードができてしまう
-      const cloneAll = () =>
-        originals.map((el) => {
-          const clone = el.cloneNode(true) as HTMLElement;
-          clone.classList.remove('card-reveal');
-          return clone;
-        });
+      const cloneAll = () => originals.map((el) => el.cloneNode(true) as HTMLElement);
 
       slider.prepend(...cloneAll());
       const tailClones = cloneAll();
@@ -256,25 +243,6 @@ const isSlider = count > 3;
         dot.addEventListener('click', () => {
           slider.scrollTo({ left: anchor + i * stepDistance(), behavior: 'smooth' });
         });
-      });
-
-      // 初期表示でスライダーの外(横スクロールでクリップされた領域)にあるカードは、
-      // BaseLayoutの.reveal監視(IntersectionObserver、しきい値15%)がページの縦スクロール
-      // にしか反応せず発火しないため、カルーセル操作で表示してもopacity:0のまま回転して
-      // 固まってしまう。右端などにわずかに覗いているだけのカードも、見えている割合が
-      // このしきい値未満だと同じく発火せず固まるため、「見えている割合」で同じ基準を使い、
-      // 15%未満のカードはあらかじめ表示済み扱いにしておく
-      const sliderRect = slider.getBoundingClientRect();
-      originals.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const overlapWidth = Math.max(
-          0,
-          Math.min(rect.right, sliderRect.right) - Math.max(rect.left, sliderRect.left),
-        );
-        const visibleRatio = rect.width > 0 ? overlapWidth / rect.width : 0;
-        if (visibleRatio < 0.15) {
-          el.classList.add('is-visible');
-        }
       });
 
       const correctLoopPosition = () => {

@@ -14,8 +14,10 @@ const isTop = currentPath === '/';
 
 <!-- 画面幅いっぱいの帯。紙色のすりガラスに下端の区切り線を引く。
   トップページ(is-overlay)ではファーストビューを過ぎるまで透明・白文字にし、イラストを見せる -->
-<header id="site-header" class:list={['site-header sticky top-0 z-40', isTop && 'is-overlay']}>
-  <div class="flex h-18 items-center gap-6 px-4 sm:px-8 lg:px-12">
+<!-- 高さは下端の区切り線込みで h-18(4.5rem)に固定する。トップのファーストビューの引き上げや
+  メニュー位置・スクロール位置の補正は、この値を前提にしている -->
+<header id="site-header" class:list={['site-header sticky top-0 z-40 h-18', isTop && 'is-overlay']}>
+  <div class="flex h-full items-center gap-6 px-4 sm:px-8 lg:px-12">
     <a href="/" class="flex shrink-0 items-center gap-2.5 text-[22px] font-semibold tracking-[-0.02em]">
       <img src="/favicon.svg" alt="" width="28" height="28" class="h-7 w-7 rounded-[5px]" />
       <span>chisamikan<span class="text-accent">.site</span></span>
@@ -149,18 +151,16 @@ const isTop = currentPath === '/';
   }
 
   .mobile-nav-overlay {
-    /* ヘッダーは背景を持たないため、オーバーレイをヘッダーの下から始めると
-       上端に裏のページが帯状に覗いてしまう。画面全体を覆い、ヘッダー(z-40)はその上に重ねる */
+    /* 画面全体を覆い、ヘッダー(z-40)はその上に重ねる。トップページのヘッダーは
+       透明なため、ヘッダーの下から始めると上端に裏のページが帯状に覗いてしまう */
     top: 0;
     height: 100dvh;
   }
 
   .mobile-nav-list {
     /* 項目の中央揃えは、ヘッダーに隠れない見えている範囲を基準にするため、
-       JSで実測したヘッダー高さの半分だけ下にずらす。
-       var()のフォールバック用コンマがscoped styleの@apply内では正しく処理できない
-       (エスケープしても出力にバックスラッシュが残ってしまう)ため、プレーンCSSのまま残す */
-    top: calc(50% + var(--mobile-header-h, 4.5rem) / 2);
+       ヘッダーの高さ(h-18 = 4.5rem)の半分だけ下にずらす */
+    top: calc(50% + 2.25rem);
   }
 
   /* 横向きで縦の表示領域が狭い端末では9項目の縦積みが画面に収まらないため、
@@ -223,26 +223,16 @@ const isTop = currentPath === '/';
 </style>
 
 <script>
-  // モバイルメニューの高さ計算用に、ヘッダーの実測高さをCSS変数として公開する。
-  // フォント読み込みや端末回転での変化に追従できるようResizeObserverで監視する。
   const siteHeader = document.getElementById('site-header');
 
-  if (siteHeader) {
-    const updateHeaderHeight = () => {
-      document.documentElement.style.setProperty('--mobile-header-h', `${siteHeader.offsetHeight}px`);
+  // トップページでは、ファーストビュー(画面の高さ)を過ぎたら帯を表示する
+  if (siteHeader?.classList.contains('is-overlay')) {
+    const updateSolid = () => {
+      siteHeader.classList.toggle('is-solid', window.scrollY > window.innerHeight - siteHeader.offsetHeight);
     };
-    updateHeaderHeight();
-    new ResizeObserver(updateHeaderHeight).observe(siteHeader);
-
-    // トップページでは、ファーストビュー(画面の高さ)を過ぎたら帯を表示する
-    if (siteHeader.classList.contains('is-overlay')) {
-      const updateSolid = () => {
-        siteHeader.classList.toggle('is-solid', window.scrollY > window.innerHeight - siteHeader.offsetHeight);
-      };
-      updateSolid();
-      window.addEventListener('scroll', updateSolid, { passive: true });
-      window.addEventListener('resize', updateSolid);
-    }
+    updateSolid();
+    window.addEventListener('scroll', updateSolid, { passive: true });
+    window.addEventListener('resize', updateSolid);
   }
 
   const toggles = document.querySelectorAll<HTMLButtonElement>('.theme-toggle-btn');
