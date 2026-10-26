@@ -75,7 +75,7 @@ const isTop = currentPath === '/';
 
 <nav
   aria-label="サイト内ナビゲーション（モバイル）"
-  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/80 opacity-0 backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 nav:hidden"
+  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/80 opacity-0 backdrop-blur-xl transition duration-200 ease-out motion-reduce:translate-y-0 peer-checked:pointer-events-auto peer-checked:duration-250 peer-checked:translate-y-0 peer-checked:opacity-100 nav:hidden"
 >
   <!-- 区切り線を画面の横幅いっぱいに引くため、左右の余白はリスト側ではなく各行(リンク)に持たせる。
     行全体をリンクにしてタップできる範囲も広げる。表示中のページは、行の左端のアクセント色の線と
@@ -183,7 +183,10 @@ const isTop = currentPath === '/';
   }
 
   .nav-icon-bars span {
-    @apply absolute left-0 w-full h-0.5 rounded-[2px] bg-current transition-all duration-[250ms] ease-in-out;
+    @apply absolute left-0 w-full h-0.5 rounded-[2px] bg-current;
+    /* top/width/leftを動かすとレイアウトの再計算が走るため、変形はtransform/opacityだけで行う。
+       Tailwindのrotate-*はtransformではなく別プロパティ(rotate)を設定するため、変形はプレーンCSSで書く */
+    transition: transform 200ms var(--ease-out), opacity 200ms ease;
   }
 
   .nav-icon-bars span:nth-child(1) {
@@ -205,20 +208,22 @@ const isTop = currentPath === '/';
     @apply top-[14px];
   }
 
+  /* 開くと上下の線は中央へ寄りながら縮んで消え、真ん中の2本が×に交差する */
   #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(1) {
-    @apply top-[7px] w-0 left-1/2;
+    transform: translateY(7px) scaleX(0);
   }
 
   #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(2) {
-    @apply rotate-45;
+    transform: rotate(45deg);
   }
 
   #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(3) {
-    @apply opacity-100 -rotate-45;
+    @apply opacity-100;
+    transform: rotate(-45deg);
   }
 
   #nav-toggle:checked ~ header .nav-icon-bars span:nth-child(4) {
-    @apply top-[7px] w-0 left-1/2;
+    transform: translateY(-7px) scaleX(0);
   }
 </style>
 

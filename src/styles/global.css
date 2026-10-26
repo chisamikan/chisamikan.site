@@ -187,7 +187,7 @@
   /* 無地の背景の上ではすりガラスのぼかしが見えずただの白いボタンになるため、
      タグ・入力欄と同じく細い枠線だけで示す。ホバーではごく薄く塗る */
   .btn-glass {
-    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-ink/20 px-5 py-2.5 font-body text-sm font-medium text-ink transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:border-ink/35 hover:bg-ink/5 active:scale-[0.97];
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-ink/20 px-5 py-2.5 font-body text-sm font-medium text-ink transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out hover:border-ink/35 hover:bg-ink/5 active:scale-[0.97];
   }
 
   /* ページ下部の導線やフォーム送信などの単独で置くボタンの横幅。親要素の幅(ページごとに異なる)の
@@ -213,7 +213,7 @@
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
   .btn-glass-ghost {
-    @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-200 ease-out hover:border-accent/50 hover:text-accent-text active:scale-[0.97];
+    @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-150 ease-out hover:border-accent/50 hover:text-accent-text active:scale-[0.97];
   }
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
@@ -519,6 +519,13 @@
     /* Tailwindのtranslate-y-0はtransformではなく別プロパティtranslateを設定してしまい、
        上のtransform(translateY(8px))を打ち消せないため、プレーンCSSで上書きする */
     transform: none;
+  }
+
+  /* 絞り込み/ページ送りで再生し直す時(lib/tagFilter.tsのrevealItemsがdata-replayを付与)は、
+     続けて何度も押される操作への反応なので、初回のスクロール表示より短く・時間差も詰める */
+  .card-reveal[data-replay] {
+    transition-duration: 200ms;
+    transition-delay: clamp(0.03s, calc((var(--card-reveal-index) + 1) * 0.03s), 0.15s);
   }
 
   .no-js .card-reveal {

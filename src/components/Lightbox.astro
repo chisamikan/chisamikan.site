@@ -45,13 +45,14 @@
   }
 
   .lightbox-dialog::backdrop {
-    @apply opacity-0 transition-opacity duration-280 ease-[ease];
+    @apply opacity-0 transition-opacity duration-200 ease-[ease];
     /* rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     background: rgba(4, 18, 36, 0.85);
   }
 
+  /* 開く時は280ms、閉じる時(基本の状態へ戻る時)は200msと、閉じる側を速くする */
   .lightbox-dialog.is-open::backdrop {
-    @apply opacity-100;
+    @apply opacity-100 duration-280;
   }
 
   .lightbox-dialog img {
@@ -61,12 +62,13 @@
     max-width: min(90vw, 900px);
     box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
     transform: scale(0.95);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .lightbox-dialog img.is-visible {
     @apply opacity-100;
     transform: scale(1);
+    transition-duration: 0.28s;
   }
 
   /* 画像とキャプションを縦に並べる。幅は画像の幅に合わせ(min-content)、
@@ -86,12 +88,13 @@
        min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     min-width: min(80vw, 20rem);
     transform: translateY(8px);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .lightbox-dialog.is-open .lightbox-caption {
     @apply opacity-100;
     transform: none;
+    transition-duration: 0.28s;
   }
 
   /* 長い説明文でも画面からはみ出さないよう、キャプション内だけをスクロールさせる */
@@ -102,12 +105,13 @@
   .lightbox-close {
     @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-white bg-transparent border-none cursor-pointer opacity-0;
     transform: scale(0.95);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .lightbox-dialog.is-open .lightbox-close {
     @apply opacity-100;
     transform: scale(1);
+    transition-duration: 0.28s;
   }
 
   .lightbox-close:hover {
@@ -120,21 +124,33 @@
     max-width: min(90vw, 420px);
     box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
     transform: scale(0.95);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .nsfw-warning-dialog.is-open {
     @apply opacity-100;
     transform: scale(1);
+    transition-duration: 0.28s;
   }
 
   .nsfw-warning-dialog::backdrop {
-    @apply opacity-0 transition-opacity duration-280 ease-[ease];
+    @apply opacity-0 transition-opacity duration-200 ease-[ease];
     background: rgba(4, 18, 36, 0.85);
   }
 
   .nsfw-warning-dialog.is-open::backdrop {
-    @apply opacity-100;
+    @apply opacity-100 duration-280;
+  }
+
+  /* 視差効果を減らす設定では、拡大・せり上がりをなくして透明度の変化だけで開閉する
+     (閉じる処理はopacityのtransitionendを待つため、transition自体は無効にしない) */
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox-dialog img,
+    .lightbox-caption,
+    .lightbox-close,
+    .nsfw-warning-dialog {
+      transform: none !important;
+    }
   }
 
   .nsfw-warning-title {
@@ -220,7 +236,7 @@
     img.classList.remove('is-visible');
     dialog.classList.remove('is-open');
     const onEnd = (e: TransitionEvent) => {
-      if (e.propertyName !== 'transform') return;
+      if (e.propertyName !== 'opacity') return;
       img.removeEventListener('transitionend', onEnd);
       dialog.close();
     };
@@ -246,7 +262,7 @@
     if (!nsfwDialog || !nsfwDialog.open) return;
     nsfwDialog.classList.remove('is-open');
     const onEnd = (e: TransitionEvent) => {
-      if (e.propertyName !== 'transform') return;
+      if (e.propertyName !== 'opacity') return;
       nsfwDialog.removeEventListener('transitionend', onEnd);
       nsfwDialog.close();
       onClosed?.();
