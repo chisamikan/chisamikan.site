@@ -156,6 +156,25 @@
     @apply bg-accent/25 text-ink;
   }
 
+  /* ダブルタップでの拡大の判定待ちをなくし、タップしたらすぐ反応させる */
+  a, button, label, summary, [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* 操作部品(ボタン・絞り込み・アコーディオンの見出し)は、長押しで文字が選択されないようにする。
+     本文やリンクの文字は、コピーできるよう選択可能なままにする */
+  button, summary, .btn-glass, .btn-glass-ghost, .nav-icon-toggle {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* iPhoneを横向きにした時、本文がノッチ等に重ならないよう安全領域の分だけ内側に寄せる
+     (BaseLayoutのviewport-fit=coverとセット。縦向きでは値が0なので変化しない) */
+  main, footer {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
   :focus-visible {
     @apply rounded-[2px] outline-[2.5px] outline-accent outline-offset-[3px];
   }
@@ -238,10 +257,12 @@
   }
 
   /* フォーム部品。入力欄は中身を書き込む面なので、ガラスではなくカードと同じ不透明な面にする。
-     枠線の色の変化だけでは入力中の欄が分かりにくいため、フォーカス時は淡いリングも添える */
+     枠線の色の変化だけでは入力中の欄が分かりにくいため、フォーカス時は淡いリングも添える。
+     文字は16px(text-base)以上にする。iOS Safariは16px未満の入力欄にフォーカスすると画面を拡大し、
+     入力後も元に戻さないため(拡大自体を禁止するのはアクセシビリティを損なうので使わない) */
   .glass-input,
   .glass-textarea {
-    @apply w-full rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink/60 focus:border-accent focus:ring-3 focus:ring-accent/20;
+    @apply w-full rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-base text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink/60 focus:border-accent focus:ring-3 focus:ring-accent/20;
   }
 
   .glass-textarea {
@@ -419,7 +440,7 @@
      不透明な面にして画像を主役にする。ホバーではカード自体は浮かせず影だけ深くし、
      中の画像を少し拡大する(Card.astro側) */
   .glass-panel {
-    @apply cursor-pointer rounded-lg border border-glass-border-subtle bg-surface shadow-card transition-shadow duration-300 ease-out hover:shadow-card-lg;
+    @apply cursor-pointer rounded-lg border border-glass-border-subtle bg-surface shadow-card transition-[box-shadow,transform] duration-150 ease-out hover:shadow-card-lg active:scale-[0.99] motion-reduce:active:scale-100;
   }
 
   /* カードのサムネイル下部に重ねる、タグ・タイトル・説明文の帯。暗いグラデーションの上に白文字で載せる。

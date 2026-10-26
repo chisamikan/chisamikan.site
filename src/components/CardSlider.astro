@@ -32,7 +32,7 @@ const isSlider = count > 3;
       ホバー時の浮き上がり(-translate-y-1.5)がちょうど収まる分の遊びを確保するため */}
   <div
     id={id}
-    class:list={['card-slider flex items-stretch snap-x snap-mandatory gap-4 sm:gap-8 overflow-x-auto py-11', sliderClass]}
+    class:list={['card-slider flex items-stretch snap-x snap-mandatory gap-4 sm:gap-8 overflow-x-auto overscroll-x-contain py-11', sliderClass]}
     data-card-slider
   >
     <slot />

@@ -39,7 +39,7 @@
   .lightbox-dialog {
     /* Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
        打ち消してしまうため、中央寄せを明示的に指定し直す */
-    @apply fixed inset-0 m-auto max-h-[85vh] p-0 overflow-visible border-none bg-transparent;
+    @apply fixed inset-0 m-auto max-h-[85dvh] p-0 overflow-visible border-none bg-transparent;
     /* min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 900px);
   }
@@ -56,7 +56,7 @@
   }
 
   .lightbox-dialog img {
-    @apply block max-h-[85vh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0;
+    @apply block max-h-[85dvh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0;
     /* min()/rgba()のコンマ、および is-visible時の transform: scale(1) と同じプロパティを
        扱う都合上、この3行のみプレーンCSSのまま残す */
     max-width: min(90vw, 900px);
@@ -79,7 +79,7 @@
 
   /* キャプションがある時は、画像と合わせて画面に収まるよう画像の高さを抑える */
   .lightbox-dialog.has-caption img {
-    @apply max-h-[78vh];
+    @apply max-h-[78dvh];
   }
 
   .lightbox-caption {
@@ -99,7 +99,7 @@
 
   /* 長い説明文でも画面からはみ出さないよう、キャプション内だけをスクロールさせる */
   .lightbox-caption-description {
-    @apply max-h-[14vh] overflow-y-auto whitespace-pre-line text-[11px] leading-relaxed text-white/70;
+    @apply max-h-[14dvh] overflow-y-auto overscroll-contain whitespace-pre-line text-[11px] leading-relaxed text-white/70;
   }
 
   .lightbox-close {
@@ -114,8 +114,10 @@
     transition-duration: 0.28s;
   }
 
-  .lightbox-close:hover {
-    @apply text-accent;
+  @media (hover: hover) and (pointer: fine) {
+    .lightbox-close:hover {
+      @apply text-accent;
+    }
   }
 
   .nsfw-warning-dialog {
@@ -170,8 +172,10 @@
     @apply absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-xl leading-none text-ink/50 bg-transparent border-none rounded-full cursor-pointer;
   }
 
-  .nsfw-warning-close:hover {
-    @apply text-ink bg-ink/8;
+  @media (hover: hover) and (pointer: fine) {
+    .nsfw-warning-close:hover {
+      @apply text-ink bg-ink/8;
+    }
   }
 </style>
 
