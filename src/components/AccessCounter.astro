@@ -8,7 +8,7 @@ const DIGITS = 6;
   <p class="text-[11px] uppercase tracking-[0.2em]">Access Counter</p>
   <div class="flex gap-1" data-access-counter-digits aria-live="polite">
     {Array.from({ length: DIGITS }).map(() => (
-      <span class="inline-flex h-8 w-6 items-center justify-center rounded-md border border-glass-border bg-glass text-sm text-ink/40 shadow-glass backdrop-blur-sm sm:h-9 sm:w-7 sm:text-base">
+      <span class="inline-flex h-8 w-6 items-center justify-center rounded-md border border-glass-border-subtle bg-surface font-num text-sm text-ink/40 sm:h-9 sm:w-7 sm:text-base">
         -
       </span>
     ))}
@@ -33,7 +33,7 @@ const DIGITS = 6;
     if (!digitsEl) return;
 
     const digitClass =
-      'inline-flex h-8 w-6 items-center justify-center rounded-md border border-glass-border bg-glass text-sm text-ink shadow-glass backdrop-blur-sm sm:h-9 sm:w-7 sm:text-base';
+      'inline-flex h-8 w-6 items-center justify-center rounded-md border border-glass-border-subtle bg-surface font-num text-sm text-ink sm:h-9 sm:w-7 sm:text-base';
 
     const renderDigits = (text: string) => {
       digitsEl.innerHTML = '';

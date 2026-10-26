@@ -196,6 +196,11 @@
     @apply w-full sm:w-80;
   }
 
+  /* ページ送りの現在のページ。絞り込みの選択中(.filter-btn.is-active)と同じ塗りで示す */
+  .btn-glass-current {
+    @apply cursor-default rounded-full border border-transparent bg-accent-strong px-3 py-1.5 text-xs font-medium text-on-accent;
+  }
+
   .btn-glass-sm {
     @apply px-3.5 py-1.5 text-xs;
   }
@@ -245,12 +250,13 @@
     @apply flex flex-col gap-2;
   }
 
+  /* ガラスの箱ではなく、お知らせ一覧と同じ細い区切り線の行として並べる */
   .glass-accordion-item {
-    @apply overflow-hidden rounded-lg border border-glass-border-subtle bg-glass backdrop-blur-md transition-shadow duration-300;
+    @apply border-b border-ink/10 first-of-type:border-t;
   }
 
   .glass-accordion-trigger {
-    @apply flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-body text-sm font-medium text-ink transition-colors duration-300 hover:bg-glass-md;
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 py-5 font-body text-sm font-medium text-ink transition-colors duration-200 hover:text-accent;
   }
 
   .glass-accordion-trigger::-webkit-details-marker {
@@ -258,7 +264,7 @@
   }
 
   .glass-accordion-content {
-    @apply px-5 pb-4 text-sm leading-relaxed text-ink/75;
+    @apply pb-6 leading-relaxed text-ink/75;
   }
 
   /* おみくじ結果(404ページ)のラベル/値の行。JSがinnerHTMLで生成するDOM向けのため、

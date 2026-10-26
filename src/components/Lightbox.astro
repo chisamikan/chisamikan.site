@@ -3,13 +3,20 @@
 // class="lightbox-trigger" data-full="{画像URL}" data-alt="{alt}" を付与するだけで連動する。
 // data-nsfw="true" を付けると、初回クリック時のみ注意書きモーダルを挟む
 // (同意状況はlocalStorageに保存し、2回目以降は素通りする)。
+// data-description="{説明文}" を付けると、画像の下に説明文(主に著作権表記)の全文を小さく表示する
+// (カード上では説明文を1行で省略しているため、ここで全文を読めるようにする)。
 ---
 
 <dialog id="lightbox" class="lightbox-dialog">
   <button type="button" id="lightbox-close" aria-label="閉じる" class="lightbox-close">
     <i class="fa-solid fa-xmark"></i>
   </button>
-  <img id="lightbox-img" src="" alt="" />
+  <figure class="lightbox-figure">
+    <img id="lightbox-img" src="" alt="" />
+    <figcaption id="lightbox-caption" class="lightbox-caption" hidden>
+      <p id="lightbox-caption-description" class="lightbox-caption-description"></p>
+    </figcaption>
+  </figure>
 </dialog>
 
 <dialog id="nsfw-warning" class="nsfw-warning-dialog">
@@ -60,6 +67,36 @@
   .lightbox-dialog img.is-visible {
     @apply opacity-100;
     transform: scale(1);
+  }
+
+  /* 画像とキャプションを縦に並べる。幅は画像の幅に合わせ(min-content)、
+     キャプションの文章は画像の幅で折り返させる */
+  .lightbox-figure {
+    @apply m-0 flex w-min flex-col items-center;
+  }
+
+  /* キャプションがある時は、画像と合わせて画面に収まるよう画像の高さを抑える */
+  .lightbox-dialog.has-caption img {
+    @apply max-h-[78vh];
+  }
+
+  .lightbox-caption {
+    @apply mt-3 w-full text-left opacity-0;
+    /* 縦長の画像でも文章が細く折り返されすぎないよう最小幅を持たせる。
+       min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
+    min-width: min(80vw, 20rem);
+    transform: translateY(8px);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+
+  .lightbox-dialog.is-open .lightbox-caption {
+    @apply opacity-100;
+    transform: none;
+  }
+
+  /* 長い説明文でも画面からはみ出さないよう、キャプション内だけをスクロールさせる */
+  .lightbox-caption-description {
+    @apply max-h-[14vh] overflow-y-auto whitespace-pre-line text-[11px] leading-relaxed text-white/70;
   }
 
   .lightbox-close {
@@ -126,6 +163,8 @@
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
   const img = document.querySelector<HTMLImageElement>('#lightbox-img');
   const closeBtn = document.querySelector<HTMLButtonElement>('#lightbox-close');
+  const caption = document.querySelector<HTMLElement>('#lightbox-caption');
+  const captionDescription = document.querySelector<HTMLElement>('#lightbox-caption-description');
 
   const nsfwDialog = document.querySelector<HTMLDialogElement>('#nsfw-warning');
   const nsfwConfirmBtn = document.querySelector<HTMLButtonElement>('#nsfw-warning-confirm');
@@ -156,6 +195,14 @@
     if (!full) return;
     img.src = full;
     img.alt = trigger.dataset.alt ?? '';
+
+    const description = trigger.dataset.description ?? '';
+    if (caption && captionDescription) {
+      captionDescription.textContent = description;
+      caption.hidden = !description;
+    }
+    dialog.classList.toggle('has-caption', Boolean(description));
+
     img.classList.remove('is-visible');
     dialog.classList.remove('is-open');
     dialog.showModal();
