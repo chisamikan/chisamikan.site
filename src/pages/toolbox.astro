@@ -17,7 +17,7 @@ const items = await getToolboxItems();
     </p>
 
     {items.length > 0 ? (
-      <div id="toolbox-list">
+      <div id="toolbox-list" class="border-b border-ink/10">
         {items.map((item) => (
           <div class="card-reveal">
             <List type="toolbox" item={item} headingLevel={2} />

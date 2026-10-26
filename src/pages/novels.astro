@@ -17,7 +17,7 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
     <TagFilter tags={tags} containerSelector="#novels-list" emptySelector="#novels-empty" />
 
     {novels.length > 0 ? (
-      <div id="novels-list">
+      <div id="novels-list" class="border-b border-ink/10">
         {novels.map((item) => (
           <div class="card-reveal" data-tags={item.tags.join('|')}>
             <List type="novel" item={item} headingLevel={2} />

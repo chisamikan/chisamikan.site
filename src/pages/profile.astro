@@ -52,7 +52,7 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
       <TagFilter tags={workTags} containerSelector="#works-list" emptySelector="#works-empty" />
 
       {works.length > 0 ? (
-        <div id="works-list">
+        <div id="works-list" class="border-b border-ink/10">
           {works.map((item) => (
             <div class="card-reveal" data-tags={item.tags.join('|')}>
               <List type="work" item={item} headingLevel={3} />

@@ -154,7 +154,7 @@
 
   /* 子ページの見出し(h1)直下のリード文。ページ間で大きさを揃え、本文(--size-body)より一回り大きくする */
   .page-lead {
-    @apply mb-10 text-left text-lg leading-relaxed text-ink/80 sm:text-xl;
+    @apply mb-10 text-left text-lg leading-[1.8] text-ink/80 sm:text-xl;
   }
 
   /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
@@ -276,7 +276,7 @@
   }
 
   .glass-accordion-content {
-    @apply pb-6 leading-relaxed text-ink/75;
+    @apply pb-6 leading-[1.9] text-ink/75;
   }
 
   /* おみくじ結果(404ページ)のラベル/値の行。JSがinnerHTMLで生成するDOM向けのため、

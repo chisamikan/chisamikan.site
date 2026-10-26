@@ -57,6 +57,17 @@ const structuredData = {
         var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.classList.toggle('dark', isDark);
       })();
+      // 読み込み画面(PageLoader)はセッション中の初回表示だけ見せる。2ページ目以降は
+      // 描画前に印を付けて最初から出さない(印の保存はPageLoader側で行う)。
+      (function () {
+        try {
+          if (sessionStorage.getItem('chisamikan-page-loader-shown')) {
+            document.documentElement.classList.add('skip-page-loader');
+          }
+        } catch (e) {
+          // sessionStorageが使えない場合は毎回表示するが、閲覧には支障がない
+        }
+      })();
     </script>
     <script>
       document.documentElement.classList.remove('no-js');
