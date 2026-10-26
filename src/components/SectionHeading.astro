@@ -9,9 +9,12 @@ interface Props {
 }
 const { eyebrow, title, level = 2, href, linkLabel = 'すべて見る' } = Astro.props;
 const Tag = `h${level}` as 'h1' | 'h2';
+// href の「すべて見る」以外を見出しの右端に置きたい場合(お知らせの「RSSで購読する」等)は、
+// slot="action" を付けた要素を渡す
+const hasAction = Astro.slots.has('action');
 ---
 
-<div class:list={['mb-10', href && 'flex items-end justify-between gap-4']}>
+<div class:list={['mb-10', (href || hasAction) && 'flex items-end justify-between gap-4']}>
   <!-- 「英語名 日本語名」を左揃えの1行に並べ、英語名を大きく見せる。狭い画面でも改行せず収まるよう、
     英語名は画面幅に応じて縮める(最長の「Privacy Policy プライバシーポリシー」が375px幅に収まる大きさ) -->
   <Tag class="flex items-baseline gap-x-3 whitespace-nowrap">
@@ -40,4 +43,5 @@ const Tag = `h${level}` as 'h1' | 'h2';
       ></i>
     </a>
   )}
+  <slot name="action" />
 </div>

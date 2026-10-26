@@ -35,7 +35,15 @@ const categoryPath = (c: NewsCategory) => `/news/category/${c}`;
 
 <BaseLayout title={`News - ${meta.label}`} description={`${meta.label}に関するお知らせ・更新履歴の一覧です。`}>
   <section class="page-section">
-    <SectionHeading eyebrow="News" title="お知らせ" level={1} />
+    <SectionHeading eyebrow="News" title="お知らせ" level={1}>
+      <a
+        slot="action"
+        href="/rss.xml"
+        class="no-external-icon inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-accent-text transition-colors hover:text-ink"
+      >
+        <i class="fa-solid fa-rss" aria-hidden="true"></i>RSSで購読する
+      </a>
+    </SectionHeading>
 
     <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} current={category} />
 
