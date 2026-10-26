@@ -174,7 +174,7 @@ const structuredData = {
     </main>
     <Footer />
     <script>
-      const revealEls = document.querySelectorAll<HTMLElement>('.reveal, .card-reveal');
+      const revealEls = document.querySelectorAll<HTMLElement>('.reveal, .card-reveal, .heading-reveal');
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -187,7 +187,24 @@ const structuredData = {
         },
         { threshold: 0.15, rootMargin: '0px 0px -10% 0px' },
       );
-      revealEls.forEach((el) => observer.observe(el));
+      const startReveal = () => revealEls.forEach((el) => observer.observe(el));
+
+      // 読み込み画面(PageLoader)が出ている間に始めると、画面に入っている見出し等の演出が
+      // その下で終わってしまうため、読み込み画面が消え始めてから監視を始める
+      const loader = document.getElementById('page-loader');
+      const loaderShown =
+        loader && !loader.classList.contains('is-hidden') && getComputedStyle(loader).display !== 'none';
+      if (loaderShown) {
+        new MutationObserver((_, mo) => {
+          if (!loader.classList.contains('is-hidden')) return;
+          mo.disconnect();
+          startReveal();
+        }).observe(loader, { attributes: true, attributeFilter: ['class'] });
+        // 読み込み画面のスクリプトが動かず is-hidden が付かない場合(CSSの10秒の安全策で消える)に備える
+        window.setTimeout(startReveal, 10000);
+      } else {
+        startReveal();
+      }
     </script>
   </body>
 </html>

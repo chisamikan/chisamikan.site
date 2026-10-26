@@ -14,23 +14,29 @@ const Tag = `h${level}` as 'h1' | 'h2';
 const hasAction = Astro.slots.has('action');
 ---
 
-<div class:list={['mb-10', (href || hasAction) && 'flex flex-wrap items-end justify-between gap-x-4 gap-y-2']}>
+<!-- heading-reveal: 画面に入ったら(BaseLayoutの監視がis-visibleを付与)、英語名→日本語名→リンクの順に現れる。
+  演出の中身は global.css の .heading-reveal-* を参照 -->
+<div class:list={['heading-reveal mb-10', (href || hasAction) && 'flex flex-wrap items-end justify-between gap-x-4 gap-y-2']}>
   <!-- 「英語名 日本語名」を左揃えの1行に並べ、英語名を大きく見せる。狭い画面でも改行せず収まるよう、
     英語名は画面幅に応じて縮める(最長の「Privacy Policy プライバシーポリシー」が375px幅に収まる大きさ) -->
   <Tag class="flex items-baseline gap-x-3 whitespace-nowrap">
     {eyebrow ? (
       <>
-        <span class="text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-semibold leading-none tracking-[-0.03em]">{eyebrow}</span>
-        <span class="text-sm font-bold text-accent-text sm:text-lg lg:text-xl">{title}</span>
+        <span class="heading-reveal-mask">
+          <span class="heading-reveal-en text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-semibold leading-none tracking-[-0.03em]">{eyebrow}</span>
+        </span>
+        <span class="heading-reveal-ja text-sm font-bold text-accent-text sm:text-lg lg:text-xl">{title}</span>
       </>
     ) : (
-      <span class="text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-bold leading-none">{title}</span>
+      <span class="heading-reveal-mask">
+        <span class="heading-reveal-en text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-bold leading-none">{title}</span>
+      </span>
     )}
   </Tag>
   {href && (
     <a
       href={href}
-      class="group no-external-icon ml-auto shrink-0 text-sm font-medium text-accent-text"
+      class="heading-reveal-link group no-external-icon ml-auto shrink-0 text-sm font-medium text-accent-text"
       {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
       {linkLabel}
@@ -43,5 +49,9 @@ const hasAction = Astro.slots.has('action');
       ></i>
     </a>
   )}
-  <slot name="action" />
+  {hasAction && (
+    <span class="heading-reveal-link ml-auto shrink-0">
+      <slot name="action" />
+    </span>
+  )}
 </div>

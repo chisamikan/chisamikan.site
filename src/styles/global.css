@@ -484,83 +484,152 @@
     }
   }
 
-  /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる(JSが .is-visible を付与) */
-  .reveal {
-    @apply opacity-0 translate-y-4 transition-[opacity,transform] duration-700 ease-out;
+  /* ---- スクロール演出(JSの監視が画面に入った要素に .is-visible を付与する) ----
+     スクロールで現れる演出は1回の訪問で数回しか見ないため、UIの操作(〜300ms)より長めにして
+     「見せる」演出にする。カーブは全体の --ease-out(強いease-out)で揃える */
+
+  /* セクション: セクション全体ではなく中身(スライダー・本文・ボタン等)を、見出しのあとに
+     順番にせり上げる。見出し(.heading-reveal)は自前の演出を持つため対象から外す。
+     遅延は並び順(sibling-index())から計算し、未対応のブラウザでは時間差なしで現れる */
+  .reveal > :not(.heading-reveal) {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity 700ms ease,
+      transform 900ms var(--ease-out);
+    transition-delay: calc(min(sibling-index(), 5) * 110ms);
   }
 
-  .reveal.is-visible {
-    @apply opacity-100 translate-y-0;
+  .reveal.is-visible > :not(.heading-reveal) {
+    opacity: 1;
+    transform: none;
   }
 
-  .no-js .reveal {
-    @apply opacity-100 transform-none;
+  /* 見出し: 英語名がマスクの中を下からせり上がり、少し遅れて日本語名がぼかしの晴れるように現れ、
+     最後に右端のリンク(「すべて見る」等)が横から滑り込む */
+  .heading-reveal-mask {
+    display: inline-block;
+    /* せり上がる英語名を、この枠の外では見せない。overflow:hiddenだと枠自体のベースラインが
+       下端に変わり日本語名との文字の下揃えが崩れるため、clip-pathで切り抜く。
+       下側は g・y などの下に伸びる文字が欠けないよう少し広げる */
+    clip-path: inset(-0.1em -0.2em -0.22em -0.2em);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .reveal {
-      @apply opacity-100 transform-none transition-none;
-    }
+  .heading-reveal-en {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(125%);
+    transition:
+      opacity 500ms ease,
+      transform 1000ms var(--ease-out);
   }
 
-  /* カード一覧(ギャラリー/小説/ツールボックス/実績など)を、画面に入ったタイミングで
-     並び順に応じて時間差で少しせり上げながらフェードインさせる。.reveal と同じくJSが
-     is-visible を付与するが、遅延はCSSのsibling-index()で並び順から自動計算する
-     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count)。
+  .heading-reveal-ja {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(6px);
+    transition:
+      opacity 700ms ease 180ms,
+      transform 900ms var(--ease-out) 180ms,
+      filter 700ms ease 180ms;
+  }
+
+  .heading-reveal-link {
+    opacity: 0;
+    transform: translateX(-12px);
+    transition:
+      opacity 600ms ease 320ms,
+      transform 800ms var(--ease-out) 320ms;
+  }
+
+  .heading-reveal.is-visible :is(.heading-reveal-en, .heading-reveal-ja, .heading-reveal-link) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* カード一覧(ギャラリー/小説/ツールボックス/実績など): 並び順に応じた時間差で、せり上がりながら
+     現れる。カードはわずかに縮んだ状態から元の大きさへ戻り、中のイラストは少し拡大した状態から
+     ゆっくり引いて「ピントが合う」ように落ち着く(一覧の行は横幅が広く縮みが目立つため、移動のみ)。
      ギャラリーは絞り込み/ページ送り用に全件を常にDOMへ描画しており、sibling-index()は
-     表示中の件数ではなくグリッド内の全カード中のDOM位置を返してしまう。そのため
-     100件目以降のカードでは遅延が数秒単位に達し、ロード完了後もカードが表示され
-     ないという不具合になっていた。9件(1ページ分)相当の値で頭打ちにして防ぐ */
+     表示中の件数ではなくグリッド内の全カード中のDOM位置を返してしまうため、遅延は上限で頭打ちにする
+     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count) */
   .card-reveal {
-    @apply opacity-0 transition-[opacity,transform] duration-500 ease-out;
-    /* will-changeで事前にコンポジットレイヤーを確保しておかないと、
-       display:none解除と同時にトランジションが始まる際、レイヤー昇格が
-       アニメーション開始と同一フレームで発生し、前半のフレームが
-       まとめて省略されて瞬間的に終端値へワープして見えることがある */
-    will-change: opacity, transform;
-    /* sibling-index()の演算結果を丸ごとクラス名化するとTailwindの矢括弧記法が
-       極端に読みづらくなるため、この2行のみプレーンCSSのまま残す。
-       --card-reveal-index を経由させているのは、CardSlider.astro
-       (無限ループ用に複製カードをDOM上の前後へ挿入するため、本物カードの
-       sibling-index()がずれてしまう)がJSから並び順を明示的に上書きできるようにするため。
-       未指定時はこれまで通りsibling-index()から自動計算する */
+    /* --card-reveal-index はギャラリー(gallery.astro)がJSで表示中の並び順を上書きできるよう、
+       変数を経由させる。未指定時はsibling-index()から自動計算する */
     --card-reveal-index: calc(sibling-index() - 1);
-    /* 回転させると作品より演出が目立ってしまうため、わずかなせり上げに留める */
-    transform: translateY(8px);
-    /* transition-delayが0の要素は、lib/tagFilter.tsのrevealItemsが
-       transitionを戻す→is-visibleを付与するのを同一フレームで行うと、
-       ブラウザが変化前の状態を観測できずワープすることがある
-       (revealItems側でこの2つを別フレームに分けて根本対応済み)。
-       ここでは下限を0sではなく0.05sにして、さらに余裕を持たせる。
-       calcの引数を+1しているのは、下限のクランプにより index 0 と
-       index 1 が両方0.05sになって段差が消えるのを防ぐため */
-    transition-delay: clamp(0.05s, calc((var(--card-reveal-index) + 1) * 0.05s), 0.4s);
+    /* 下限を0sではなく0.06sにするのは、lib/tagFilter.tsのrevealItemsで表示状態を戻した直後に
+       ブラウザが変化前の状態を観測できず、トランジションを省略してワープするのを防ぐ余裕のため */
+    --card-reveal-delay: clamp(0.06s, calc((var(--card-reveal-index) + 1) * 0.07s), 0.5s);
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 600ms ease var(--card-reveal-delay),
+      transform 900ms var(--ease-out) var(--card-reveal-delay);
+    /* display:none解除と同時にトランジションが始まる際、レイヤー昇格が開始と同一フレームで起きると
+       前半のフレームがまとめて省略されることがあるため、事前にコンポジットレイヤーを確保しておく */
+    will-change: opacity, transform;
   }
 
-  .card-reveal.is-visible {
-    @apply opacity-100;
-    /* Tailwindのtranslate-y-0はtransformではなく別プロパティtranslateを設定してしまい、
-       上のtransform(translateY(8px))を打ち消せないため、プレーンCSSで上書きする */
+  .card-reveal:has(> .glass-panel) {
+    transform: translateY(28px) scale(0.96);
+  }
+
+  /* イラストのピント合わせ。ホバー時の拡大はTailwindの scale プロパティ(transformとは別)なので、
+     ここでは transform を使い、両方のトランジションを指定して干渉しないようにする */
+  .card-reveal img {
+    transform: scale(1.12);
+    transition:
+      transform 1400ms var(--ease-out) var(--card-reveal-delay),
+      scale 300ms var(--ease-out);
+  }
+
+  .card-reveal.is-visible,
+  .card-reveal.is-visible img {
+    opacity: 1;
     transform: none;
   }
 
   /* 絞り込み/ページ送りで再生し直す時(lib/tagFilter.tsのrevealItemsがdata-replayを付与)は、
-     続けて何度も押される操作への反応なので、初回のスクロール表示より短く・時間差も詰める */
+     続けて何度も押される操作への反応なので、短く・時間差も詰め、せり上がりとフェードだけにする。
+     カードの縮小やイラストの拡大を入れると、途中の端数の位置でサムネイルとカード下部の境目に
+     1pxの隙間が開き、ダークモードでは区切り線が一瞬白い線として見えてしまうため */
   .card-reveal[data-replay] {
-    transition-duration: 200ms;
-    transition-delay: clamp(0.03s, calc((var(--card-reveal-index) + 1) * 0.03s), 0.15s);
+    --card-reveal-delay: clamp(0.03s, calc((var(--card-reveal-index) + 1) * 0.035s), 0.18s);
+    transition-duration: 220ms, 280ms;
   }
 
-  .no-js .card-reveal {
-    @apply opacity-100 transform-none;
+  .card-reveal[data-replay]:not(.is-visible),
+  .card-reveal[data-replay]:not(.is-visible):has(> .glass-panel) {
+    transform: translateY(12px);
   }
 
+  .card-reveal[data-replay] img {
+    transform: none;
+    transition: scale 300ms var(--ease-out);
+  }
+
+  .no-js :is(.reveal > *, .heading-reveal-en, .heading-reveal-ja, .heading-reveal-link, .card-reveal, .card-reveal img) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* 視差効果を減らす設定では、移動・拡大・ぼかしをなくし、透明度の変化だけを短く残す */
   @media (prefers-reduced-motion: reduce) {
-    .card-reveal {
-      @apply opacity-100 transition-none transform-none;
+    .reveal > :not(.heading-reveal),
+    .heading-reveal-en,
+    .heading-reveal-ja,
+    .heading-reveal-link,
+    .card-reveal,
+    .card-reveal:has(> .glass-panel),
+    .card-reveal img {
+      transform: none !important;
+      filter: none !important;
+      transition: opacity 300ms ease !important;
     }
   }
-
 
   /* 外部リンク(href が http/https始まり)のテキストの右隣に、自動でアイコンを表示する。
      除外したい場合は .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')は
