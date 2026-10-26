@@ -52,7 +52,7 @@ const pageItems = getPageItems(page.currentPage, page.lastPage);
     <div class="flex items-center gap-2">
       {pageItems.map((item) =>
         item === 'ellipsis' ? (
-          <span class="px-1 text-ink/40">…</span>
+          <span class="px-1 text-ink-soft">…</span>
         ) : item === page.currentPage ? (
           <span
             aria-current="page"

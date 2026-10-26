@@ -15,8 +15,10 @@
   --color-paper: rgb(232 240 250);
   --color-paper-dim: rgb(219 229 242);
   --color-ink: rgb(15 23 42);
-  --color-ink-soft: rgb(106 114 129);
-  --color-graphite: rgb(150 158 171);
+  /* 補足の文字色。背景(paper)との明暗差がWCAGの基準(4.5:1)を満たす濃さにする
+     (ink-soft 約6.6:1 / graphite 約4.8:1) */
+  --color-ink-soft: rgb(75 85 99);
+  --color-graphite: rgb(95 105 120);
   --color-accent: rgb(8 145 178);
   --color-accent-2: rgb(37 99 235);
 
@@ -81,7 +83,7 @@
     --color-paper-dim: rgb(20 24 40);
     --color-ink: rgb(255 255 255);
     --color-ink-soft: rgb(145 147 152);
-    --color-graphite: rgb(96 98 106);
+    --color-graphite: rgb(128 134 145); /* 背景との明暗差 約5.3:1 */
     --color-accent: rgb(94 231 223);
     --color-accent-2: rgb(59 130 246);
 
@@ -206,7 +208,7 @@
      枠線の色の変化だけでは入力中の欄が分かりにくいため、フォーカス時は淡いリングも添える */
   .glass-input,
   .glass-textarea {
-    @apply w-full rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink/40 focus:border-accent focus:ring-3 focus:ring-accent/20;
+    @apply w-full rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink/60 focus:border-accent focus:ring-3 focus:ring-accent/20;
   }
 
   .glass-textarea {
