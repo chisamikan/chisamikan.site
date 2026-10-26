@@ -31,6 +31,7 @@ const placeholderFrameClass = bare ? '' : 'thumbnail-frame-static';
       src={src}
       alt={label}
       loading="lazy"
+      onerror="this.onerror=null;this.src='/images/work-placeholder.svg'"
       class="h-full w-full object-cover object-top transition-transform duration-300 scale-[1.02] group-hover:scale-105 motion-reduce:group-hover:scale-[1.02]"
     />
   </button>

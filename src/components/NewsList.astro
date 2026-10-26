@@ -4,8 +4,10 @@ import { getCategoryMeta } from '../lib/news';
 
 interface Props {
   items: NewsFeedItem[];
+  // 0件の時の表示。カテゴリで絞り込んだページでは、そのカテゴリが空であることを伝える
+  emptyText?: string;
 }
-const { items } = Astro.props;
+const { items, emptyText = 'お知らせはまだありません。' } = Astro.props;
 ---
 
 {items.length > 0 ? (
@@ -55,12 +57,12 @@ const { items } = Astro.props;
             >
               {item.link && <i class="fa-solid fa-chevron-right"></i>}
             </span>
-            {item.body && <p class="col-span-full text-sm leading-relaxed text-ink/70 sm:col-start-3 sm:col-end-4">{item.body}</p>}
+            {item.body && <p class="col-span-full whitespace-pre-line text-sm leading-relaxed text-ink/70 sm:col-start-3 sm:col-end-4">{item.body}</p>}
           </Wrapper>
         </li>
       );
     })}
   </ul>
 ) : (
-  <p class="text-center text-sm text-graphite">お知らせはまだありません。</p>
+  <p class="text-sm text-graphite">{emptyText}</p>
 )}

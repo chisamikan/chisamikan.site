@@ -237,9 +237,11 @@
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
 
-  /* タグ: カード・実績・スキル・お知らせのカテゴリに共通で使う。ガラスの面は持たせず、細い枠線だけで示す */
+  /* タグ: カード・実績・スキル・お知らせのカテゴリに共通で使う。ガラスの面は持たせず、細い枠線だけで示す。
+     長いタグが丸いタグの中で2行に折れていびつにならないよう、1行に固定して入りきらない分は「…」で省略する
+     (全文は呼び出し側で title 属性に入れる) */
   .glass-tag {
-    @apply inline-flex items-center rounded-full border border-ink/15 px-2.5 py-0.5 font-body text-xs text-ink-soft;
+    @apply inline-block max-w-full truncate rounded-full border border-ink/15 px-2.5 py-0.5 align-middle font-body text-xs text-ink-soft;
   }
 
   /* 暗い画像の上(カードのサムネイルに重ねる部分)に置くタグ。枠線と文字を白にする */

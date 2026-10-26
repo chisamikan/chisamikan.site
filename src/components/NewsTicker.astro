@@ -10,8 +10,9 @@ const formattedDate = item.date
   ? new Date(item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
   : null;
 
-// 文字数に関わらず流れる速さ(px/秒)が揃って見えるよう、日付+タイトルの長さから再生時間を概算する
-const duration = Math.min(30, Math.max(10, (item.title.length + (formattedDate?.length ?? 0)) * 0.35));
+// 文字数に関わらず流れる速さ(px/秒)が揃って見えるよう、日付+タイトルの長さから再生時間を概算する。
+// 上限を設けると、長いタイトルほど速く流れて読めなくなるため、下限(10秒)だけにする
+const duration = Math.max(10, (item.title.length + (formattedDate?.length ?? 0)) * 0.35);
 
 // リンクが無い(URL未設定の手動投稿)場合は、お知らせ一覧へ案内する
 const href = item.link ?? '/news';
@@ -77,4 +78,31 @@ const isExternal = Boolean(item.link && item.external);
       @apply hidden;
     }
   }
+
+  /* 文字が札の幅に収まる短いタイトルは、流すとループの途中で右側が空白になるため止めて表示する(JSが付与) */
+  .news-ticker.is-static .news-ticker-track {
+    @apply animate-none transform-none;
+  }
+
+  .news-ticker.is-static .news-ticker-copy:nth-child(2) {
+    @apply hidden;
+  }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.news-ticker').forEach((ticker) => {
+    const viewport = ticker.querySelector<HTMLElement>('.news-ticker-viewport');
+    const copy = ticker.querySelector<HTMLElement>('.news-ticker-copy');
+    if (!viewport || !copy) return;
+
+    // コピー1個分の文字の幅(右側の間隔 pr-16 を除く)が札に収まるかで、流すかどうかを決める
+    const update = () => {
+      const textWidth = copy.offsetWidth - parseFloat(getComputedStyle(copy).paddingRight);
+      ticker.classList.toggle('is-static', textWidth <= viewport.clientWidth);
+    };
+    update();
+    // Webフォントの読み込みで文字幅が変わるため、読み込み後と、札の幅が変わった時に判定し直す
+    document.fonts?.ready.then(update);
+    new ResizeObserver(update).observe(viewport);
+  });
+</script>

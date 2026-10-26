@@ -12,6 +12,10 @@ type Props =
 const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
 const PLACEHOLDER = '/images/work-placeholder.svg';
+// 画像の配信元が404等を返した時に、壊れた画像アイコンではなく代わりの画像を出す
+const onImageError = `this.onerror=null;this.src='${PLACEHOLDER}'`;
+// サムネイル上に重ねるタグの上限。多いと重ね表示が膨らんでイラストを覆うため、残りは「+N」にまとめる
+const MAX_TAGS = 3;
 // BOOTH商品(shop)は追加日時を取得できないため対象外
 const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
 ---
@@ -33,6 +37,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             src={props.item.imageUrl}
             alt={props.item.title}
             loading="lazy"
+            onerror={onImageError}
             class:list={[
               'absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 ease-out',
               props.item.nsfw ? 'scale-110 blur-xl' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
@@ -62,14 +67,19 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
       <div class="card-overlay">
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
-            {props.item.tags.map((tag) => (
-              <li class="glass-tag glass-tag-inverse">
+            {props.item.tags.slice(0, MAX_TAGS).map((tag) => (
+              <li class="glass-tag glass-tag-inverse" title={tag}>
                 {tag}
               </li>
             ))}
+            {props.item.tags.length > MAX_TAGS && (
+              <li class="glass-tag glass-tag-inverse" title={props.item.tags.slice(MAX_TAGS).join(' / ')}>
+                +{props.item.tags.length - MAX_TAGS}
+              </li>
+            )}
           </ul>
         )}
-        <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white break-normal">
+        <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white break-normal wrap-anywhere">
           {props.item.title}
         </Tag>
         {props.item.description && (
@@ -114,6 +124,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         src={props.item.imageUrl ?? PLACEHOLDER}
         alt={props.item.imageUrl ? props.item.title : ''}
         loading="lazy"
+            onerror={onImageError}
         class:list={[
           'absolute inset-0 h-full w-full object-cover object-top',
           props.item.imageUrl && 'transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:group-hover:scale-100',
@@ -125,11 +136,16 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
       <div class="card-overlay">
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
-            {props.item.tags.map((tag) => (
-              <li class="glass-tag glass-tag-inverse">
+            {props.item.tags.slice(0, MAX_TAGS).map((tag) => (
+              <li class="glass-tag glass-tag-inverse" title={tag}>
                 {tag}
               </li>
             ))}
+            {props.item.tags.length > MAX_TAGS && (
+              <li class="glass-tag glass-tag-inverse" title={props.item.tags.slice(MAX_TAGS).join(' / ')}>
+                +{props.item.tags.length - MAX_TAGS}
+              </li>
+            )}
           </ul>
         )}
         <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white">
@@ -158,6 +174,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             src={props.item.imageUrl ?? PLACEHOLDER}
             alt={props.item.imageUrl ? props.item.title : ''}
             loading="lazy"
+            onerror={onImageError}
             class:list={[
               'absolute inset-0 h-full w-full object-cover object-top',
               props.item.imageUrl && 'transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:group-hover:scale-100',
@@ -166,7 +183,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         </a>
       ) : (
         <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
-          <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
+          <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" onerror={onImageError} class="h-full w-full object-cover object-top" />
         </div>
       )}
       {isNew && (
@@ -210,6 +227,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             src={props.item.imageUrl}
             alt={props.item.title}
             loading="lazy"
+            onerror={onImageError}
             class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:group-hover:scale-100"
           />
         ) : (
@@ -219,7 +237,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
       <div class="card-overlay">
         {props.item.category && (
           <ul class="flex flex-wrap gap-1.5">
-            <li class="glass-tag glass-tag-inverse">{props.item.category}</li>
+            <li class="glass-tag glass-tag-inverse" title={props.item.category}>{props.item.category}</li>
           </ul>
         )}
         <Tag class="line-clamp-2 font-display text-base font-medium leading-snug text-white">

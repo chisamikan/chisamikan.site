@@ -82,13 +82,17 @@ const heroImages =
   <!-- ギャラリー抜粋 -->
   <section id="gallery" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" href="/gallery" />
-    <CardSlider id="home-gallery-slider" count={featuredGallery.length}>
-      {featuredGallery.map((item) => (
-        <div class="h-full">
-          <Card type="artwork" item={item} />
-        </div>
-      ))}
-    </CardSlider>
+    {featuredGallery.length > 0 ? (
+      <CardSlider id="home-gallery-slider" count={featuredGallery.length}>
+        {featuredGallery.map((item) => (
+          <div class="h-full">
+            <Card type="artwork" item={item} />
+          </div>
+        ))}
+      </CardSlider>
+    ) : (
+      <p class="text-sm text-graphite">まだ作品が登録されていません。</p>
+    )}
   </section>
 
   <!-- 小説抜粋 -->

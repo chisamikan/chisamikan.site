@@ -14,7 +14,7 @@ const Tag = `h${level}` as 'h1' | 'h2';
 const hasAction = Astro.slots.has('action');
 ---
 
-<div class:list={['mb-10', (href || hasAction) && 'flex items-end justify-between gap-4']}>
+<div class:list={['mb-10', (href || hasAction) && 'flex flex-wrap items-end justify-between gap-x-4 gap-y-2']}>
   <!-- 「英語名 日本語名」を左揃えの1行に並べ、英語名を大きく見せる。狭い画面でも改行せず収まるよう、
     英語名は画面幅に応じて縮める(最長の「Privacy Policy プライバシーポリシー」が375px幅に収まる大きさ) -->
   <Tag class="flex items-baseline gap-x-3 whitespace-nowrap">
@@ -30,7 +30,7 @@ const hasAction = Astro.slots.has('action');
   {href && (
     <a
       href={href}
-      class="group no-external-icon shrink-0 text-sm font-medium text-accent-text"
+      class="group no-external-icon ml-auto shrink-0 text-sm font-medium text-accent-text"
       {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
       {linkLabel}

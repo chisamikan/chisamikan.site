@@ -45,7 +45,7 @@ function formatPeriod(start: string | null, end: string | null) {
             {props.item.tags.length > 0 && (
               <ul class="flex flex-wrap gap-1.5">
                 {props.item.tags.map((tag) => (
-                  <li class="glass-tag">
+                  <li class="glass-tag" title={tag}>
                     {tag}
                   </li>
                 ))}
@@ -73,7 +73,7 @@ function formatPeriod(start: string | null, end: string | null) {
           {props.item.tags.length > 0 && (
             <ul class="flex flex-wrap gap-1.5">
               {props.item.tags.map((tag) => (
-                <li class="glass-tag">
+                <li class="glass-tag" title={tag}>
                   {tag}
                 </li>
               ))}
