@@ -4,9 +4,8 @@ import { getCategoryMeta } from '../lib/news';
 
 interface Props {
   items: NewsFeedItem[];
-  showCategory?: boolean;
 }
-const { items, showCategory = true } = Astro.props;
+const { items } = Astro.props;
 ---
 
 {items.length > 0 ? (
@@ -36,14 +35,10 @@ const { items, showCategory = true } = Astro.props;
             ]}
           >
             <span class="font-num text-[13px] text-ink-soft">{formattedDate}</span>
-            {showCategory ? (
-              <span class="glass-tag justify-self-start whitespace-nowrap">
-                <i class={`${meta.icon} mr-1`} aria-hidden="true"></i>
-                {meta.label}
-              </span>
-            ) : (
-              <span class="hidden sm:block"></span>
-            )}
+            <span class="glass-tag justify-self-start whitespace-nowrap">
+              <i class={`${meta.icon} mr-1`} aria-hidden="true"></i>
+              {meta.label}
+            </span>
             <span class:list={['col-span-full font-medium text-ink sm:col-span-1', item.link && 'transition-colors group-hover:text-accent-text']}>
               {item.title}
               {/* 外部リンクの印は右端ではなく、テキストの右隣に置く(全ページ共通の仕様) */}

@@ -132,6 +132,10 @@
   html {
     @apply scroll-smooth;
     -webkit-tap-highlight-color: transparent;
+    /* 内容が短く縦スクロールバーが出ないページ(記事0件のお知らせカテゴリ等)では、
+       スクロールバーの幅だけページが広がり、ナビや中身が横にずれて見える。
+       スクロールバーの有無に関わらずその幅を常に確保して、ページ間で位置を揃える */
+    scrollbar-gutter: stable;
   }
 
   html[lang="ja"] {

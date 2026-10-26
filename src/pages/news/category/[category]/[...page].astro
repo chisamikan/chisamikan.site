@@ -39,7 +39,7 @@ const categoryPath = (c: NewsCategory) => `/news/category/${c}`;
 
     <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} current={category} />
 
-    <NewsList items={page.data} showCategory={false} />
+    <NewsList items={page.data} />
 
     <NewsPagination page={page} basePath={`/news/category/${category}`} />
 
