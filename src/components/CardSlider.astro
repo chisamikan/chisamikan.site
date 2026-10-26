@@ -67,7 +67,7 @@ const isSlider = count > 3;
   </div>
 
   {/* カルーセルであることを示すためのページネーションドット。本物のカード1枚につき1つ表示し、
-      現在中央に表示されているカードに合わせてJSからis-activeを切り替える */}
+      現在左端(見出しの左端の位置)に表示されているカードに合わせてJSからis-activeを切り替える */}
   <div class="mt-3 flex flex-wrap items-center justify-center gap-2" data-slider-dots role="tablist" aria-label="表示中のカード">
     {Array.from({ length: count }).map((_, i) => (
       <button
@@ -118,10 +118,12 @@ const isSlider = count > 3;
   @media (min-width: 640px) {
     .card-slider {
       --card-slider-fade: clamp(1.25rem, 4vw, 3rem);
+      /* 左側は、左端に揃えたカード(見出しと同じ位置から始まる)にフェードがかからないよう、
+         カードの手前の余白(--card-slider-inset、JSで実測)より狭くする */
       mask-image: linear-gradient(
         to right,
         transparent,
-        #000 var(--card-slider-fade),
+        #000 min(var(--card-slider-fade), var(--card-slider-inset, 0px)),
         #000 calc(100% - var(--card-slider-fade)),
         transparent
       );
@@ -136,10 +138,10 @@ const isSlider = count > 3;
      flexのalign-items:stretchによる高さ揃えを無効化してしまい(stretchは子のcross-sizeがautoの時だけ効く)、
      カードごとに縦幅がバラバラになってしまうため */
   .card-slider > :global(*) {
-    /* startだと、scroll-snap-type: x mandatoryがプログラムでのscrollLeft指定も
-       「あるカードの左端が揃う位置」に強制的にスナップしてしまい、中央寄せができない。
-       centerにすることでネイティブのスナップ自体をカードの中央寄せ位置に合わせる */
-    scroll-snap-align: center;
+    /* カードの左端を見出しの左端に揃えて止める。スライダーは見出しより左右にはみ出して
+       いるため、スライダーの左端ではなく、JSでscroll-padding-inline-startに設定する
+       はみ出し分(--card-slider-inset)だけ内側の位置にスナップさせる */
+    scroll-snap-align: start;
     flex: none;
     width: 85%;
     height: auto;
@@ -204,7 +206,7 @@ const isSlider = count > 3;
     if (originals.length > 1) {
       // 複製は見た目・内容が本物と同一なので、そのまま操作可能にしておく(ホバー/クリック/
       // Lightboxなどは.lightbox-triggerクラス等への委任なので複製にも自然に効く)。
-      // 中央のカードが端(1枚目・最後)にある間は、左右どちらかに見えている隣のカードが
+      // 左端のカードが端(1枚目・最後)にある間は、左右どちらかに見えている隣のカードが
       // 複製側になるため、inertにすると「見えているのに反応しない」カードができてしまう
       const cloneAll = () =>
         originals.map((el) => {
@@ -217,19 +219,27 @@ const isSlider = count > 3;
       const tailClones = cloneAll();
       slider.append(...tailClones);
 
-      // 初期状態は1枚目のカードが画面端に寄るのではなく、スライダーの中央に来るようにする。
-      // anchorは「1枚目のカードを中央に置いたときのscrollLeft」で、ループ補正の基準位置も
+      // 初期状態は1枚目(最新)のカードの左端が、セクションの見出しの左端に揃うようにする。
+      // スライダーは見出しより左右にはみ出している(card-slider-fullbleed)ため、その
+      // はみ出し分(inset)を実測し、スナップ位置(scroll-padding)と初期位置の両方に使う。
+      // anchorは「1枚目のカードを左端に揃えたときのscrollLeft」で、ループ補正の基準位置も
       // (blockWidthそのものではなく)このanchorを起点にずらす
       let anchor = 0;
+      const section = wrapper.parentElement;
       const measure = () => {
         blockWidth = tailClones[0].offsetLeft - originals[0].offsetLeft;
-        const cardWidth = originals[0].getBoundingClientRect().width;
-        anchor = originals[0].offsetLeft - (slider.clientWidth - cardWidth) / 2;
+        const contentLeft = section
+          ? section.getBoundingClientRect().left + parseFloat(getComputedStyle(section).paddingLeft)
+          : slider.getBoundingClientRect().left;
+        const inset = Math.max(0, contentLeft - slider.getBoundingClientRect().left);
+        slider.style.scrollPaddingInlineStart = `${inset}px`;
+        slider.style.setProperty('--card-slider-inset', `${inset}px`);
+        anchor = originals[0].offsetLeft - inset;
       };
       measure();
       slider.scrollLeft = anchor;
 
-      // 現在中央にあるカードに対応するドットにis-activeを付与する。anchorが1枚目の位置なので
+      // 現在左端にあるカードに対応するドットにis-activeを付与する。anchorが1枚目の位置なので
       // (scrollLeft - anchor)を1枚分の距離で割った回数がそのまま何枚目かに対応する
       const updateActiveDot = () => {
         if (dots.length === 0) return;
