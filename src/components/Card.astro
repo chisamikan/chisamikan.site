@@ -62,7 +62,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
             {props.item.tags.map((tag) => (
-              <li class="glass-tag backdrop-blur-none">
+              <li class="glass-tag glass-tag-inverse">
                 {tag}
               </li>
             ))}
@@ -125,7 +125,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
             {props.item.tags.map((tag) => (
-              <li class="glass-tag backdrop-blur-none">
+              <li class="glass-tag glass-tag-inverse">
                 {tag}
               </li>
             ))}
@@ -223,7 +223,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
         {props.item.category && (
           <ul class="flex flex-wrap gap-1.5">
-            <li class="glass-tag backdrop-blur-none">{props.item.category}</li>
+            <li class="glass-tag glass-tag-inverse">{props.item.category}</li>
           </ul>
         )}
         <Tag class="line-clamp-2 font-display text-base font-medium leading-snug text-white">

@@ -1,12 +1,40 @@
 ---
+import SnsLinks from './SnsLinks.astro';
+import { nav } from '../lib/config';
+
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-ink/10 py-10">
-  <div class="mx-auto flex max-w-5xl flex-col items-center gap-3 px-6 text-center text-xs text-graphite sm:flex-row sm:justify-between sm:text-left">
-    <p>&copy; {year} Chisamikan <a href="/secret" aria-label="secret" class="no-underline">🍊</a></p>
-    <p class="flex items-center gap-4">
+<!-- ページの最後まで読んだ人が次に移動できるよう、サイト名・SNS・ページ一覧を置く -->
+<footer class="border-t border-ink/10">
+  <div class="mx-auto max-w-5xl px-6 pt-12 pb-8">
+    <div class="flex flex-col gap-10 md:flex-row md:justify-between">
+      <div>
+        <a href="/" class="inline-flex items-center gap-2.5 text-xl font-semibold tracking-[-0.02em] text-ink">
+          <img src="/favicon.svg" alt="" width="28" height="28" class="h-7 w-7 rounded-[5px]" />
+          <span>chisamikan<span class="text-accent">.site</span></span>
+        </a>
+        <p class="mt-2 text-sm text-ink-soft">千紗みかんのポートフォリオサイト</p>
+        <SnsLinks align="start" />
+      </div>
+
+      <nav aria-label="フッターのサイト内ナビゲーション">
+        <ul class="grid grid-cols-2 gap-x-10 gap-y-3 sm:grid-cols-3">
+          {nav.map((item) => (
+            <li>
+              <a href={item.href} class="group flex items-baseline gap-2">
+                <span class="text-sm font-medium text-ink transition-colors group-hover:text-accent">{item.label}</span>
+                <span class="text-[11px] text-ink-soft">{item.labelJa}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center gap-3 border-t border-ink/10 pt-6 text-xs text-graphite sm:flex-row sm:justify-between">
+      <p>&copy; {year} Chisamikan <a href="/secret" aria-label="secret" class="no-underline">🍊</a></p>
       <a href="/privacy" class="transition-colors hover:text-accent">Privacy Policy</a>
-    </p>
+    </div>
   </div>
 </footer>

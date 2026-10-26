@@ -191,9 +191,14 @@
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
 
-  /* タグ・バッジ: Card/WorkItem/ProfileContent のスキルタグに使用 */
+  /* タグ: カード・実績・スキル・お知らせのカテゴリに共通で使う。ガラスの面は持たせず、細い枠線だけで示す */
   .glass-tag {
-    @apply inline-flex items-center rounded-full border border-glass-border-subtle bg-glass px-2.5 py-0.5 font-body text-[11px] text-ink/80 backdrop-blur-sm transition-colors duration-300;
+    @apply inline-flex items-center rounded-full border border-ink/15 px-2.5 py-0.5 font-body text-xs text-ink-soft;
+  }
+
+  /* 暗い画像の上(カードのサムネイルに重ねる部分)に置くタグ。枠線と文字を白にする */
+  .glass-tag-inverse {
+    @apply border-white/45 text-white;
   }
 
   .glass-badge {
@@ -481,4 +486,11 @@
        maskの1行のみプレーンCSSのまま残す */
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0-201.4 201.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 96C35.8 96 0 131.8 0 176L0 432c0 44.2 35.8 80 80 80l256 0c44.2 0 80-35.8 80-80l0-80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 80c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l80 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 96z'/%3E%3C/svg%3E") center / contain no-repeat;
   }
+}
+
+/* 文章ページ(このサイトについて・プライバシーポリシー等)の小見出し。各ページのスコープ付き
+   styleから @apply content-heading で使えるよう @utility で定義する。お知らせ一覧と同じ
+   細い区切り線を見出しの下に引き、ページの見出し(SectionHeading)より一段控えめにする */
+@utility content-heading {
+  @apply mt-12 mb-5 border-b border-ink/10 pb-3 text-xl font-bold text-ink;
 }
