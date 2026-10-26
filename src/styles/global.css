@@ -19,17 +19,10 @@
   --color-graphite: rgb(150 158 171);
   --color-accent: rgb(8 145 178);
   --color-accent-2: rgb(37 99 235);
-  --color-accent-violet: rgb(109 40 217);
-  --color-accent-rose: rgb(190 24 93);
-  --color-accent-amber: rgb(180 83 9);
-  --color-accent-lime: rgb(21 128 61);
 
   /* すりガラス面の下地色・境界線色 */
   --color-glass: rgba(255, 255, 255, 0.62);
   --color-glass-md: rgba(255, 255, 255, 0.78);
-  --color-glass-lg: rgba(255, 255, 255, 0.9);
-  --color-glass-dark: rgba(0, 0, 0, 0.06);
-  --color-glass-dark-md: rgba(15, 23, 42, 0.08);
   --color-glass-border: rgba(15, 23, 42, 0.14);
   --color-glass-border-subtle: rgba(15, 23, 42, 0.09);
   --color-glass-border-bright: rgba(15, 23, 42, 0.22);
@@ -37,8 +30,6 @@
   /* 本文の欧文は字幅の詰まったOswaldだと和文と並べたときにガタつくため、和文に馴染むInter Tightにする */
   --font-body: 'Inter Tight', 'Zen Kaku Gothic New', sans-serif;
   --font-display: var(--font-body);
-  /* font-monoは注釈やラベルの小さな文字に広く使っているため、等幅にはせず本文と同じ書体のままにする */
-  --font-mono: var(--font-body);
   /* 日付・数値だけは等幅にして、桁が揃った落ち着いた見た目にする */
   --font-num: 'IBM Plex Mono', 'Zen Kaku Gothic New', monospace;
 
@@ -68,28 +59,16 @@
 
 /* 影はTailwindがクラスに値を直接埋め込むため、テーマで切り替える値は変数経由で参照させる */
 @theme inline {
-  --shadow-glass: var(--glass-shadow);
-  --shadow-glass-lg: var(--glass-shadow-float);
-  --shadow-glass-accent: var(--glass-shadow-accent);
-  --shadow-glass-accent-lg: var(--glass-shadow-accent-lg);
   --shadow-card: var(--glass-shadow-card);
   --shadow-card-lg: var(--glass-shadow-card-lg);
-  --shadow-float: var(--glass-shadow-float);
-  --shadow-glow: var(--glass-shadow-glow);
 }
 
 @layer base {
   :root {
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    --glass-shadow-float: 0 20px 60px rgba(0, 0, 0, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
-    --reflection-top: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 50%);
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    --glass-shadow-accent: 0 4px 24px rgba(8, 145, 178, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    --glass-shadow-accent-lg: 0 8px 36px rgba(8, 145, 178, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    /* .btn-glass-accent と同じ形状(オフセット/ぼかし+内側ハイライト)に揃えつつ、色は従来の黒系のまま変更しない */
+    /* カードの影。外側の柔らかい影に、上面のハイライト(--reflection-inner)を重ねる */
     --glass-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.1), var(--reflection-inner);
     --glass-shadow-card-lg: 0 8px 36px rgba(0, 0, 0, 0.16), var(--reflection-inner);
-    --glass-shadow-glow: 0 0 40px rgba(8, 145, 178, 0.25);
 
     color-scheme: light;
 
@@ -105,16 +84,9 @@
     --color-graphite: rgb(96 98 106);
     --color-accent: rgb(94 231 223);
     --color-accent-2: rgb(59 130 246);
-    --color-accent-violet: rgb(180 144 245);
-    --color-accent-rose: rgb(247 168 196);
-    --color-accent-amber: rgb(255 210 127);
-    --color-accent-lime: rgb(168 240 138);
 
     --color-glass: rgba(255, 255, 255, 0.12);
     --color-glass-md: rgba(255, 255, 255, 0.2);
-    --color-glass-lg: rgba(255, 255, 255, 0.3);
-    --color-glass-dark: rgba(0, 0, 0, 0.18);
-    --color-glass-dark-md: rgba(0, 0, 0, 0.28);
     --color-glass-border: rgba(255, 255, 255, 0.25);
     --color-glass-border-subtle: rgba(255, 255, 255, 0.12);
     --color-glass-border-bright: rgba(255, 255, 255, 0.5);
@@ -123,16 +95,10 @@
     --color-on-accent: rgb(4 20 26);
     --color-surface: rgb(19 24 40);
 
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    --glass-shadow-float: 0 20px 60px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);
-    --reflection-top: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%);
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
-    --glass-shadow-accent: 0 4px 24px rgba(94, 231, 223, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
-    --glass-shadow-accent-lg: 0 8px 36px rgba(94, 231, 223, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
-    /* .btn-glass-accent と同じ形状(オフセット/ぼかし+内側ハイライト)に揃えつつ、色は従来の黒系のまま変更しない */
+    /* カードの影。外側の柔らかい影に、上面のハイライト(--reflection-inner)を重ねる */
     --glass-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.28), var(--reflection-inner);
     --glass-shadow-card-lg: 0 8px 36px rgba(0, 0, 0, 0.4), var(--reflection-inner);
-    --glass-shadow-glow: 0 0 40px rgba(120, 200, 255, 0.35);
 
     color-scheme: dark;
   }
@@ -236,10 +202,11 @@
     @apply border-accent/30 bg-accent/15 text-accent;
   }
 
-  /* フォーム部品 */
+  /* フォーム部品。入力欄は中身を書き込む面なので、ガラスではなくカードと同じ不透明な面にする。
+     枠線の色の変化だけでは入力中の欄が分かりにくいため、フォーカス時は淡いリングも添える */
   .glass-input,
   .glass-textarea {
-    @apply w-full rounded-md border border-glass-border-subtle bg-glass px-3.5 py-2.5 text-ink outline-none backdrop-blur-sm transition-colors duration-300 placeholder:text-ink/40 focus:border-accent;
+    @apply w-full rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink/40 focus:border-accent focus:ring-3 focus:ring-accent/20;
   }
 
   .glass-textarea {
@@ -247,7 +214,7 @@
   }
 
   .glass-checkbox {
-    @apply mt-1 h-4 w-4 shrink-0 rounded-xs border border-glass-border bg-glass backdrop-blur-sm transition-colors duration-300 accent-accent focus:outline-none focus:ring-2 focus:ring-accent;
+    @apply mt-1 h-4 w-4 shrink-0 rounded-xs border border-ink/25 bg-surface transition-colors duration-200 accent-accent focus:outline-none focus:ring-2 focus:ring-accent;
   }
 
   /* アコーディオン: <details class="glass-accordion-item"><summary class="glass-accordion-trigger"> で組む(JS不要) */
@@ -499,16 +466,6 @@
     }
   }
 
-  /* .card-reveal の回転は表示前(opacity:0)は見えないはずだが、回転による見た目の
-     はみ出しはレイアウト上は健在なため、ギャラリーのように表示前カードが画面外に
-     大量に控えている一覧では、そのはみ出し分がページの横スクロールを生んでしまう
-     (狭い画面で顕著)。.card-reveal を data-tags を持つ親(.card-clip)でもう1枚
-     包み、その親が「まだ表示されていない(is-visible前の)子」を持つ間だけ切り詰める。
-     is-visible化した瞬間に切り詰めをやめるため、表示アニメーションやホバー時の
-     ドロップシャドウ・せり上がりはそのまま(見えている間は一切クリップしない) */
-  .card-clip:has(> .card-reveal:not(.is-visible)) {
-    @apply overflow-hidden;
-  }
 
   /* 外部リンク(href が http/https始まり)のテキストの右隣に、自動でアイコンを表示する。
      除外したい場合は .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')は

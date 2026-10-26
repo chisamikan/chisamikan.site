@@ -45,7 +45,7 @@ const pageItems = getPageItems(page.currentPage, page.lastPage);
 ---
 
 {page.lastPage > 1 && (
-  <nav aria-label="ページ送り" class="mt-16 flex items-center justify-center gap-2 font-mono text-sm">
+  <nav aria-label="ページ送り" class="mt-16 flex items-center justify-center gap-2 text-sm">
     {page.currentPage > 1 && (
       <a href={pathFor(page.currentPage - 1)} aria-label="前のページ" class="btn-glass-ghost px-3!">&lt;</a>
     )}

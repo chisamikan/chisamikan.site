@@ -50,7 +50,7 @@ const galleryStructuredData = {
 
     <CardGrid id="gallery-grid" managed class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <div id={`gallery-${item.id}`} class="card-clip h-full scroll-mt-24" data-tags={item.tags.join('|')}>
+        <div id={`gallery-${item.id}`} class="h-full scroll-mt-24" data-tags={item.tags.join('|')}>
           <div class="card-reveal h-full">
             <Card type="artwork" item={item} headingLevel={2} />
           </div>
@@ -59,14 +59,14 @@ const galleryStructuredData = {
     </CardGrid>
 
     {items.length === 0 && (
-      <p class="font-mono text-sm text-graphite">まだ作品が登録されていません。</p>
+      <p class="text-sm text-graphite">まだ作品が登録されていません。</p>
     )}
 
     <!-- ページネーションは絞り込み結果の件数に応じてJSが表示/非表示・ページ数を計算する -->
     <nav
       id="pagination-nav"
       aria-label="ページ送り"
-      class="mt-16 hidden items-center justify-center gap-2 font-mono text-sm"
+      class="mt-16 hidden items-center justify-center gap-2 text-sm"
     >
       <button type="button" id="prev-page" aria-label="前のページ" class="btn-glass-ghost px-3!">
         &lt;
@@ -185,7 +185,7 @@ const galleryStructuredData = {
       // アニメーションを再生する。
       const reveal = card.querySelector<HTMLElement>('.card-reveal');
       if (show && reveal) {
-        // .card-revealは横スクロールバー対策の.card-clipに包まれ、常にその唯一の
+        // .card-revealはdata-tagsを持つカード枠に包まれ、常にその唯一の
         // 子になったため、CSS側のsibling-index()は全カードで1固定になってしまい
         // (=--card-reveal-indexが常に0になり)スタッガーの段差が消えてしまう。
         // CardSlider.astroと同じ手法で、そのページ内での表示順(0始まり)を

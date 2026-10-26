@@ -60,10 +60,10 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
           ))}
         </div>
       ) : (
-        <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
+        <p class="text-sm text-graphite">まだ実績が登録されていません。</p>
       )}
 
-      <p id="works-empty" class="hidden font-mono text-sm text-graphite">
+      <p id="works-empty" class="hidden text-sm text-graphite">
         該当するタグの実績がありません。
       </p>
     </div>

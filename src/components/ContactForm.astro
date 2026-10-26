@@ -6,7 +6,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 
 <form id="contact-form" class="space-y-6 text-left" novalidate>
   <div>
-    <label for="name" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
+    <label for="name" class="mb-1.5 block text-xs uppercase tracking-wide text-graphite">
       お名前 <span class="text-accent">*</span>
     </label>
     <input
@@ -21,7 +21,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   </div>
 
   <div>
-    <label for="email" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
+    <label for="email" class="mb-1.5 block text-xs uppercase tracking-wide text-graphite">
       メールアドレス <span class="text-accent">*</span>
     </label>
     <input
@@ -36,7 +36,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   </div>
 
   <div>
-    <label for="message" class="mb-1.5 block font-mono text-xs uppercase tracking-wide text-graphite">
+    <label for="message" class="mb-1.5 block text-xs uppercase tracking-wide text-graphite">
       お問い合わせ内容 <span class="text-accent">*</span>
     </label>
     <textarea
@@ -97,7 +97,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     </button>
   </div>
 
-  <p id="form-status" role="status" class="font-mono text-sm text-center"></p>
+  <p id="form-status" role="status" class="text-sm text-center"></p>
 </form>
 
 <!-- 送信完了画面。自動返信メールは送らないため、送信内容の控えはこの画面で渡す -->
@@ -109,7 +109,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   class="space-y-6 rounded-lg border border-glass-border-subtle bg-surface p-6 text-left shadow-card outline-none"
 >
   <div class="text-center">
-    <h2 id="contact-complete-title" class="font-mono text-base font-semibold text-accent">
+    <h2 id="contact-complete-title" class="text-base font-semibold text-accent">
       <i class="fa-solid fa-circle-check pr-1" aria-hidden="true"></i>送信しました
     </h2>
     <p class="mt-3 text-sm leading-relaxed text-ink-soft">
@@ -130,7 +130,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
 
   <div>
     <p class="mb-3 text-sm text-ink-soft">送信内容の控えが必要な場合は、コピーして保存してください。</p>
-    <dl class="space-y-4 rounded-md border border-glass-border-subtle p-4 font-mono text-sm">
+    <dl class="space-y-4 rounded-md border border-glass-border-subtle p-4 text-sm">
       <div>
         <dt class="text-xs uppercase tracking-wide text-graphite">お名前</dt>
         <dd id="complete-name" class="mt-1 text-ink wrap-anywhere"></dd>
@@ -151,7 +151,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       <i class="fa-solid fa-copy pr-1" aria-hidden="true"></i>内容をコピー
     </button>
   </div>
-  <p id="complete-copy-status" role="status" class="text-center font-mono text-xs"></p>
+  <p id="complete-copy-status" role="status" class="text-center text-xs"></p>
 </section>
 
 {turnstileSiteKey && (
@@ -189,7 +189,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   function showError(message: string) {
     if (!status) return;
     status.textContent = message;
-    status.className = 'font-mono text-sm text-red-600';
+    status.className = 'text-sm text-red-600';
   }
 
   // --- 送信完了画面 ---
@@ -240,10 +240,10 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     try {
       await navigator.clipboard.writeText(text);
       copyStatus.textContent = 'コピーしました。';
-      copyStatus.className = 'text-center font-mono text-xs text-accent';
+      copyStatus.className = 'text-center text-xs text-accent';
     } catch {
       copyStatus.textContent = 'コピーできませんでした。お手数ですが、上の内容を選択してコピーしてください。';
-      copyStatus.className = 'text-center font-mono text-xs text-red-600';
+      copyStatus.className = 'text-center text-xs text-red-600';
     }
   });
 
@@ -256,7 +256,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     // ハニーポットに値が入っていたらスパムとみなし、成功したように見せて何もしない
     if (data.company) {
       status.textContent = '送信しました。ありがとうございます。';
-      status.className = 'font-mono text-sm text-accent';
+      status.className = 'text-sm text-accent';
       form.reset();
       return;
     }

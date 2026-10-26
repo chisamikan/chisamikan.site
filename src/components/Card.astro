@@ -41,7 +41,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
           {props.item.nsfw && (
             // 画像の上に重ねる固定の暗幕バッジなので、ページのテーマに関わらず black/white で統一する
             <span class="absolute inset-0 flex items-center justify-center bg-black/35">
-              <span class="rounded-full bg-black/85 px-3 py-1 font-mono text-xs uppercase tracking-widest text-white">
+              <span class="rounded-full bg-black/85 px-3 py-1 text-xs uppercase tracking-widest text-white">
                 NSFW
               </span>
             </span>
