@@ -12,7 +12,7 @@ export const person = {
   image: '/images/profile-icon.webp',
 };
 
-// ナビゲーションでは日本語名(labelJa)を主に表示し、英語名(label)はその下に小さく併記する
+// ナビゲーションでは英語名(label)を主に表示し、日本語名(labelJa)を小さく併記する
 export const nav = [
   { href: '/', label: 'Top', labelJa: 'トップ' },
   { href: '/news', label: 'News', labelJa: 'お知らせ' },

@@ -45,9 +45,6 @@ const heroImages =
 ---
 
 <BaseLayout>
-  <!-- ページ全体のh1: 視覚的には非表示だが、ページの主題(サイト/作者)を検索エンジンとスクリーンリーダーに伝える -->
-  <h1 class="sr-only">{site.description}</h1>
-
   <!-- ファーストビュー: 全画面イラスト。ヘッダーは背景を持たない浮かぶ部品なので、
     その高さぶん上に引き上げてイラストをヘッダーの裏まで敷く -->
   <section class="relative mt-[calc(-1*var(--mobile-header-h,4.5rem))] h-svh min-h-140 w-full overflow-hidden">
@@ -59,9 +56,11 @@ const heroImages =
     <div class="relative z-10 flex h-full flex-col items-start justify-end gap-6 px-4 pb-10 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:px-8 sm:pb-12 lg:px-12">
       <div class="text-white">
         <p class="text-xs font-medium uppercase tracking-[0.16em] text-white/75">Illustration / Design / Writing</p>
-        <p class="mt-3 text-[clamp(3.5rem,11vw,9rem)] font-semibold leading-[0.9] tracking-[-0.05em]">
-          Chisa<br />Mikan.site
-        </p>
+        <!-- 画面に見えているサイト名をページのh1にする。ページの主題(サイト/作者)は
+          視覚的には非表示の補足として添え、検索エンジンとスクリーンリーダーに伝える -->
+        <h1 class="mt-3 text-[clamp(3.5rem,11vw,9rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
+          Chisa<br />Mikan.site<span class="sr-only"> — {site.description}</span>
+        </h1>
       </div>
 
       {latestNote && <NewsTicker item={latestNote} />}
