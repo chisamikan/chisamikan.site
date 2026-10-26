@@ -67,14 +67,14 @@ function formatPeriod(start: string | null, end: string | null) {
             )}
           </div>
           <Tag class="mt-1 font-display text-xl font-semibold text-ink">{props.item.client}</Tag>
-          {props.item.role && <p class="mt-0.5 text-sm font-medium text-accent">{props.item.role}</p>}
+          {props.item.role && <p class="mt-0.5 text-sm font-medium text-accent-text">{props.item.role}</p>}
 
           {props.item.url && (
             <a
               href={props.item.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-glass btn-glass-sm mt-4 hover:text-accent"
+              class="btn-glass btn-glass-sm mt-4 hover:text-accent-text"
             >
               詳細を見る
             </a>
@@ -109,7 +109,7 @@ function formatPeriod(start: string | null, end: string | null) {
                   href={props.item.kakuyomuUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-glass btn-glass-sm hover:text-accent"
+                  class="btn-glass btn-glass-sm hover:text-accent-text"
                 >
                   カクヨムで読む
                 </a>
@@ -119,7 +119,7 @@ function formatPeriod(start: string | null, end: string | null) {
                   href={props.item.pixivUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-glass btn-glass-sm hover:text-accent"
+                  class="btn-glass btn-glass-sm hover:text-accent-text"
                 >
                   pixivで読む
                 </a>
@@ -129,7 +129,7 @@ function formatPeriod(start: string | null, end: string | null) {
                   href={props.item.shopUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-glass btn-glass-sm hover:text-accent"
+                  class="btn-glass btn-glass-sm hover:text-accent-text"
                 >
                   通販はこちら
                 </a>
@@ -152,7 +152,7 @@ function formatPeriod(start: string | null, end: string | null) {
               href={props.item.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-glass btn-glass-sm mt-4 hover:text-accent"
+              class="btn-glass btn-glass-sm mt-4 hover:text-accent-text"
             >
               配布先
             </a>

@@ -18,7 +18,7 @@ const Tag = `h${level}` as 'h1' | 'h2';
     {eyebrow ? (
       <>
         <span class="text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-semibold leading-none tracking-[-0.03em]">{eyebrow}</span>
-        <span class="text-sm font-bold text-accent sm:text-lg lg:text-xl">{title}</span>
+        <span class="text-sm font-bold text-accent-text sm:text-lg lg:text-xl">{title}</span>
       </>
     ) : (
       <span class="text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-bold leading-none">{title}</span>
@@ -27,7 +27,7 @@ const Tag = `h${level}` as 'h1' | 'h2';
   {href && (
     <a
       href={href}
-      class="group no-external-icon shrink-0 text-sm font-medium text-accent"
+      class="group no-external-icon shrink-0 text-sm font-medium text-accent-text"
       {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
       {linkLabel}

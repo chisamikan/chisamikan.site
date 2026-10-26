@@ -87,7 +87,7 @@ const isTop = currentPath === '/';
           class:list={[
             'relative flex items-baseline gap-3 px-8 py-2.5 leading-tight transition-colors duration-150 sm:px-12',
             isActive(item.href)
-              ? 'bg-accent/8 text-accent before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-accent before:content-[""]'
+              ? 'bg-accent/8 text-accent-text before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-accent before:content-[""]'
               : 'text-ink/70 hover:text-ink',
           ]}
         >
@@ -248,6 +248,8 @@ const isTop = currentPath === '/';
 
   function applyState(isDark: boolean) {
     document.documentElement.classList.toggle('dark', isDark);
+    // スマホのブラウザの上部バーの色も切り替える(BaseLayoutのmeta、global.cssの --color-paper と同じ色)
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#0b0e1a' : '#e8f0fa');
     toggles.forEach((toggle) => {
       toggle.setAttribute('aria-pressed', String(isDark));
       toggle.setAttribute('aria-label', isDark ? 'Light Mode' : 'Dark Mode');

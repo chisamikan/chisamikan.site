@@ -23,7 +23,7 @@ const year = new Date().getFullYear();
           {nav.map((item) => (
             <li>
               <a href={item.href} class="group flex items-baseline gap-2">
-                <span class="text-sm font-medium text-ink transition-colors group-hover:text-accent">{item.label}</span>
+                <span class="text-sm font-medium text-ink transition-colors group-hover:text-accent-text">{item.label}</span>
                 <span class="text-[11px] text-ink-soft">{item.labelJa}</span>
               </a>
             </li>
@@ -34,7 +34,7 @@ const year = new Date().getFullYear();
 
     <div class="mt-12 flex flex-col items-center gap-3 border-t border-ink/10 pt-6 text-xs text-graphite sm:flex-row sm:justify-between">
       <p>&copy; {year} Chisamikan <a href="/secret" aria-label="secret" class="no-underline">🍊</a></p>
-      <a href="/privacy" class="transition-colors hover:text-accent">Privacy Policy</a>
+      <a href="/privacy" class="transition-colors hover:text-accent-text">Privacy Policy</a>
     </div>
   </div>
 </footer>

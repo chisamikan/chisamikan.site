@@ -44,7 +44,7 @@ const { items, showCategory = true } = Astro.props;
             ) : (
               <span class="hidden sm:block"></span>
             )}
-            <span class:list={['col-span-full font-medium text-ink sm:col-span-1', item.link && 'transition-colors group-hover:text-accent']}>
+            <span class:list={['col-span-full font-medium text-ink sm:col-span-1', item.link && 'transition-colors group-hover:text-accent-text']}>
               {item.title}
               {/* 外部リンクの印は右端ではなく、テキストの右隣に置く(全ページ共通の仕様) */}
               {item.external && (
@@ -54,7 +54,7 @@ const { items, showCategory = true } = Astro.props;
             <span
               class:list={[
                 'hidden text-sm text-ink/35 sm:block',
-                item.link && 'transition-[color,transform] duration-200 ease-out group-hover:translate-x-1 group-hover:text-accent',
+                item.link && 'transition-[color,transform] duration-200 ease-out group-hover:translate-x-1 group-hover:text-accent-text',
               ]}
               aria-hidden="true"
             >

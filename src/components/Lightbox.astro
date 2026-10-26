@@ -60,7 +60,7 @@
        扱う都合上、この3行のみプレーンCSSのまま残す */
     max-width: min(90vw, 900px);
     box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
-    transform: scale(0.85);
+    transform: scale(0.95);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 
@@ -101,7 +101,7 @@
 
   .lightbox-close {
     @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-white bg-transparent border-none cursor-pointer opacity-0;
-    transform: scale(0.85);
+    transform: scale(0.95);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 
@@ -115,11 +115,11 @@
   }
 
   .nsfw-warning-dialog {
-    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-[0.75rem] bg-paper text-ink opacity-0;
+    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-lg bg-paper text-ink opacity-0;
     /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 420px);
     box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
-    transform: scale(0.85);
+    transform: scale(0.95);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
 

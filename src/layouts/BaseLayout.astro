@@ -49,6 +49,9 @@ const structuredData = {
 <!doctype html>
 <html lang="ja" class="no-js">
   <head>
+    <!-- スマホのブラウザの上部バー等の色。サイト内のテーマ切り替えにも追従させるため、
+      media属性で端末設定に任せず、直後のスクリプトとHeader.astroのapplyStateで値を書き換える -->
+    <meta name="theme-color" content="#e8f0fa" />
     <script is:inline>
       // 初回描画前にテーマを確定させ、ちらつき(FOUC)を防ぐ。
       // 明示的な保存済み設定(localStorage)があればそれを優先し、無ければ端末の設定(prefers-color-scheme)に従う。
@@ -56,6 +59,8 @@ const structuredData = {
         var stored = localStorage.getItem('theme');
         var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.classList.toggle('dark', isDark);
+        // global.cssの --color-paper(ライト/ダーク)と同じ色
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#0b0e1a' : '#e8f0fa');
       })();
       // 読み込み画面(PageLoader)はセッション中の初回表示だけ見せる。2ページ目以降は
       // 描画前に印を付けて最初から出さない(印の保存はPageLoader側で行う)。
@@ -154,9 +159,17 @@ const structuredData = {
 	
   </head>
   <body>
+    <!-- キーボード操作時に、毎ページのナビを飛ばして本文へ移動できるようにする。
+      普段は隠し、Tabキーでフォーカスしたときだけ左上に表示する -->
+    <a
+      href="#main"
+      class="sr-only rounded-full bg-accent-strong px-4 py-2 text-sm font-medium text-on-accent focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-110"
+    >
+      本文へスキップ
+    </a>
     <PageLoader />
     <Header />
-    <main>
+    <main id="main" tabindex="-1" class="outline-none">
       <slot />
     </main>
     <Footer />

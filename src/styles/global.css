@@ -41,6 +41,9 @@
   /* 強いボタン(.btn-glass-accent)の塗り。白文字でも読めるよう accent より一段濃いシアンにする */
   --color-accent-strong: rgb(14 116 144);
   --color-on-accent: rgb(255 255 255);
+  /* 文字に使うアクセント色。accent のままだと背景(paper)との明暗差が約3.2:1しかなく
+     読みにくいため、文字には一段濃いシアン(約4.7:1)を使う。下線・点・枠線などの装飾は accent のまま */
+  --color-accent-text: rgb(14 116 144);
   /* カードなど「中身」を載せる面。ガラスはヘッダー等の浮かぶ操作部品だけに使い、中身は不透明な面に載せる */
   --color-surface: rgb(255 255 255);
 
@@ -56,7 +59,7 @@
   --blur-lg: 32px;
   --blur-xl: 60px;
 
-  --shadow-pin: 0 6px 16px -4px rgba(34, 31, 27, 0.25);
+  --shadow-pin: 0 6px 16px -4px rgba(4, 18, 36, 0.25);
 }
 
 /* 影はTailwindがクラスに値を直接埋め込むため、テーマで切り替える値は変数経由で参照させる */
@@ -115,6 +118,7 @@
 
     --color-accent-strong: rgb(94 231 223);
     --color-on-accent: rgb(4 20 26);
+    --color-accent-text: rgb(94 231 223);
     --color-surface: rgb(19 24 40);
 
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
@@ -127,6 +131,7 @@
 
   html {
     @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html[lang="ja"] {
@@ -208,7 +213,7 @@
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
   .btn-glass-ghost {
-    @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-200 ease-out hover:border-accent/50 hover:text-accent active:scale-[0.97];
+    @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-200 ease-out hover:border-accent/50 hover:text-accent-text active:scale-[0.97];
   }
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
@@ -258,7 +263,7 @@
   }
 
   .glass-accordion-trigger {
-    @apply flex cursor-pointer list-none items-center justify-between gap-3 py-5 font-body text-sm font-medium text-ink transition-colors duration-200 hover:text-accent;
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 py-5 font-body text-sm font-medium text-ink transition-colors duration-200 hover:text-accent-text;
   }
 
   .glass-accordion-trigger::-webkit-details-marker {
