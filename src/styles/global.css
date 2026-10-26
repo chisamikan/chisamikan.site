@@ -201,12 +201,13 @@
     @apply border-white/45 text-white;
   }
 
+  /* 「NEW」などのバッジ。トップのファーストビューの「NEW」の札(NewsTicker)と同じ塗り・文字組みに揃える */
   .glass-badge {
-    @apply inline-flex items-center gap-1 rounded-full border border-glass-border bg-glass-md px-2 py-0.5 text-xs font-medium text-ink backdrop-blur-sm;
+    @apply inline-flex items-center gap-1 rounded-full bg-glass-md px-2.5 py-1 text-[11px] font-semibold tracking-wider text-ink;
   }
 
   .glass-badge-accent {
-    @apply border-accent/30 bg-accent/15 text-accent;
+    @apply bg-accent-strong text-on-accent;
   }
 
   /* フォーム部品。入力欄は中身を書き込む面なので、ガラスではなくカードと同じ不透明な面にする。
@@ -240,6 +241,38 @@
 
   .glass-accordion-trigger::-webkit-details-marker {
     @apply hidden;
+  }
+
+  /* 開閉を示す矢印。開いている間は上向きに回す */
+  .glass-accordion-icon {
+    @apply shrink-0 text-sm text-accent transition-transform duration-250 ease-out;
+  }
+
+  .glass-accordion-item[open] .glass-accordion-icon {
+    @apply rotate-180;
+  }
+
+  /* 中身の開閉を高さのアニメーションでつなぐ。::details-content と interpolate-size に
+     対応していないブラウザでは、これまでどおり一瞬で開閉する(表示そのものは崩れない) */
+  .glass-accordion-item {
+    interpolate-size: allow-keywords;
+  }
+
+  .glass-accordion-item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size 250ms var(--ease-out), content-visibility 250ms allow-discrete;
+  }
+
+  .glass-accordion-item[open]::details-content {
+    block-size: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-accordion-icon,
+    .glass-accordion-item::details-content {
+      transition: none;
+    }
   }
 
   .glass-accordion-content {

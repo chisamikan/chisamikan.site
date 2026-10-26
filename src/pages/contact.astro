@@ -12,7 +12,7 @@ import ContactForm from '../components/ContactForm.astro';
 
     <div class="request-content leading-relaxed text-ink">
       <details class="glass-accordion-item">
-      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-paintbrush" aria-hidden="true"></i>ご依頼に関するお問い合わせ</h2></summary>
+      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-paintbrush" aria-hidden="true"></i>ご依頼に関するお問い合わせ</h2><i class="fa-solid fa-chevron-down glass-accordion-icon" aria-hidden="true"></i></summary>
       <div class="glass-accordion-content">
 
       <h3>できること</h3>
@@ -71,7 +71,7 @@ import ContactForm from '../components/ContactForm.astro';
       </details>
 
       <details class="glass-accordion-item">
-      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>BOOTH通販に関するお問い合わせ</h2></summary>
+      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>BOOTH通販に関するお問い合わせ</h2><i class="fa-solid fa-chevron-down glass-accordion-icon" aria-hidden="true"></i></summary>
       <div class="glass-accordion-content">
 
       <h3>BOOTHの自家通販（BOOTH倉庫及びpixivファクトリーから発送される商品を除く）に関するお問い合わせ</h3>
@@ -90,7 +90,7 @@ import ContactForm from '../components/ContactForm.astro';
       </details>
 
       <details class="glass-accordion-item">
-      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-circle-question" aria-hidden="true"></i>その他お問い合わせ</h2></summary>
+      <summary class="glass-accordion-trigger"><h2><i class="fa-solid fa-circle-question" aria-hidden="true"></i>その他お問い合わせ</h2><i class="fa-solid fa-chevron-down glass-accordion-icon" aria-hidden="true"></i></summary>
       <div class="glass-accordion-content">
 
       <ul>
@@ -116,22 +116,7 @@ import ContactForm from '../components/ContactForm.astro';
 <style>
   @reference '../styles/global.css';
 
-  /* 区切り線・余白等は global.css の .glass-accordion-* を流用し、
-     ここでは矢印アイコンの開閉アニメーションだけを追加する */
-  .glass-accordion-trigger::after {
-    content: '';
-    flex-shrink: 0;
-    width: 0.55em;
-    height: 0.55em;
-    border-right: 2px solid theme('colors.accent.DEFAULT');
-    border-bottom: 2px solid theme('colors.accent.DEFAULT');
-    transform: rotate(45deg);
-    transition: transform 300ms ease;
-  }
-
-  details[open] > .glass-accordion-trigger::after {
-    transform: rotate(-135deg);
-  }
+  /* 区切り線・余白・開閉アニメーション等は global.css の .glass-accordion-* を流用する */
 
   .request-content h2 {
     @apply m-0 flex items-center gap-2.5 border-0 pl-0 text-base font-semibold sm:text-lg;

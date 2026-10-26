@@ -47,7 +47,7 @@
   .lightbox-dialog::backdrop {
     @apply opacity-0 transition-opacity duration-280 ease-[ease];
     /* rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    background: rgba(34, 31, 27, 0.82);
+    background: rgba(4, 18, 36, 0.85);
   }
 
   .lightbox-dialog.is-open::backdrop {
@@ -59,7 +59,7 @@
     /* min()/rgba()のコンマ、および is-visible時の transform: scale(1) と同じプロパティを
        扱う都合上、この3行のみプレーンCSSのまま残す */
     max-width: min(90vw, 900px);
-    box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
+    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
     transform: scale(0.85);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
@@ -100,7 +100,7 @@
   }
 
   .lightbox-close {
-    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-[#faf7f0] bg-transparent border-none cursor-pointer opacity-0;
+    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-white bg-transparent border-none cursor-pointer opacity-0;
     transform: scale(0.85);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
@@ -111,14 +111,14 @@
   }
 
   .lightbox-close:hover {
-    @apply text-[#0099ff];
+    @apply text-accent;
   }
 
   .nsfw-warning-dialog {
     @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-[0.75rem] bg-paper text-ink opacity-0;
     /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 420px);
-    box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
+    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
     transform: scale(0.85);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
@@ -130,7 +130,7 @@
 
   .nsfw-warning-dialog::backdrop {
     @apply opacity-0 transition-opacity duration-280 ease-[ease];
-    background: rgba(34, 31, 27, 0.82);
+    background: rgba(4, 18, 36, 0.85);
   }
 
   .nsfw-warning-dialog.is-open::backdrop {

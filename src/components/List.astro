@@ -95,7 +95,7 @@ function formatPeriod(start: string | null, end: string | null) {
           )}
 
           <Tag class:list={['flex items-baseline gap-2 font-display text-xl font-semibold text-ink', props.item.tags.length > 0 && 'mt-2']}>
-            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap text-sm">NEW</span>}
+            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap">NEW</span>}
             {props.item.title}
           </Tag>
           {props.item.description && (
@@ -142,7 +142,7 @@ function formatPeriod(start: string | null, end: string | null) {
       {props.type === 'toolbox' && (
         <>
           <Tag class="flex items-baseline gap-2 font-display text-xl font-semibold text-ink">
-            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap text-sm">NEW</span>}
+            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap">NEW</span>}
             {props.item.title}
           </Tag>
           {props.item.description && <p class="mt-1 text-sm text-ink/70">{props.item.description}</p>}
