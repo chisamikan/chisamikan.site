@@ -65,6 +65,26 @@
   --shadow-card-lg: var(--glass-shadow-card-lg);
 }
 
+/* ページ間の移動を、ブラウザ標準のビュートランジションでなめらかにつなぐ(CSSのみ)。
+   Astroの<ClientRouter />と違いページ遷移は通常どおりなので、各ページのスクリプトは
+   そのまま動く。未対応のブラウザ(Firefox等)では普通のページ移動になる */
+@view-transition {
+  navigation: auto;
+}
+
+/* 既定のクロスフェード(0.25s)を、サイトのUIの動きに合わせて短く鋭いカーブにする */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
 @layer base {
   :root {
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
@@ -157,10 +177,12 @@
     @apply mb-10 text-left text-lg leading-[1.8] text-ink/80 sm:text-xl;
   }
 
-  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
+  /* ボタンの共通土台。強いボタンなどの塗りは .btn-glass-* 修飾クラスで指定する */
   /* ホバーで浮かせる代わりに、押した瞬間に縮めて「押せた」手応えを返す */
+  /* 無地の背景の上ではすりガラスのぼかしが見えずただの白いボタンになるため、
+     タグ・入力欄と同じく細い枠線だけで示す。ホバーではごく薄く塗る */
   .btn-glass {
-    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-body text-sm font-medium text-ink backdrop-blur-xl transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:border-glass-border-bright hover:bg-glass-md active:scale-[0.97];
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-ink/20 px-5 py-2.5 font-body text-sm font-medium text-ink transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:border-ink/35 hover:bg-ink/5 active:scale-[0.97];
   }
 
   /* ページ下部の導線やフォーム送信などの単独で置くボタンの横幅。親要素の幅(ページごとに異なる)の
@@ -186,7 +208,7 @@
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
   .btn-glass-ghost {
-    @apply cursor-pointer rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-body text-xs font-medium text-ink/70 backdrop-blur-md transition-[transform,background-color,border-color,color] duration-200 ease-out hover:border-accent/40 hover:bg-glass-md hover:text-accent active:scale-[0.97];
+    @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-200 ease-out hover:border-accent/50 hover:text-accent active:scale-[0.97];
   }
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */

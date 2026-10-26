@@ -118,6 +118,9 @@ const isTop = currentPath === '/';
   .site-header {
     @apply border-b border-ink/10 bg-paper/80 text-ink backdrop-blur-xl;
     transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+    /* ページ間のビュートランジション(global.css)で、ヘッダーだけはページと一緒に
+       フェードさせず、その場に留めて見せる */
+    view-transition-name: site-header;
   }
 
   /* トップページでファーストビューに重なっている間は、帯を消してイラストを見せる */
