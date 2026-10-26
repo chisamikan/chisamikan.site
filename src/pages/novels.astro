@@ -11,7 +11,7 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
 ---
 
 <BaseLayout title="Novels" description="これまでに執筆した小説作品の一覧です。">
-  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+  <section class="page-section">
     <SectionHeading eyebrow="Novels" title="小説" level={1} />
 
     <TagFilter tags={tags} containerSelector="#novels-list" emptySelector="#novels-empty" />
@@ -33,12 +33,12 @@ const tags = Array.from(new Set(novels.flatMap((i) => i.tags))).sort();
     </p>
 
 	<div class="mt-16 text-center">
-      <a href="/contact" class="btn-glass btn-glass-accent md:w-1/3 w-full">
+      <a href="/contact" class="btn-glass btn-glass-accent btn-wide">
         <i class="fa-solid fa-envelope pr-1"></i>ご依頼はこちら
       </a>
     </div>
     <div class="mt-8 text-center">
-      <a href="/" class="btn-glass md:w-1/3 w-full">
+      <a href="/" class="btn-glass btn-wide">
         <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
       </a>
     </div>

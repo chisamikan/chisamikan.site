@@ -29,9 +29,22 @@
   --color-glass-border-subtle: rgba(15, 23, 42, 0.09);
   --color-glass-border-bright: rgba(15, 23, 42, 0.22);
 
-  --font-body: 'Oswald', 'Zen Kaku Gothic New', sans-serif;
+  /* 本文の欧文は字幅の詰まったOswaldだと和文と並べたときにガタつくため、和文に馴染むInter Tightにする */
+  --font-body: 'Inter Tight', 'Zen Kaku Gothic New', sans-serif;
   --font-display: var(--font-body);
+  /* font-monoは注釈やラベルの小さな文字に広く使っているため、等幅にはせず本文と同じ書体のままにする */
   --font-mono: var(--font-body);
+  /* 日付・数値だけは等幅にして、桁が揃った落ち着いた見た目にする */
+  --font-num: 'IBM Plex Mono', 'Zen Kaku Gothic New', monospace;
+
+  /* Tailwind標準の ease-out は立ち上がりが弱く、もたついて見えるため、より鋭いカーブで上書きする */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* 強いボタン(.btn-glass-accent)の塗り。白文字でも読めるよう accent より一段濃いシアンにする */
+  --color-accent-strong: rgb(14 116 144);
+  --color-on-accent: rgb(255 255 255);
+  /* カードなど「中身」を載せる面。ガラスはヘッダー等の浮かぶ操作部品だけに使い、中身は不透明な面に載せる */
+  --color-surface: rgb(255 255 255);
 
   /* CodePen "Liquid Glass UI kit" の radius / blur スケールに合わせる */
   --radius-xs: 6px;
@@ -75,7 +88,7 @@
 
     color-scheme: light;
 
-    --size-body: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
+    --size-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
     --line-height: 1.6;
   }
 
@@ -100,6 +113,10 @@
     --color-glass-border: rgba(255, 255, 255, 0.25);
     --color-glass-border-subtle: rgba(255, 255, 255, 0.12);
     --color-glass-border-bright: rgba(255, 255, 255, 0.5);
+
+    --color-accent-strong: rgb(94 231 223);
+    --color-on-accent: rgb(4 20 26);
+    --color-surface: rgb(19 24 40);
 
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     --glass-shadow-float: 0 20px 60px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -129,15 +146,10 @@
        実際に見えている幅より広くなるブラウザがあり、それがそのままページ全体の横スクロール
        バーとして出てしまう。中身が見切れるわけではない誤差なので、横方向のoverflowを隠して防ぐ */
     @apply overflow-x-hidden bg-paper text-ink font-body antialiased transition-colors duration-300;
-    /* ガラス面が光を透かして見えるよう、固定位置のカラーブロブを紙のドット柄の奥に敷く */
-    background-image:
-      radial-gradient(ellipse 60% 45% at 12% -8%, --alpha(var(--color-accent) / 18%), transparent 100%),
-      radial-gradient(ellipse 55% 42% at 100% 12%, --alpha(var(--color-accent-violet) / 14%), transparent 100%),
-      radial-gradient(ellipse 60% 48% at 45% 100%, --alpha(var(--color-accent-amber) / 12%), transparent 100%),
-      radial-gradient(circle at 1px 1px, --alpha(var(--color-ink) / 5%) 1px, transparent 0);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-    background-attachment: fixed, fixed, fixed, scroll;
+    /* 色数を増やすと濁るため、右上から差す水色の光1つだけを固定で敷く */
+    background-image: radial-gradient(60% 40% at 85% 0%, --alpha(var(--color-accent) / 12%), transparent 70%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     font-size: var(--size-body);
     line-height: var(--line-height);
   }
@@ -150,8 +162,9 @@
     @apply rounded-[2px] outline-[2.5px] outline-accent outline-offset-[3px];
   }
 
+  /* 大きな文字ほど字間が開いて見えるため、見出しはわずかに詰める */
   h1, h2, h3, h4 {
-    @apply font-display text-ink;
+    @apply font-display text-ink tracking-[-0.01em];
   }
 
   p {
@@ -160,40 +173,49 @@
 }
 
 @layer components {
+  /* 子ページの外枠。文章が読みやすい幅に絞り、見出しと本文を同じ幅に揃える。
+     ギャラリーのようにカードを横に並べるページだけ、呼び出し側で max-w-5xl に広げる */
+  .page-section {
+    @apply mx-auto max-w-3xl px-6 pt-4 pb-16 sm:pt-12 sm:pb-24;
+  }
+
+  /* 子ページの見出し(h1)直下のリード文。ページ間で大きさを揃え、本文(--size-body)より一回り大きくする */
+  .page-lead {
+    @apply mb-10 text-left text-lg leading-relaxed text-ink/80 sm:text-xl;
+  }
+
   /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
+  /* ホバーで浮かせる代わりに、押した瞬間に縮めて「押せた」手応えを返す */
   .btn-glass {
-    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-mono text-sm text-ink shadow-card backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-glass-border-bright hover:bg-glass-md hover:shadow-card-lg;
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-body text-sm font-medium text-ink backdrop-blur-xl transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:border-glass-border-bright hover:bg-glass-md active:scale-[0.97];
+  }
+
+  /* ページ下部の導線やフォーム送信などの単独で置くボタンの横幅。親要素の幅(ページごとに異なる)の
+     割合で決めると幅が揃わないため、固定幅にする。狭い画面では横幅いっぱいに広げる */
+  .btn-wide {
+    @apply w-full sm:w-80;
   }
 
   .btn-glass-sm {
     @apply px-3.5 py-1.5 text-xs;
   }
 
-  /* accent → accent-2 の斜めグラデーション + 上面のガラス反射(::before)で構成する */
+  /* 1画面に1つだけ置く強いボタン。半透明のグラデーションだと白文字が読みづらいため、不透明な塗りにする */
   .btn-glass-accent {
-    @apply border-accent/45 text-white shadow-glass-accent active:scale-95 hover:shadow-glass-accent-lg;
-    position: relative;
-    background-image: linear-gradient(135deg, --alpha(var(--color-accent) / 50%) 0%, --alpha(var(--color-accent-2) / 50%) 100%);
-  }
-
-  .btn-glass-accent:hover {
-    background-image: linear-gradient(135deg, --alpha(var(--color-accent) / 70%) 0%, --alpha(var(--color-accent-2) / 70%) 100%);
-  }
-
-  .btn-glass-accent::before {
-    @apply content-[''] absolute inset-0 rounded-[inherit] pointer-events-none [background:var(--reflection-top)];
+    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90;
+    box-shadow: 0 8px 24px -8px --alpha(var(--color-accent-strong) / 60%);
   }
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
   .btn-glass-ghost {
-    @apply cursor-pointer rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:bg-glass-md hover:text-accent;
+    @apply cursor-pointer rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-body text-xs font-medium text-ink/70 backdrop-blur-md transition-[transform,background-color,border-color,color] duration-200 ease-out hover:border-accent/40 hover:bg-glass-md hover:text-accent active:scale-[0.97];
   }
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
 
   /* タグ・バッジ: Card/WorkItem/ProfileContent のスキルタグに使用 */
   .glass-tag {
-    @apply inline-flex items-center rounded-full border border-glass-border-subtle bg-glass px-2.5 py-0.5 font-mono text-[11px] text-ink/80 backdrop-blur-sm transition-colors duration-300;
+    @apply inline-flex items-center rounded-full border border-glass-border-subtle bg-glass px-2.5 py-0.5 font-body text-[11px] text-ink/80 backdrop-blur-sm transition-colors duration-300;
   }
 
   .glass-badge {
@@ -304,6 +326,13 @@
     @apply content-[''] absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
   }
 
+  /* ファーストビュー(index.astro)のイラスト上に重ねる、浮かぶガラスの部品(ナビ・お知らせの札)。
+     背景の明暗に関わらず読めるよう、すりガラスを白く曇らせて文字は ink 色で載せる */
+  .glass-float {
+    @apply border border-glass-border-subtle bg-glass-md backdrop-blur-xl backdrop-saturate-[1.8];
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 8px 24px rgba(4, 18, 36, 0.12);
+  }
+
   /* ファーストビューのレンズフレア(HeroSlideshow.astro)。色付きの円を重ねてmix-blend-mode:overlayで馴染ませ、ゆっくり回転させる */
   .flare-circle {
     @apply absolute h-[min(55vw,55vh)] w-[min(55vw,55vh)] rounded-full mix-blend-overlay;
@@ -345,20 +374,15 @@
 }
 
 @layer utilities {
-  /* 見出しの左右に配置する飾り線。border色は before:border-* / after:border-* で呼び出し側から指定する */
-  .heading-lines {
-    @apply relative inline-block px-13.75 before:absolute before:top-1/2 before:left-0 before:h-0.5 before:w-11.25 before:border-y before:content-[''] after:absolute after:top-1/2 after:right-0 after:h-0.5 after:w-11.25 after:border-y after:content-[''];
-  }
-
-  /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動。
-     ボタン(.btn-glass)と同じ transition-all + duration-300 でイージングを揃える */
+  /* カードのホバー挙動。カード自体は浮かせず影だけ深くし、中の画像を少し拡大する(Card.astro側) */
   .glass-card {
-    @apply cursor-pointer transition-all duration-300 will-change-transform hover:-translate-y-1.5;
+    @apply cursor-pointer transition-shadow duration-300 ease-out hover:shadow-card-lg;
   }
 
-  /* カード/サムネイルの共通の見た目(角丸・枠線・背景・影・ぼかし)。ホバー演出は .glass-card 側で付与 */
+  /* カード/サムネイルの共通の見た目。ガラスは浮かぶ操作部品だけに使い、
+     作品を載せるカードは不透明な面にして画像を主役にする */
   .glass-panel {
-    @apply rounded-2xl border border-glass-border bg-glass shadow-card backdrop-blur-xl hover:border-glass-border-bright hover:shadow-card-lg;
+    @apply rounded-lg border border-glass-border-subtle bg-surface shadow-card;
   }
 
   /* カード下部(figcaption/div)の共通レイアウト。
@@ -372,12 +396,12 @@
   /* リストUI(List.astro/Thumbnail.astro)専用のサムネイル枠。
      カードUI(.glass-card/.glass-panel)とは角丸の値が異なるため独立させている */
   .thumbnail-frame {
-    @apply cursor-pointer rounded-lg border border-glass-border bg-glass shadow-card backdrop-blur-xl transition-all duration-300 will-change-transform hover:-translate-y-1.5 hover:border-glass-border-bright hover:shadow-card-lg sm:rounded-2xl;
+    @apply cursor-pointer rounded-lg border border-glass-border-subtle bg-surface shadow-card transition-shadow duration-300 ease-out hover:shadow-card-lg;
   }
 
   /* 画像未設定時のプレースホルダー枠。ホバー演出は持たせない */
   .thumbnail-frame-static {
-    @apply cursor-default rounded-lg border border-glass-border bg-glass shadow-card backdrop-blur-xl sm:rounded-2xl;
+    @apply cursor-default rounded-lg border border-glass-border-subtle bg-surface shadow-card;
   }
 
   /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素用にカーソルを明示する */
@@ -386,20 +410,17 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .glass-card,
-    .glass-card:hover,
-    .thumbnail-frame,
-    .thumbnail-frame:hover,
     .btn-glass,
-    .btn-glass:hover,
-    .btn-glass-accent:active {
+    .btn-glass:active,
+    .btn-glass-ghost,
+    .btn-glass-ghost:active {
       @apply transition-none! transform-none!;
     }
   }
 
   /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる(JSが .is-visible を付与) */
   .reveal {
-    @apply opacity-0 translate-y-7 transition-[opacity,transform] duration-800 ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply opacity-0 translate-y-4 transition-[opacity,transform] duration-700 ease-out;
   }
 
   .reveal.is-visible {
@@ -417,15 +438,15 @@
   }
 
   /* カード一覧(ギャラリー/小説/ツールボックス/実績など)を、画面に入ったタイミングで
-     並び順に応じて回転させながら時間差でフェードインさせる。.reveal と同じくJSが
-     is-visible を付与するが、遅延と回転角はCSSのsibling-index()で並び順から自動計算する
+     並び順に応じて時間差で少しせり上げながらフェードインさせる。.reveal と同じくJSが
+     is-visible を付与するが、遅延はCSSのsibling-index()で並び順から自動計算する
      (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count)。
      ギャラリーは絞り込み/ページ送り用に全件を常にDOMへ描画しており、sibling-index()は
      表示中の件数ではなくグリッド内の全カード中のDOM位置を返してしまう。そのため
      100件目以降のカードでは遅延が数秒単位に達し、ロード完了後もカードが表示され
      ないという不具合になっていた。9件(1ページ分)相当の値で頭打ちにして防ぐ */
   .card-reveal {
-    @apply opacity-0 transition-[opacity,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply opacity-0 transition-[opacity,transform] duration-500 ease-out;
     /* will-changeで事前にコンポジットレイヤーを確保しておかないと、
        display:none解除と同時にトランジションが始まる際、レイヤー昇格が
        アニメーション開始と同一フレームで発生し、前半のフレームが
@@ -438,10 +459,8 @@
        sibling-index()がずれてしまう)がJSから並び順を明示的に上書きできるようにするため。
        未指定時はこれまで通りsibling-index()から自動計算する */
     --card-reveal-index: calc(sibling-index() - 1);
-    /* --card-reveal-indexは0始まりのため、素の (index * 1.5deg) だと1枚目
-       (index 0)だけ回転角が常に0degになり、フェードするだけで回転による
-       スタッガー感が出ない。+1してから掛けることで1枚目にも回転を持たせる */
-    transform: rotate(clamp(0deg, calc((var(--card-reveal-index) + 1) * 1.5deg), 12deg));
+    /* 回転させると作品より演出が目立ってしまうため、わずかなせり上げに留める */
+    transform: translateY(8px);
     /* transition-delayが0の要素は、lib/tagFilter.tsのrevealItemsが
        transitionを戻す→is-visibleを付与するのを同一フレームで行うと、
        ブラウザが変化前の状態を観測できずワープすることがある
@@ -454,9 +473,9 @@
 
   .card-reveal.is-visible {
     @apply opacity-100;
-    /* Tailwindのrotate-0はtransformではなく別プロパティrotateを設定してしまい、
-       上のtransform(rotate(clamp(...)))を打ち消せないため、プレーンCSSで上書きする */
-    transform: rotate(0deg);
+    /* Tailwindのtranslate-y-0はtransformではなく別プロパティtranslateを設定してしまい、
+       上のtransform(translateY(8px))を打ち消せないため、プレーンCSSで上書きする */
+    transform: none;
   }
 
   .no-js .card-reveal {
@@ -480,14 +499,16 @@
     @apply overflow-hidden;
   }
 
-  /* 外部リンク(href が http/https始まり)に自動でアイコンを表示する。除外したい場合は
-     .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')はLightning CSS
-     の圧縮バグでPUA文字が空文字に潰され本番ビルドで消えるため、SVGマスクで代替する */
+  /* 外部リンク(href が http/https始まり)のテキストの右隣に、自動でアイコンを表示する。
+     除外したい場合は .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')は
+     Lightning CSSの圧縮バグでPUA文字が空文字に潰され本番ビルドで消えるため、
+     手動で置く fa-arrow-up-right-from-square と見た目が揃うよう、同じアイコンのSVG
+     (Font Awesome Free 7.3.1 / CC BY 4.0)をマスクにして代替する */
   a[href^="http://"]:not(.no-external-icon)::after,
   a[href^="https://"]:not(.no-external-icon)::after {
     @apply content-[''] inline-block bg-current ml-[0.3em] align-[-0.125em] w-[0.8em] h-[0.8em];
     /* data URI中の引用符・スペースがTailwindの矢括弧記法の値パースと衝突するため、
        maskの1行のみプレーンCSSのまま残す */
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0-201.4 201.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 96C35.8 96 0 131.8 0 176L0 432c0 44.2 35.8 80 80 80l256 0c44.2 0 80-35.8 80-80l0-80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 80c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l80 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 96z'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 }

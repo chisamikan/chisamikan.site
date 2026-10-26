@@ -13,7 +13,7 @@ const { images } = Astro.props;
     <img
       src={src}
       alt="ファーストビューのイラスト"
-      class={`hero-slide absolute inset-0 h-full w-full object-cover${i === 0 ? ' is-active' : ''}`}
+      class={`hero-slide absolute inset-0 h-full w-full object-cover object-top${i === 0 ? ' is-active' : ''}`}
       style={i === 0 ? undefined : 'opacity: 0;'}
       loading={i === 0 ? 'eager' : 'lazy'}
       fetchpriority={i === 0 ? 'high' : 'low'}
@@ -35,7 +35,7 @@ const { images } = Astro.props;
   @reference "../styles/global.css";
 
   .hero-slide {
-    @apply transition-opacity duration-[1200ms] ease-[ease];
+    @apply transition-opacity duration-1200 ease-[ease];
     /* is-active時のhero-zoomアニメーションと同じtransformプロパティを扱うため、
        ここもscale-100ではなくプレーンCSSで統一する */
     transform: scale(1);
@@ -49,6 +49,13 @@ const { images } = Astro.props;
     }
     to {
       transform: scale(1.08);
+    }
+  }
+
+  /* 大きな画像がゆっくり動き続けると酔いやすいため、視差効果を減らす設定ではズームさせない */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide.is-active {
+      @apply animate-none;
     }
   }
 </style>

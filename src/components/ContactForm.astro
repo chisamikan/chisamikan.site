@@ -49,7 +49,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
       class="glass-textarea"
     ></textarea>
     <!-- 入力のたびに読み上げられないよう、残り文字数の表示は aria-live にしない -->
-    <p id="message-count" class="mt-1 text-right font-mono text-xs tabular-nums text-graphite">
+    <p id="message-count" class="mt-1 text-right font-num text-xs tabular-nums text-graphite">
       0 / {CONTACT_LIMITS.message}
     </p>
   </div>
@@ -89,7 +89,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
     <button
       type="submit"
       id="contact-submit"
-      class="group btn-glass btn-glass-accent px-6 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 md:w-1/3 w-full"
+      class="group btn-glass btn-glass-accent px-6 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 btn-wide"
     >
       <!-- 送信中はボタンが disabled になるので、表示の切り替えはCSSだけで行う -->
       <span class="group-disabled:hidden"><i class="fa-solid fa-circle-chevron-right pr-1"></i>送信する</span>
@@ -147,7 +147,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY;
   </div>
 
   <div class="text-center">
-    <button type="button" id="complete-copy" class="btn-glass btn-glass-accent w-full px-6 md:w-1/3">
+    <button type="button" id="complete-copy" class="btn-glass btn-glass-accent btn-wide px-6">
       <i class="fa-solid fa-copy pr-1" aria-hidden="true"></i>内容をコピー
     </button>
   </div>

@@ -10,83 +10,83 @@ function isActive(href: string) {
 
 <input type="checkbox" id="nav-toggle" class="peer hidden" />
 
-<header id="site-header" class="sticky top-0 z-40 border-b border-glass-border bg-paper/70 shadow-glass backdrop-blur-xl">
-  <div class="mx-auto max-w-5xl px-6 py-4">
-    <div class="flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2 font-display text-xl font-semibold tracking-tight text-ink">
-        <img src="/favicon.svg" alt="" width="24" height="24" class="h-6 w-6 rounded" />
-        chisamikan.site
-      </a>
+<!-- ヘッダーは帯ではなく、ナビを浮かぶガラスの部品として右上に置く。
+  背景を持たないため、トップページではファーストビューのイラストがそのまま裏に透ける -->
+<header id="site-header" class="sticky top-0 z-40">
+  <div class="flex items-center justify-end gap-3 px-4 py-4 sm:px-8 lg:px-12">
+    <!-- 日本語名を併記すると横幅が増え、lg(1024px)では収まらないため、
+      横並びのナビはxl以上で表示し、それ未満はメニューボタンに切り替える -->
+    <nav aria-label="サイト内ナビゲーション" class="glass-float hidden rounded-full p-1.5 xl:block">
+      <ul class="flex items-center gap-0.5">
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[
+                'flex flex-col items-center rounded-full px-3.5 py-2 leading-tight transition-colors duration-150',
+                isActive(item.href) ? 'bg-ink text-paper' : 'text-ink/70 hover:bg-ink/6 hover:text-ink',
+              ]}
+            >
+              <span class="text-[15px] font-medium">{item.labelJa}</span>
+              <span class="text-[10px] font-medium uppercase tracking-[0.12em] opacity-60">{item.label}</span>
+            </a>
+          </li>
+        ))}
+        <li>
+          <button
+            type="button"
+            aria-label="Dark Mode"
+            aria-pressed="false"
+            class="theme-toggle-btn flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-ink/70 transition-colors duration-150 hover:bg-ink/6 hover:text-ink"
+          >
+            <!-- FontAwesomeのCSSはcascade layer外で読み込まれ常に優先されるため、
+              .fa-regular の display: inline-block を dark: 切り替えで上書きできるよう
+              important修飾子(末尾の!)で明示的に優先させる -->
+            <i class="fa-regular fa-moon dark:hidden!" aria-hidden="true"></i>
+            <i class="fa-regular fa-sun hidden! dark:inline!" aria-hidden="true"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
 
-      <div class="flex items-center gap-1 sm:gap-3">
-        <nav aria-label="サイト内ナビゲーション" class="hidden lg:block">
-          <ul class="flex items-center gap-1 font-mono text-xs uppercase tracking-wider sm:gap-2">
-            {nav.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  aria-current={isActive(item.href) ? 'page' : undefined}
-                  class:list={[
-                    'relative rounded px-2.5 py-1.5 transition-colors hover:text-accent sm:px-3',
-                    isActive(item.href) ? 'text-accent' : 'text-ink/70',
-                  ]}
-                >
-                  {item.label}
-                  {isActive(item.href) && (
-                    <span class="absolute inset-x-2 -bottom-0.5 h-0.5 bg-accent" aria-hidden="true"></span>
-                  )}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <label
-          for="nav-toggle"
-          class="nav-icon-toggle flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded text-ink/70 transition-colors hover:text-accent lg:hidden"
-          aria-label="メニューを開閉する"
-        >
-          <span class="nav-icon-bars">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </label>
-
-        <button
-          type="button"
-          aria-label="Dark Mode"
-          aria-pressed="false"
-          class="theme-toggle-btn hidden h-9 w-9 shrink-0 items-center justify-center rounded text-ink/70 transition-colors hover:text-accent lg:flex"
-        >
-          <!-- FontAwesomeのCSSはcascade layer外で読み込まれ常に優先されるため、
-            .fa-regular の display: inline-block を dark: 切り替えで上書きできるよう
-            important修飾子(末尾の!)で明示的に優先させる -->
-          <i class="fa-regular fa-moon dark:hidden!" aria-hidden="true"></i>
-          <i class="fa-regular fa-sun hidden! dark:inline!" aria-hidden="true"></i>
-        </button>
-      </div>
-    </div>
+    <label
+      for="nav-toggle"
+      class="nav-icon-toggle glass-float flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-ink transition-transform duration-150 ease-out active:scale-[0.97] xl:hidden"
+      aria-label="メニューを開閉する"
+    >
+      <span class="nav-icon-bars">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </label>
   </div>
 </header>
 
 <nav
   aria-label="サイト内ナビゲーション（モバイル）"
-  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/70 opacity-0 shadow-glass backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 lg:hidden"
+  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/80 opacity-0 backdrop-blur-xl transition duration-300 ease-out peer-checked:pointer-events-auto peer-checked:translate-y-0 peer-checked:opacity-100 xl:hidden"
 >
-  <ul class="mobile-nav-list absolute left-1/2 top-1/2 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 px-6 font-mono text-xs uppercase tracking-wider">
+  <!-- 区切り線を画面の横幅いっぱいに引くため、左右の余白はリスト側ではなく各行(リンク)に持たせる。
+    行全体をリンクにしてタップできる範囲も広げる。表示中のページは、行の左端のアクセント色の線と
+    文字色・ごく薄い色の敷きで示す -->
+  <ul class="mobile-nav-list absolute inset-x-0 flex -translate-y-1/2 flex-col divide-y divide-ink/10 border-y border-ink/10">
     {nav.map((item) => (
       <li>
         <a
           href={item.href}
           aria-current={isActive(item.href) ? 'page' : undefined}
           class:list={[
-            'relative inline-block rounded px-3 py-2 transition-colors hover:text-accent',
-            isActive(item.href) ? 'text-accent' : 'text-ink/70',
+            'relative flex items-baseline gap-3 px-8 py-2.5 leading-tight transition-colors duration-150 sm:px-12',
+            isActive(item.href)
+              ? 'bg-accent/8 text-accent before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-accent before:content-[""]'
+              : 'text-ink/70 hover:text-ink',
           ]}
         >
-          {item.label}
+          <span class="text-2xl font-semibold">{item.labelJa}</span>
+          <span class="text-xs font-medium uppercase tracking-[0.12em] opacity-60">{item.label}</span>
         </a>
       </li>
     ))}
@@ -95,7 +95,7 @@ function isActive(href: string) {
         type="button"
         aria-label="Dark Mode"
         aria-pressed="false"
-        class="theme-toggle-btn inline-flex items-center gap-2 rounded px-3 py-2 uppercase text-ink/70 transition-colors hover:text-accent"
+        class="theme-toggle-btn flex w-full cursor-pointer items-center gap-2 px-8 py-3.5 text-base text-ink/70 transition-colors duration-150 hover:text-ink sm:px-12"
       >
         <i class="fa-regular fa-moon dark:hidden!" aria-hidden="true"></i>
         <i class="fa-regular fa-sun hidden! dark:inline!" aria-hidden="true"></i>
@@ -110,19 +110,32 @@ function isActive(href: string) {
   @reference "../styles/global.css";
 
   .mobile-nav-overlay {
-    /* オーバーレイの中央揃えがヘッダーの裏に隠れた分だけズレないよう、
-       JSで実測したヘッダー高さぶん top を下げ、見えている範囲だけを基準にする。
+    /* ヘッダーは背景を持たないため、オーバーレイをヘッダーの下から始めると
+       上端に裏のページが帯状に覗いてしまう。画面全体を覆い、ヘッダー(z-40)はその上に重ねる */
+    top: 0;
+    height: 100dvh;
+  }
+
+  .mobile-nav-list {
+    /* 項目の中央揃えは、ヘッダーに隠れない見えている範囲を基準にするため、
+       JSで実測したヘッダー高さの半分だけ下にずらす。
        var()のフォールバック用コンマがscoped styleの@apply内では正しく処理できない
        (エスケープしても出力にバックスラッシュが残ってしまう)ため、プレーンCSSのまま残す */
-    top: var(--mobile-header-h, 4.5rem);
-    height: calc(100dvh - var(--mobile-header-h, 4.5rem));
+    top: calc(50% + var(--mobile-header-h, 4.5rem) / 2);
   }
 
   /* 横向きで縦の表示領域が狭い端末では9項目の縦積みが画面に収まらないため、
      画面が低いときだけ横並び+折り返しにする */
   @media (max-height: 500px) and (orientation: landscape) {
     .mobile-nav-list {
-      @apply max-w-[92vw] flex-row flex-wrap justify-center gap-y-2 gap-x-6;
+      /* 横並びでは区切り線が項目の上に1本ずつ浮いて見えるため外す */
+      @apply flex-row flex-wrap justify-start gap-y-2 gap-x-6 divide-y-0 border-y-0 px-8;
+    }
+
+    /* 横並びでは行の概念がないため、各項目の余白と表示中ページの左端の線をなくし、文字色だけで示す */
+    .mobile-nav-list a,
+    .mobile-nav-list .theme-toggle-btn {
+      @apply px-0 py-1 bg-transparent before:hidden;
     }
   }
 

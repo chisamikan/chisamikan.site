@@ -13,17 +13,18 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
 ---
 
 <BaseLayout title="Profile" description="千紗みかんのプロフィールページです。">
-  <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+  <section class="page-section">
     <SectionHeading eyebrow="Profile" title="プロフィール" level={1} />
 
-    <div class="mx-auto max-w-2xl text-center">
+    <!-- md以上はトップページのプロフィールと同じ2カラムになるため中央揃えを外す -->
+    <div class="text-center md:text-left">
       <ProfileContent />
     </div>
 
 	<!-- 支援先 -->
-    <div class="mx-auto mt-16 max-w-2xl">
+    <div class="mt-16">
       <h2 class="profile-section-heading">支援先</h2>
-      <ul class="mx-auto mt-6 divide-y divide-ink/10 text-left">
+      <ul class="mt-6 divide-y divide-ink/10 text-left">
         {supportLinks.map((link) => (
           <li class="py-4 first:pt-0 last:pb-0">
             <a
@@ -45,7 +46,7 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
     </div>
 
     <!-- 仕事履歴 -->
-    <div class="mx-auto mt-16 max-w-2xl">
+    <div class="mt-16">
       <h2 class="profile-section-heading">仕事履歴</h2>
 
       <TagFilter tags={workTags} containerSelector="#works-list" emptySelector="#works-empty" />
@@ -67,12 +68,12 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
       </p>
     </div>
     <div class="mt-8 text-center">
-      <a href="/contact" class="btn-glass btn-glass-accent md:w-1/3 w-full">
+      <a href="/contact" class="btn-glass btn-glass-accent btn-wide">
         <i class="fa-solid fa-envelope pr-1"></i>ご依頼はこちら
       </a>
     </div>
     <div class="mt-8 text-center">
-      <a href="/" class="btn-glass md:w-1/3 w-full">
+      <a href="/" class="btn-glass btn-wide">
         <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
       </a>
     </div>

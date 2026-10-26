@@ -12,16 +12,17 @@ export const person = {
   image: '/images/profile-icon.webp',
 };
 
+// ナビゲーションでは日本語名(labelJa)を主に表示し、英語名(label)はその下に小さく併記する
 export const nav = [
-  { href: '/', label: 'Top' },
-  { href: '/news', label: 'News' },
-  { href: '/about', label: 'About' },
-  { href: '/profile', label: 'Profile' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/novels', label: 'Novels' },
-  { href: '/toolbox', label: 'ToolBox' },
-  { href: '/#shop', label: 'Shop' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/', label: 'Top', labelJa: 'トップ' },
+  { href: '/news', label: 'News', labelJa: 'お知らせ' },
+  { href: '/about', label: 'About', labelJa: 'サイトについて' },
+  { href: '/profile', label: 'Profile', labelJa: 'プロフィール' },
+  { href: '/gallery', label: 'Gallery', labelJa: 'ギャラリー' },
+  { href: '/novels', label: 'Novels', labelJa: '小説' },
+  { href: '/toolbox', label: 'ToolBox', labelJa: 'ツールボックス' },
+  { href: '/#shop', label: 'Shop', labelJa: 'ショップ' },
+  { href: '/contact', label: 'Contact', labelJa: 'お問い合わせ' },
 ];
 
 export const snsLinks = [

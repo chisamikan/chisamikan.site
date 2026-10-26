@@ -3,16 +3,41 @@ interface Props {
   eyebrow?: string;
   title: string;
   level?: 1 | 2;
+  // 指定するとトップページのセクション用に左寄せになり、右端に一覧への導線を置く
+  href?: string;
+  linkLabel?: string;
 }
-const { eyebrow, title, level = 2 } = Astro.props;
+const { eyebrow, title, level = 2, href, linkLabel = 'すべて見る' } = Astro.props;
 const Tag = `h${level}` as 'h1' | 'h2';
 ---
 
-<div class="mb-10 text-center">
-  {eyebrow && (
-    <p class="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-graphite">{eyebrow}</p>
-  )}
-  <Tag class="heading-lines before:border-ink after:border-ink text-3xl font-semibold sm:text-4xl">
-    {title}
+<div class:list={['mb-10', href && 'flex items-end justify-between gap-4']}>
+  <!-- 「英語名 日本語名」を左揃えの1行に並べ、英語名を大きく見せる。狭い画面でも改行せず収まるよう、
+    英語名は画面幅に応じて縮める(最長の「Privacy Policy プライバシーポリシー」が375px幅に収まる大きさ) -->
+  <Tag class="flex items-baseline gap-x-3 whitespace-nowrap">
+    {eyebrow ? (
+      <>
+        <span class="text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-semibold leading-none tracking-[-0.03em]">{eyebrow}</span>
+        <span class="text-sm font-bold text-accent sm:text-lg lg:text-xl">{title}</span>
+      </>
+    ) : (
+      <span class="text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-bold leading-none">{title}</span>
+    )}
   </Tag>
+  {href && (
+    <a
+      href={href}
+      class="group no-external-icon shrink-0 text-sm font-medium text-accent"
+      {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    >
+      {linkLabel}
+      <i
+        class:list={[
+          'fa-solid ml-1.5 inline-block text-[0.85em] transition-transform duration-200 ease-out group-hover:translate-x-1',
+          href.startsWith('http') ? 'fa-arrow-up-right-from-square' : 'fa-arrow-right',
+        ]}
+        aria-hidden="true"
+      ></i>
+    </a>
+  )}
 </div>

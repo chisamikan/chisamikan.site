@@ -33,10 +33,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             alt={props.item.title}
             loading="lazy"
             class:list={[
-              'absolute left-1/2 top-1/2 max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top transition-[width,height] duration-300',
-              props.item.nsfw
-                ? 'h-[110%] w-[110%] blur-xl'
-                : 'h-full w-full group-hover:h-[110%] group-hover:w-[110%]',
+              'absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 ease-out',
+              props.item.nsfw ? 'scale-110 blur-xl' : 'group-hover:scale-105',
             ]}
           />
           {props.item.nsfw && (
@@ -80,7 +78,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         {(props.item.date || props.item.url) && (
           <div class="mt-2 flex items-center gap-2">
             {props.item.date && (
-              <p class="font-mono text-[11px] text-graphite">
+              <p class="font-num text-[11px] text-graphite">
                 {new Date(props.item.date).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
               </p>
             )}
@@ -112,8 +110,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         alt={props.item.imageUrl ? props.item.title : ''}
         loading="lazy"
         class:list={[
-          'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top',
-          props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
+          'absolute inset-0 h-full w-full object-cover object-top',
+          props.item.imageUrl && 'transition-transform duration-500 ease-out group-hover:scale-105',
         ]}
       />
       {isNew && (
@@ -159,8 +157,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             alt={props.item.imageUrl ? props.item.title : ''}
             loading="lazy"
             class:list={[
-              'absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top',
-              props.item.imageUrl && 'transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]',
+              'absolute inset-0 h-full w-full object-cover object-top',
+              props.item.imageUrl && 'transition-transform duration-500 ease-out group-hover:scale-105',
             ]}
           />
         </a>
@@ -179,7 +177,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
               href={props.item.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="pointer-events-auto no-external-icon transition-colors hover:text-accent"
+              class="pointer-events-auto transition-colors hover:text-accent"
             >
               {props.item.title}
             </a>
@@ -212,7 +210,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             src={props.item.imageUrl}
             alt={props.item.title}
             loading="lazy"
-            class="absolute left-1/2 top-1/2 h-full w-full max-w-none max-h-none -translate-x-1/2 -translate-y-1/2 object-cover object-top transition-[width,height] duration-300 group-hover:h-[110%] group-hover:w-[110%]"
+            class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
           />
         ) : (
           <img src={PLACEHOLDER} alt="" loading="lazy" class="h-full w-full object-cover object-top" />
@@ -237,7 +235,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
       </div>
     </div>
     <div class="glass-card-body">
-      <p class="font-mono text-sm text-accent">{props.item.price}</p>
+      <p class="font-num text-sm text-accent">{props.item.price}</p>
     </div>
   </article>
 )}
