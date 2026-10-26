@@ -40,6 +40,17 @@
        コンマがscoped styleの@apply内では正しく処理できないため、この2行のみプレーンCSSのまま残す */
     background-image: radial-gradient(circle at 1px 1px, --alpha(var(--color-ink) / 5.5%) 1px, transparent 0);
     transition-property: opacity, visibility;
+    /* スクリプトの読み込み失敗などで is-hidden が付かなくてもページが見られなくならないよう、
+       一定時間たったらCSSだけで読み込み画面を消す */
+    animation: page-loader-failsafe 0s 10s forwards;
+  }
+
+  @keyframes page-loader-failsafe {
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
   }
 
   .page-loader.is-hidden {

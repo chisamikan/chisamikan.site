@@ -119,6 +119,9 @@ const structuredData = {
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
       />
+      <!-- 読み込み画面(PageLoader)はJSで消すため、JSが無効な環境では最初から出さない。
+        is:inline が無いとAstroがstyleを<head>へ移してnoscriptの外に出し、常に非表示になってしまう -->
+      <style is:inline>#page-loader { display: none; }</style>
     </noscript>
 
     <script>

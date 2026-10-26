@@ -57,7 +57,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
       )}
       {/* サムネイル下部にタグ・タイトル・説明文を重ねて表示する。クリック操作はサムネイル本体(button)が担うため pointer-events-none にする。
         説明文をカード下部に置くと、説明文の無いカードが同じ行の他のカードの高さに引き伸ばされて
-        大きな空白ができるため、ここに置いてカード下部は日付・リンクの1行だけにし、全カードの高さを揃える */}
+        大きな空白ができるため、ここに置いてカード下部は日付・リンクの1行だけにし、全カードの高さを揃える
+        (小説・ツールボックスのカードも同じ理由で説明文をここに置き、カード下部を持たせない) */}
       <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8">
         {props.item.tags.length > 0 && (
           <ul class="flex flex-wrap gap-1.5">
@@ -134,13 +135,10 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white">
           {props.item.title}
         </Tag>
+        {props.item.description && (
+          <p class="truncate text-[11px] leading-relaxed text-white/80">{props.item.description}</p>
+        )}
       </div>
-    </div>
-
-    <div class="glass-card-body">
-      {props.item.description && (
-        <p class="line-clamp-2 whitespace-pre-line text-sm text-ink/70">{props.item.description}</p>
-      )}
     </div>
   </a>
 )}
@@ -189,13 +187,11 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             props.item.title
           )}
         </Tag>
+        {props.item.description && (
+          <p class="truncate text-[11px] leading-relaxed text-white/80">{props.item.description}</p>
+        )}
       </div>
     </div>
-    <figcaption class="glass-card-body">
-      {props.item.description && (
-        <p class="line-clamp-2 text-sm text-ink/70">{props.item.description}</p>
-      )}
-    </figcaption>
   </figure>
 )}
 
