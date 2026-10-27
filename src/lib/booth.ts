@@ -1,3 +1,5 @@
+import { safeLinkUrl } from './url';
+
 export interface BoothItem {
   id: number;
   title: string;
@@ -41,13 +43,15 @@ export async function getBoothItems(limit = 3): Promise<BoothItem[]> {
     for (const match of html.matchAll(DATA_ITEM_PATTERN)) {
       try {
         const raw = JSON.parse(decodeHtmlEntities(match[1]));
+        const url = safeLinkUrl(raw.shop_item_url ?? raw.url);
+        if (!url) continue;
         items.push({
           id: raw.id,
           title: raw.name,
           price: raw.price,
           category: raw.category?.name?.ja ?? raw.category?.name?.en ?? null,
           imageUrl: raw.thumbnail_image_urls?.[0] ?? null,
-          url: raw.shop_item_url ?? raw.url,
+          url,
         });
       } catch {
         // 個別の商品データが想定外の形式だった場合はその商品だけ読み飛ばす

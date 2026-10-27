@@ -1,34 +1,18 @@
-import { Client, isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
+import { isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
 import type { PageObjectResponse, QueryDataSourceParameters } from '@notionhq/client/build/src/api-endpoints';
+import { createNotionClient, type ImageKind } from './notionClient';
+import { safeLinkUrl } from './url';
 
+// ビルド時(静的ページの生成)専用のモジュール。Workerで動くAPIルートからは import しないこと
+// (import.meta.env.NOTION_TOKEN がWorkerのコードに平文で埋め込まれてしまうため)。
 // トークンが無い場合はエラーで止めず空の一覧を返す
 const token = import.meta.env.NOTION_TOKEN;
-
-/**
- * Notion SDK のクライアントを生成する共通関数。このプロジェクトでは必ずこれを使うこと。
- *
- * 新しい @notionhq/client は「ブラウザ環境」を検出するとトークン使用を拒否する。
- * Astro のプリレンダーや Cloudflare Workers(workerd)は window 等が存在するためブラウザと
- * 誤判定されるので、dangerouslyAllowBrowser を有効にしている。
- * この関数はサーバー側(ビルド時 / Workers / APIルート)でのみ呼ぶこと。
- * クライアント側の <script> やコンポーネントから import するとトークンが漏洩する。
- */
-export function createNotionClient(auth: string): Client {
-  return new Client({
-    auth,
-    fetch: fetch.bind(globalThis),
-    dangerouslyAllowBrowser: true,
-  });
-}
 
 export const notion = token ? createNotionClient(token) : null;
 
 function warnMissingToken(context: string) {
   console.warn(`[notion] NOTION_TOKEN が設定されていないため "${context}" は空で表示します。`);
 }
-
-export const IMAGE_KINDS = ['gallery', 'works', 'toolbox', 'novels'] as const;
-export type ImageKind = (typeof IMAGE_KINDS)[number];
 
 // --- 型定義 -----------------------------------------------------------------
 
@@ -105,7 +89,7 @@ function richTextProp(props: Props, key: string): string {
 
 function urlProp(props: Props, key: string): string | null {
   const prop = props[key];
-  return prop?.type === 'url' ? prop.url : null;
+  return prop?.type === 'url' ? safeLinkUrl(prop.url) : null;
 }
 
 function dateProp(props: Props, key: string) {

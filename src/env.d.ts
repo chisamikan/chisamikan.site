@@ -11,10 +11,9 @@ interface ImportMetaEnv {
   readonly RSS_FEED_URL: string;
   readonly BOOTH_SHOP_URL: string;
   readonly TURNSTILE_SITE_KEY: string;
-  readonly TURNSTILE_SECRET_KEY: string;
-  readonly DISCORD_WEBHOOK_URL: string;
-  readonly CONTACT_ADMIN_EMAIL: string;
-  readonly CONTACT_FALLBACK_EMAIL: string;
+  // TURNSTILE_SECRET_KEY・DISCORD_WEBHOOK_URL・CONTACT_ADMIN_EMAIL・CONTACT_FALLBACK_EMAIL は
+  // APIルートで実行時に読む(src/lib/env.ts の runtimeEnv)。import.meta.env から読むと
+  // ビルド時の値がWorkerのコードに平文で埋め込まれるため、ここには定義しない
 }
 
 interface ImportMeta {

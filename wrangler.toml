@@ -27,6 +27,20 @@ name = "CONTACT_RATE_LIMITER"
 namespace_id = "1001"
 simple = { limit = 5, period = 60 }
 
+# アクセスカウンター(/api/counter)の加算の、IPアドレスごとの回数制限
+# 同じ回線(家族・職場など)からの別端末の来訪も数えられるよう、1件ではなく少し余裕を持たせる
+[[ratelimits]]
+name = "COUNTER_RATE_LIMITER"
+namespace_id = "1002"
+simple = { limit = 3, period = 60 }
+
+# 画像API(/api/image)の、IPアドレスごとの回数制限。エッジのキャッシュに無くNotionへ問い合わせる場合だけ数える
+# ギャラリーは画像が多い(200点近く)ため、初回表示でまとめて読み込まれても引っかからない程度にしている
+[[ratelimits]]
+name = "IMAGE_RATE_LIMITER"
+namespace_id = "1003"
+simple = { limit = 100, period = 10 }
+
 # お問い合わせ内容を管理者(自分)宛にメールで送るためのバインディング
 # Email Routing で認証済みの宛先にしか送れないため、外部への迷惑メール送信には悪用できない
 # (宛先はリポジトリに載せないよう、シークレット CONTACT_ADMIN_EMAIL で指定する)
@@ -34,6 +48,10 @@ simple = { limit = 5, period = 60 }
 name = "CONTACT_EMAIL"
 allowed_sender_addresses = ["no-reply@chisamikan.site"]
 
-# 本番の環境変数(NOTION_TOKEN など)は Cloudflare Pages の
-# ダッシュボード > Settings > Environment variables で設定してください。
-# ローカル開発では .env ファイルを使用します(.env.example 参照)。
+# 本番の環境変数は、用途に応じて次の2か所に設定してください(ローカル開発では .env を使用。.env.example 参照)。
+# - ビルド時に使うもの(NOTION_TOKEN・各DB ID・RSS_FEED_URL・BOOTH_SHOP_URL・TURNSTILE_SITE_KEY):
+#   Workers & Pages > このWorker > Settings > Build > Variables and secrets
+# - API(/api/*)が実行時に使うシークレット(NOTION_TOKEN・TURNSTILE_SECRET_KEY・CONTACT_ADMIN_EMAIL・
+#   CONTACT_FALLBACK_EMAIL・DISCORD_WEBHOOK_URL・CF_DEPLOY_HOOK_URL):
+#   Workers & Pages > このWorker > Settings > Variables and Secrets(または wrangler secret put)
+#   ビルド時の値はWorkerのコードに埋め込まないため、こちらに無いとAPIが動きません。

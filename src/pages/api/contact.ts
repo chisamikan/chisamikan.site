@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { notifyDiscord, sendAdminEmail } from '../../lib/notify';
-import { pickEnv } from '../../lib/env';
+import { runtimeEnv } from '../../lib/env';
+import { isRateLimited, isSameOrigin } from '../../lib/apiGuard';
 import { CONTACT_LIMITS, normalizeNewlines } from '../../lib/contactLimits';
 
 // このエンドポイントだけは事前ビルド(静的化)せず、Cloudflare上でリクエストごとに実行します。
@@ -26,20 +27,6 @@ function json(body: Record<string, unknown>, status = 200, headers: Record<strin
 // 文字列以外(数値・配列・オブジェクト等)が送られてきた場合は未入力として扱う
 function asString(value: unknown): string {
   return typeof value === 'string' ? value : '';
-}
-
-/**
- * 同じIPアドレスからの短時間の連続送信を制限します(上限は wrangler.toml の CONTACT_RATE_LIMITER)。
- * レート制限の仕組み自体が失敗した場合は、お問い合わせを取りこぼさないよう通過させます。
- */
-async function isRateLimited(ip: string | null): Promise<boolean> {
-  try {
-    const { success } = await env.CONTACT_RATE_LIMITER.limit({ key: ip ?? 'unknown' });
-    return !success;
-  } catch (err) {
-    console.error('[api/contact] レート制限の確認に失敗しました:', err);
-    return false;
-  }
 }
 
 function isValidEmail(value: string): boolean {
@@ -90,7 +77,7 @@ const HAS_CONTROL_CHAR = /[\u0000-\u001F\u007F]/;
  * Discordに定型文で知らせます。未設定・失敗してもお問い合わせの処理は止めません。
  */
 async function notifyDiscordSafely(content: string): Promise<void> {
-  const webhookUrl = pickEnv('DISCORD_WEBHOOK_URL', import.meta.env.DISCORD_WEBHOOK_URL);
+  const webhookUrl = runtimeEnv('DISCORD_WEBHOOK_URL');
   if (!webhookUrl) return;
   try {
     await notifyDiscord(content, webhookUrl);
@@ -107,12 +94,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   // --- リクエスト自体の検証 ---
 
   // 他サイトのページから送信させる攻撃(CSRF)を防ぐため、自サイト以外からの送信は拒否する
-  if (request.headers.get('Origin') !== requestUrl.origin) {
+  if (!isSameOrigin(request)) {
     return json({ error: 'forbidden' }, 403);
   }
-  // Turnstileの検証などの重い処理より前に、連続送信を弾く
+  // Turnstileの検証などの重い処理より前に、連続送信を弾く(上限は wrangler.toml の CONTACT_RATE_LIMITER)
   const remoteIp = request.headers.get('CF-Connecting-IP');
-  if (await isRateLimited(remoteIp)) {
+  if (await isRateLimited(env.CONTACT_RATE_LIMITER, remoteIp, 'api/contact')) {
     return json({ error: 'rate_limited' }, 429, { 'Retry-After': '60' });
   }
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) {
@@ -154,7 +141,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   // 3. Cloudflare Turnstile
   // 本番でsecretが未設定の場合は、検証が素通りにならないようエラーにする(設定漏れに気づけるように)。
   // ローカル開発時のみ、secret未設定なら検証をスキップする。
-  const turnstileSecret = pickEnv('TURNSTILE_SECRET_KEY', import.meta.env.TURNSTILE_SECRET_KEY);
+  const turnstileSecret = runtimeEnv('TURNSTILE_SECRET_KEY');
   if (!turnstileSecret && !import.meta.env.DEV) {
     console.error('[api/contact] TURNSTILE_SECRET_KEY が設定されていません');
     return json({ error: 'server_error' }, 500);
@@ -202,11 +189,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
   // 予備の連絡先(Email Routingで作った転送用アドレス)。公開ページには載せず、
   // Turnstileを通過した送信者にだけ、完了画面・送信失敗時の案内として返す。
   // 迷惑メールが届くようになったら、別のアドレスに差し替えられるようシークレットで管理する
-  const fallbackEmail = pickEnv('CONTACT_FALLBACK_EMAIL', import.meta.env.CONTACT_FALLBACK_EMAIL);
+  const fallbackEmail = runtimeEnv('CONTACT_FALLBACK_EMAIL');
 
   // お問い合わせ内容の保管先は管理者宛メールのみ。メールが送れた場合だけ成功を返す
   // (失敗時はフォームに入力内容が残るため、ユーザーが再送信できる)
-  const adminAddress = pickEnv('CONTACT_ADMIN_EMAIL', import.meta.env.CONTACT_ADMIN_EMAIL);
+  const adminAddress = runtimeEnv('CONTACT_ADMIN_EMAIL');
   if (!adminAddress) {
     console.error('[api/contact] CONTACT_ADMIN_EMAIL が設定されていません');
     notifyInBackground('⚠️ お問い合わせを受け付けられません(CONTACT_ADMIN_EMAIL が未設定です)');
