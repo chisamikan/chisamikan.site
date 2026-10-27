@@ -13,20 +13,142 @@ const DIGITS = 6;
       </span>
     ))}
   </div>
-  <a
-    href="https://q.misskey.io/u/chisamikan"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="text-sm tracking-wide text-accent-text underline transition-colors hover:text-accent-text/80"
+  <button
+    type="button"
+    class="btn-glass btn-glass-sm hover:text-accent-text"
+    aria-haspopup="dialog"
+    data-kiriban-open
   >
     キリ番報告はこちら
-  </a>
-  <p class="mt-3 text-center text-xs text-graphite">※ioQ Whisper（外部サイト）にジャンプします。<br>
-  ※ご報告いただいても特に何も見返りはないですが、私がニッコリします。<br>
-    お返事を差し上げる際は、<a href="https://misskey.io/@chisamikan" target="_blank" rel="noopener noreferrer" class="underline hover:text-accent-text">Misskey.io</a>に投稿いたします。</p>
+  </button>
+
+  <dialog class="kiriban-dialog" aria-labelledby="kiriban-dialog-title" data-kiriban-dialog>
+    <button type="button" aria-label="閉じる" class="kiriban-close" data-kiriban-close>
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <p id="kiriban-dialog-title" class="kiriban-title">キリ番について</p>
+	<p>いい感じのキリ番を踏んだ際はぜひ報告ください。</p>
+	<div class="kiriban-actions">
+      <a
+        href="https://q.misskey.io/u/chisamikan"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-glass btn-glass-accent"
+      >
+        ioQ Whisperで報告する
+      </a>
+    </div>
+    <p class="kiriban-body mb-[1.6em] text-center">※ioQ Whisper（外部サイト）にジャンプします。</p>
+    <p class="kiriban-body">
+      ご報告いただいても特に何も見返りはないですが、私がニッコリします。<br>
+      お返事を差し上げる際は、<a href="https://misskey.io/@chisamikan" target="_blank" rel="noopener noreferrer" class="underline hover:text-accent-text">Misskey.io</a>に投稿いたします。
+    </p>
+  </dialog>
 </div>
 
+<style>
+  @reference "../styles/global.css";
+
+  /* 開閉の動きはライトボックスのNSFW注意書き(Lightbox.astro)と揃える */
+  .kiriban-dialog {
+    /* Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
+       打ち消してしまうため、中央寄せを明示的に指定し直す */
+    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-lg bg-paper text-left text-ink opacity-0;
+    /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
+    max-width: min(90vw, 420px);
+    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+
+  .kiriban-dialog.is-open {
+    @apply opacity-100;
+    transform: scale(1);
+    transition-duration: 0.28s;
+  }
+
+  .kiriban-dialog::backdrop {
+    @apply opacity-0 transition-opacity duration-200 ease-[ease];
+    background: rgba(4, 18, 36, 0.85);
+  }
+
+  .kiriban-dialog.is-open::backdrop {
+    @apply opacity-100 duration-280;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kiriban-dialog {
+      transform: none !important;
+    }
+  }
+
+  .kiriban-title {
+    @apply text-lg font-semibold mb-2;
+    font-family: var(--font-display, inherit);
+  }
+
+  .kiriban-body {
+    @apply text-sm leading-[1.6] text-ink/75;
+  }
+
+  .kiriban-actions {
+    @apply flex justify-center mt-6 mb-6;
+  }
+
+  .kiriban-close {
+    @apply absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-xl leading-none text-ink/50 bg-transparent border-none rounded-full cursor-pointer;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .kiriban-close:hover {
+      @apply text-ink bg-ink/8;
+    }
+  }
+</style>
+
 <script>
+  // キリ番報告のモーダル
+  {
+    const dialog = document.querySelector<HTMLDialogElement>('[data-kiriban-dialog]');
+    const openBtn = document.querySelector<HTMLButtonElement>('[data-kiriban-open]');
+    const closeBtn = dialog?.querySelector<HTMLButtonElement>('[data-kiriban-close]');
+
+    const open = () => {
+      if (!dialog) return;
+      dialog.classList.remove('is-open');
+      dialog.showModal();
+      // 初期状態(縮小・透明)を描画してからズームイン/背景フェードインさせる
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => dialog.classList.add('is-open'));
+      });
+    };
+
+    const close = () => {
+      if (!dialog || !dialog.open) return;
+      dialog.classList.remove('is-open');
+      const onEnd = (e: TransitionEvent) => {
+        if (e.propertyName !== 'opacity') return;
+        dialog.removeEventListener('transitionend', onEnd);
+        dialog.close();
+      };
+      dialog.addEventListener('transitionend', onEnd);
+    };
+
+    openBtn?.addEventListener('click', open);
+    closeBtn?.addEventListener('click', close);
+
+    // 背景(dialog自身)をクリックしたら閉じる
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog) close();
+    });
+
+    // Escキーでもフェードアウトしてから閉じる
+    dialog?.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      close();
+    });
+  }
+
   (async () => {
     const root = document.querySelector<HTMLElement>('[data-access-counter]');
     const digitsEl = root?.querySelector<HTMLElement>('[data-access-counter-digits]');
