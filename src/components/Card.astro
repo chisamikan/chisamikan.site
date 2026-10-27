@@ -22,7 +22,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
 
 {props.type === 'artwork' && (
   <figure class="glass-panel group flex h-full flex-col overflow-hidden">
-    <div class="relative">
+    <div class="relative overflow-hidden rounded-t-lg" data-lightbox-frame>
       {props.item.imageUrl ? (
         <button
           type="button"

@@ -86,6 +86,36 @@
   }
 }
 
+/* ダークモードの切り替え(Header.astroがhtmlに .theme-transition を付けてビュートランジションを開始する)。
+   古い画面はそのまま残し、新しい色の画面を押したボタンの位置から円形に広げる。
+   ヘッダーもまとめて切り替えるため、ヘッダー個別のトランジション名は外す。
+   また、背景色などの個別のtransitionが動いていると新しい画面が色の変化途中で記録されるため止める */
+html.theme-transition .site-header {
+  view-transition-name: none;
+}
+
+html.theme-transition,
+html.theme-transition * {
+  transition: none !important;
+}
+
+html.theme-transition::view-transition-old(root) {
+  animation: none;
+}
+
+html.theme-transition::view-transition-new(root) {
+  animation: theme-reveal 600ms var(--ease-out);
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-reveal-x, 100%) var(--theme-reveal-y, 0));
+  }
+  to {
+    clip-path: circle(150vmax at var(--theme-reveal-x, 100%) var(--theme-reveal-y, 0));
+  }
+}
+
 @layer base {
   :root {
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
@@ -549,6 +579,87 @@
     filter: none;
   }
 
+  /* トップのファーストビュー: 1回の訪問で1度しか見ない第一印象の場面なので、見出しと同じ演出の言葉づかいで
+     少し長めに見せる。小さな英字→サイト名(1行ずつマスクの中をせり上がる)→「NEW」の札の順に現れる */
+  .hero-reveal-eyebrow {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 700ms ease 100ms,
+      transform 900ms var(--ease-out) 100ms;
+  }
+
+  .hero-reveal-line {
+    display: block;
+    /* 下に伸びる文字(行間0.9のため g などが行の外にはみ出す)が欠けないよう、下側を広げて切り抜く */
+    clip-path: inset(-0.1em -0.2em -0.25em -0.2em);
+  }
+
+  .hero-reveal-line-inner {
+    display: inline-block;
+    transform: translateY(115%);
+    transition: transform 1200ms var(--ease-out);
+  }
+
+  .hero-reveal-line:nth-child(1) .hero-reveal-line-inner {
+    transition-delay: 220ms;
+  }
+
+  .hero-reveal-line:nth-child(2) .hero-reveal-line-inner {
+    transition-delay: 340ms;
+  }
+
+  .hero-reveal-chip {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 700ms ease 700ms,
+      transform 1000ms var(--ease-out) 700ms;
+  }
+
+  .hero-reveal.is-visible :is(.hero-reveal-eyebrow, .hero-reveal-line-inner, .hero-reveal-chip) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* お問い合わせの送信完了画面(ContactForm.astro): 送信は1回きりの操作なので、「ちゃんと届いた」ことが
+     伝わるよう、完了画面をせり上げて見せ、チェックアイコンを少し遅れて小さく弾ませる */
+  #contact-complete:not([hidden]) {
+    animation: contact-complete-in 700ms var(--ease-out) both;
+  }
+
+  #contact-complete:not([hidden]) .contact-complete-icon {
+    display: inline-block;
+    animation: contact-complete-icon-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms both;
+  }
+
+  @keyframes contact-complete-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @keyframes contact-complete-icon-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6) rotate(-12deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #contact-complete:not([hidden]),
+    #contact-complete:not([hidden]) .contact-complete-icon {
+      animation: fade-in 300ms ease both;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
   /* カード一覧(ギャラリー/小説/ツールボックス/実績など): 並び順に応じた時間差で、せり上がりながら
      現れる。カードはわずかに縮んだ状態から元の大きさへ戻り、中のイラストは少し拡大した状態から
      ゆっくり引いて「ピントが合う」ように落ち着く(一覧の行は横幅が広く縮みが目立つため、移動のみ)。
@@ -610,7 +721,7 @@
     transition: scale 300ms var(--ease-out);
   }
 
-  .no-js :is(.reveal > *, .heading-reveal-en, .heading-reveal-ja, .heading-reveal-link, .card-reveal, .card-reveal img) {
+  .no-js :is(.reveal > *, .heading-reveal-en, .heading-reveal-ja, .heading-reveal-link, .card-reveal, .card-reveal img, .hero-reveal-eyebrow, .hero-reveal-line-inner, .hero-reveal-chip) {
     opacity: 1;
     transform: none;
     filter: none;
@@ -624,7 +735,10 @@
     .heading-reveal-link,
     .card-reveal,
     .card-reveal:has(> .glass-panel),
-    .card-reveal img {
+    .card-reveal img,
+    .hero-reveal-eyebrow,
+    .hero-reveal-line-inner,
+    .hero-reveal-chip {
       transform: none !important;
       filter: none !important;
       transition: opacity 300ms ease !important;

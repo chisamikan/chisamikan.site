@@ -173,6 +173,31 @@ const isTop = currentPath === '/';
     height: 100dvh;
   }
 
+  /* メニューを開いた時、項目を上から順に少しずつ時間差で現れさせる(全体で0.3秒以内)。
+     閉じる時は待たせず、まとめて素早く消す */
+  .mobile-nav-list > li {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity 150ms ease,
+      transform 150ms var(--ease-out);
+  }
+
+  #nav-toggle:checked ~ .mobile-nav-overlay .mobile-nav-list > li {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 250ms ease,
+      transform 350ms var(--ease-out);
+    transition-delay: calc(min(sibling-index(), 10) * 28ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav-list > li {
+      transform: none !important;
+    }
+  }
+
   .mobile-nav-list {
     /* 項目の中央揃えは、ヘッダーに隠れない見えている範囲を基準にするため、
        ヘッダーの高さ(h-18 = 4.5rem)の半分だけ下にずらす */
@@ -275,7 +300,21 @@ const isTop = currentPath === '/';
     toggle.addEventListener('click', () => {
       const isDark = !document.documentElement.classList.contains('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      applyState(isDark);
+
+      // 押したボタンの位置から、新しい色の画面が円形に広がるように切り替える(global.cssの theme-transition)。
+      // 未対応のブラウザや、視差効果を減らす設定では、そのまま切り替える
+      const root = document.documentElement;
+      if (!('startViewTransition' in document) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        applyState(isDark);
+        return;
+      }
+      const rect = toggle.getBoundingClientRect();
+      root.style.setProperty('--theme-reveal-x', `${rect.left + rect.width / 2}px`);
+      root.style.setProperty('--theme-reveal-y', `${rect.top + rect.height / 2}px`);
+      root.classList.add('theme-transition');
+      document.startViewTransition(() => applyState(isDark)).finished.finally(() => {
+        root.classList.remove('theme-transition');
+      });
     });
   });
 

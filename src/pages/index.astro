@@ -53,17 +53,25 @@ const heroImages =
     <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(4,18,36,0.75)_0%,rgba(4,18,36,0.25)_40%,rgba(4,18,36,0)_62%),linear-gradient(to_bottom,rgba(4,18,36,0.5),rgba(4,18,36,0)_26%)]"></div>
 
     <!-- 狭い画面では、サイト名と「NEW」の札を左寄せの縦並びにして下端に寄せる -->
-    <div class="relative z-10 flex h-full flex-col items-start justify-end gap-6 px-4 pb-10 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:px-8 sm:pb-12 lg:px-12">
+    <!-- hero-reveal: 読み込み画面が消えたら(BaseLayoutの監視がis-visibleを付与)、小さな英字→サイト名を1行ずつ→
+      「NEW」の札の順に現れる。演出の中身は global.css の .hero-reveal-* を参照 -->
+    <div class="hero-reveal relative z-10 flex h-full flex-col items-start justify-end gap-6 px-4 pb-10 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:px-8 sm:pb-12 lg:px-12">
       <div class="text-white">
-        <p class="text-xs font-medium uppercase tracking-[0.16em] text-white/75">Illustration / Design / Writing</p>
+        <p class="hero-reveal-eyebrow text-xs font-medium uppercase tracking-[0.16em] text-white/75">Illustration / Design / Writing</p>
         <!-- 画面に見えているサイト名をページのh1にする。ページの主題(サイト/作者)は
           視覚的には非表示の補足として添え、検索エンジンとスクリーンリーダーに伝える -->
         <h1 class="mt-3 text-[clamp(3.5rem,11vw,9rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
-          Chisa<br />Mikan.site<span class="sr-only"> — {site.description}</span>
+          <span class="hero-reveal-line"><span class="hero-reveal-line-inner">Chisa</span></span>
+          <span class="hero-reveal-line"><span class="hero-reveal-line-inner">Mikan.site</span></span>
+          <span class="sr-only"> — {site.description}</span>
         </h1>
       </div>
 
-      {latestNote && <NewsTicker item={latestNote} />}
+      {latestNote && (
+        <div class="hero-reveal-chip w-full sm:w-auto">
+          <NewsTicker item={latestNote} />
+        </div>
+      )}
     </div>
   </section>
 
