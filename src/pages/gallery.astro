@@ -43,14 +43,14 @@ const galleryStructuredData = {
   {items.length > 0 && (
     <script type="application/ld+json" is:inline set:html={JSON.stringify(galleryStructuredData)} />
   )}
-  <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+  <section class="page-section max-w-5xl">
     <SectionHeading eyebrow="Gallery" title="ギャラリー" level={1} />
 
-    <TagFilter tags={tags} class="mb-10 flex flex-wrap justify-center gap-2" />
+    <TagFilter tags={tags} class="mb-10 flex flex-wrap gap-2" />
 
     <CardGrid id="gallery-grid" managed class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <div id={`gallery-${item.id}`} class="card-clip h-full scroll-mt-24" data-tags={item.tags.join('|')}>
+        <div id={`gallery-${item.id}`} class="h-full scroll-mt-24" data-tags={item.tags.join('|')}>
           <div class="card-reveal h-full">
             <Card type="artwork" item={item} headingLevel={2} />
           </div>
@@ -59,32 +59,32 @@ const galleryStructuredData = {
     </CardGrid>
 
     {items.length === 0 && (
-      <p class="font-mono text-sm text-graphite">まだ作品が登録されていません。</p>
+      <p class="text-sm text-graphite">まだ作品が登録されていません。</p>
     )}
 
     <!-- ページネーションは絞り込み結果の件数に応じてJSが表示/非表示・ページ数を計算する -->
     <nav
       id="pagination-nav"
       aria-label="ページ送り"
-      class="mt-16 hidden items-center justify-center gap-2 font-mono text-sm"
+      class="mt-16 hidden items-center justify-center gap-2 text-sm"
     >
       <button type="button" id="prev-page" aria-label="前のページ" class="btn-glass-ghost px-3!">
-        &lt;
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
       </button>
       <div id="page-numbers" class="flex items-center gap-2"></div>
       <button type="button" id="next-page" aria-label="次のページ" class="btn-glass-ghost px-3!">
-        &gt;
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
       </button>
     </nav>
 
 	<div class="mt-16 text-center">
-      <a href="/contact" class="btn-glass btn-glass-accent md:w-1/3 w-full">
-        <i class="fa-solid fa-envelope pr-1"></i>ご依頼はこちら
+      <a href="/contact" class="btn-glass btn-glass-accent btn-wide">
+        <i class="fa-solid fa-envelope"></i>ご依頼はこちら
       </a>
     </div>
     <div class="mt-8 text-center">
-      <a href="/" class="btn-glass md:w-1/3 w-full">
-        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      <a href="/" class="btn-glass btn-wide">
+        <i class="fa-solid fa-arrow-left"></i>サイトトップへ
       </a>
     </div>
   </section>
@@ -185,7 +185,7 @@ const galleryStructuredData = {
       // アニメーションを再生する。
       const reveal = card.querySelector<HTMLElement>('.card-reveal');
       if (show && reveal) {
-        // .card-revealは横スクロールバー対策の.card-clipに包まれ、常にその唯一の
+        // .card-revealはdata-tagsを持つカード枠に包まれ、常にその唯一の
         // 子になったため、CSS側のsibling-index()は全カードで1固定になってしまい
         // (=--card-reveal-indexが常に0になり)スタッガーの段差が消えてしまう。
         // CardSlider.astroと同じ手法で、そのページ内での表示順(0始まり)を
@@ -207,7 +207,7 @@ const galleryStructuredData = {
         if (item === 'ellipsis') {
           const span = document.createElement('span');
           span.textContent = '…';
-          span.className = 'px-1 text-ink/40';
+          span.className = 'px-1 text-ink-soft';
           pageNumbers.appendChild(span);
           return;
         }
@@ -220,7 +220,7 @@ const galleryStructuredData = {
           btn.disabled = true;
           btn.setAttribute('aria-current', 'page');
           btn.className =
-            'rounded-full border border-glass-border-subtle bg-glass px-3 py-1.5 text-ink/40 backdrop-blur-md cursor-not-allowed';
+            'btn-glass-current';
         } else {
           btn.className = 'btn-glass-ghost px-3!';
           btn.addEventListener('click', () => goToPage(item));

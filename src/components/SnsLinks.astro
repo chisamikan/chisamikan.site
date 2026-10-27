@@ -1,9 +1,18 @@
 ---
 import { snsLinks } from '../lib/config';
 import MisskeyIcon from './icons/MisskeyIcon.astro';
+
+interface Props {
+  // start: 左寄せ(トップページのプロフィール・フッター用)
+  // responsive: 狭い画面では中央、md以上では左寄せ(プロフィールページ用)
+  align?: 'start' | 'responsive';
+}
+const { align = 'start' } = Astro.props;
+
+const alignClass = align === 'responsive' ? 'mt-8 justify-center md:justify-start' : 'mt-6 justify-start';
 ---
 
-<div class="mt-8 flex flex-wrap justify-center gap-3">
+<div class:list={['flex flex-wrap gap-3', alignClass]}>
   {snsLinks.map((link) => (
     <a
       href={link.href}
@@ -11,7 +20,7 @@ import MisskeyIcon from './icons/MisskeyIcon.astro';
       rel="noopener noreferrer"
       aria-label={link.label}
       title={link.label}
-      class="no-external-icon inline-flex h-10 w-10 items-center justify-center rounded-full border border-glass-border bg-glass text-base text-ink shadow-glass backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:bg-glass-md hover:text-accent hover:shadow-glass-lg"
+      class="no-external-icon inline-flex h-10 w-10 items-center justify-center rounded-full border border-ink/15 text-base text-ink/70 transition-[color,border-color,transform] duration-200 ease-out hover:border-accent/50 hover:text-accent active:scale-[0.97]"
     >
       {link.icon === 'custom:misskey' ? (
         <MisskeyIcon />

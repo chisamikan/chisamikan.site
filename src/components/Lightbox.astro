@@ -3,13 +3,20 @@
 // class="lightbox-trigger" data-full="{画像URL}" data-alt="{alt}" を付与するだけで連動する。
 // data-nsfw="true" を付けると、初回クリック時のみ注意書きモーダルを挟む
 // (同意状況はlocalStorageに保存し、2回目以降は素通りする)。
+// data-description="{説明文}" を付けると、画像の下に説明文(主に著作権表記)の全文を小さく表示する
+// (カード上では説明文を1行で省略しているため、ここで全文を読めるようにする)。
 ---
 
 <dialog id="lightbox" class="lightbox-dialog">
   <button type="button" id="lightbox-close" aria-label="閉じる" class="lightbox-close">
     <i class="fa-solid fa-xmark"></i>
   </button>
-  <img id="lightbox-img" src="" alt="" />
+  <figure class="lightbox-figure">
+    <img id="lightbox-img" src="" alt="" />
+    <figcaption id="lightbox-caption" class="lightbox-caption" hidden>
+      <p id="lightbox-caption-description" class="lightbox-caption-description"></p>
+    </figcaption>
+  </figure>
 </dialog>
 
 <dialog id="nsfw-warning" class="nsfw-warning-dialog">
@@ -32,72 +39,127 @@
   .lightbox-dialog {
     /* Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
        打ち消してしまうため、中央寄せを明示的に指定し直す */
-    @apply fixed inset-0 m-auto max-h-[85vh] p-0 overflow-visible border-none bg-transparent;
+    @apply fixed inset-0 m-auto max-h-[85dvh] p-0 overflow-visible border-none bg-transparent;
     /* min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 900px);
   }
 
   .lightbox-dialog::backdrop {
-    @apply opacity-0 transition-opacity duration-280 ease-[ease];
+    @apply opacity-0 transition-opacity duration-200 ease-[ease];
     /* rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    background: rgba(34, 31, 27, 0.82);
+    background: rgba(4, 18, 36, 0.85);
   }
 
+  /* 開く時は280ms、閉じる時(基本の状態へ戻る時)は200msと、閉じる側を速くする */
   .lightbox-dialog.is-open::backdrop {
-    @apply opacity-100;
+    @apply opacity-100 duration-280;
   }
 
   .lightbox-dialog img {
-    @apply block max-h-[85vh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0;
+    @apply block max-h-[85dvh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0;
     /* min()/rgba()のコンマ、および is-visible時の transform: scale(1) と同じプロパティを
        扱う都合上、この3行のみプレーンCSSのまま残す */
     max-width: min(90vw, 900px);
-    box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
-    transform: scale(0.85);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .lightbox-dialog img.is-visible {
     @apply opacity-100;
     transform: scale(1);
+    transition-duration: 0.28s;
+  }
+
+  /* サムネイルから拡大画像へのビュートランジション中は、CSSのフェード/ズームを止めて最終状態で記録させる */
+  .lightbox-dialog.is-morphing,
+  .lightbox-dialog.is-morphing::backdrop,
+  .lightbox-dialog.is-morphing * {
+    transition: none !important;
+  }
+
+  /* 画像とキャプションを縦に並べる。幅は画像の幅に合わせ(min-content)、
+     キャプションの文章は画像の幅で折り返させる */
+  .lightbox-figure {
+    @apply m-0 flex w-min flex-col items-center;
+  }
+
+  /* キャプションがある時は、画像と合わせて画面に収まるよう画像の高さを抑える */
+  .lightbox-dialog.has-caption img {
+    @apply max-h-[78dvh];
+  }
+
+  .lightbox-caption {
+    @apply mt-3 w-full text-left opacity-0;
+    /* 縦長の画像でも文章が細く折り返されすぎないよう最小幅を持たせる。
+       min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
+    min-width: min(80vw, 20rem);
+    transform: translateY(8px);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+
+  .lightbox-dialog.is-open .lightbox-caption {
+    @apply opacity-100;
+    transform: none;
+    transition-duration: 0.28s;
+  }
+
+  /* 長い説明文でも画面からはみ出さないよう、キャプション内だけをスクロールさせる */
+  .lightbox-caption-description {
+    @apply max-h-[14dvh] overflow-y-auto overscroll-contain whitespace-pre-line text-[11px] leading-relaxed text-white/70;
   }
 
   .lightbox-close {
-    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-[#faf7f0] bg-transparent border-none cursor-pointer opacity-0;
-    transform: scale(0.85);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-white bg-transparent border-none cursor-pointer opacity-0;
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .lightbox-dialog.is-open .lightbox-close {
     @apply opacity-100;
     transform: scale(1);
+    transition-duration: 0.28s;
   }
 
-  .lightbox-close:hover {
-    @apply text-[#0099ff];
+  @media (hover: hover) and (pointer: fine) {
+    .lightbox-close:hover {
+      @apply text-accent;
+    }
   }
 
   .nsfw-warning-dialog {
-    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-[0.75rem] bg-paper text-ink opacity-0;
+    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-lg bg-paper text-ink opacity-0;
     /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
     max-width: min(90vw, 420px);
-    box-shadow: 0 12px 32px -8px rgba(34, 31, 27, 0.5);
-    transform: scale(0.85);
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
 
   .nsfw-warning-dialog.is-open {
     @apply opacity-100;
     transform: scale(1);
+    transition-duration: 0.28s;
   }
 
   .nsfw-warning-dialog::backdrop {
-    @apply opacity-0 transition-opacity duration-280 ease-[ease];
-    background: rgba(34, 31, 27, 0.82);
+    @apply opacity-0 transition-opacity duration-200 ease-[ease];
+    background: rgba(4, 18, 36, 0.85);
   }
 
   .nsfw-warning-dialog.is-open::backdrop {
-    @apply opacity-100;
+    @apply opacity-100 duration-280;
+  }
+
+  /* 視差効果を減らす設定では、拡大・せり上がりをなくして透明度の変化だけで開閉する
+     (閉じる処理はopacityのtransitionendを待つため、transition自体は無効にしない) */
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox-dialog img,
+    .lightbox-caption,
+    .lightbox-close,
+    .nsfw-warning-dialog {
+      transform: none !important;
+    }
   }
 
   .nsfw-warning-title {
@@ -117,8 +179,56 @@
     @apply absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-xl leading-none text-ink/50 bg-transparent border-none rounded-full cursor-pointer;
   }
 
-  .nsfw-warning-close:hover {
-    @apply text-ink bg-ink/8;
+  @media (hover: hover) and (pointer: fine) {
+    .nsfw-warning-close:hover {
+      @apply text-ink bg-ink/8;
+    }
+  }
+
+  /* 伸び縮みする画像。正方形のサムネイルと縦長・横長の拡大画像の形の違いは、切り抜き(cover)で
+     つなぎ、引き伸ばして歪ませない */
+  :global(::view-transition-group(lightbox-image)) {
+    animation-duration: 380ms;
+    animation-timing-function: var(--ease-out);
+  }
+
+  :global(::view-transition-image-pair(lightbox-image)) {
+    overflow: clip;
+  }
+
+  :global(::view-transition-old(lightbox-image)),
+  :global(::view-transition-new(lightbox-image)) {
+    height: 100%;
+    object-fit: cover;
+    animation-duration: 380ms;
+  }
+
+  /* ヘッダーはページ移動用に個別のトランジション名(site-header)を持つが、名前付きの要素は画面全体より上に
+     描かれるため、開閉の間だけ暗い覆いの上に浮き、終わった瞬間に覆いの下へ隠れて不自然に見える。
+     拡大表示の開閉中は名前を外し、背景と一緒に覆いの下へフェードさせる */
+  :global(html.lightbox-morph .site-header) {
+    view-transition-name: none;
+  }
+
+  /* 背景の暗さ・説明文など(画面全体のクロスフェード)も、画像の伸び縮みと同じ長さで動かし、
+     画像だけが取り残されて止まったように見えないようにする */
+  :global(html.lightbox-morph::view-transition-old(root)),
+  :global(html.lightbox-morph::view-transition-new(root)) {
+    animation-duration: 380ms;
+  }
+
+  /* 閉じる時: 強いease-outは序盤で大半を動き終えて終盤がほぼ止まり、「一旦止まってから収まる」ように
+     見えるため、画面上の移動に向いた途中で止まらないカーブ(iOSのシートと同じ)で、開くより少し短く戻す */
+  :global(html.lightbox-closing::view-transition-group(lightbox-image)) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  :global(html.lightbox-closing::view-transition-old(lightbox-image)),
+  :global(html.lightbox-closing::view-transition-new(lightbox-image)),
+  :global(html.lightbox-closing::view-transition-old(root)),
+  :global(html.lightbox-closing::view-transition-new(root)) {
+    animation-duration: 320ms;
   }
 </style>
 
@@ -126,6 +236,8 @@
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
   const img = document.querySelector<HTMLImageElement>('#lightbox-img');
   const closeBtn = document.querySelector<HTMLButtonElement>('#lightbox-close');
+  const caption = document.querySelector<HTMLElement>('#lightbox-caption');
+  const captionDescription = document.querySelector<HTMLElement>('#lightbox-caption-description');
 
   const nsfwDialog = document.querySelector<HTMLDialogElement>('#nsfw-warning');
   const nsfwConfirmBtn = document.querySelector<HTMLButtonElement>('#nsfw-warning-confirm');
@@ -150,30 +262,97 @@
     }
   };
 
-  function openLightbox(trigger: HTMLElement) {
-    if (!dialog || !img) return;
+  // タップしたサムネイルから拡大画像へ、ブラウザ標準のビュートランジションで位置と大きさをつなげて開閉する。
+  // 未対応のブラウザや、視差効果を減らす設定では、従来どおりその場でのズーム/フェードで開閉する
+  const canMorph = () =>
+    'startViewTransition' in document && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 開いている拡大画像の元になったサムネイル。閉じる時に同じ位置へ戻すために覚えておく。
+  // 画像(img)だけをつなげると、上に重ねたタグ・タイトル・NEWの札や角丸が伸び縮みの間は隠れ、
+  // 着地した瞬間に現れて「止まってから収まる」ように見えるため、サムネイル部分全体
+  // (カードは data-lightbox-frame の枠、一覧のサムネイルはボタン自体)をつなげる単位にする
+  let sourceThumb: HTMLElement | null = null;
+
+  function setOpenState(isOpen: boolean) {
+    img?.classList.toggle('is-visible', isOpen);
+    dialog?.classList.toggle('is-open', isOpen);
+  }
+
+  function prepareContent(trigger: HTMLElement): boolean {
+    if (!dialog || !img) return false;
     const full = trigger.dataset.full;
-    if (!full) return;
+    if (!full) return false;
     img.src = full;
     img.alt = trigger.dataset.alt ?? '';
-    img.classList.remove('is-visible');
-    dialog.classList.remove('is-open');
+
+    const description = trigger.dataset.description ?? '';
+    if (caption && captionDescription) {
+      captionDescription.textContent = description;
+      caption.hidden = !description;
+    }
+    dialog.classList.toggle('has-caption', Boolean(description));
+    return true;
+  }
+
+  function openLightbox(trigger: HTMLElement) {
+    if (!dialog || !img || !prepareContent(trigger)) return;
+    const thumb = trigger.closest<HTMLElement>('[data-lightbox-frame]') ?? trigger;
+
+    if (canMorph() && thumb) {
+      sourceThumb = thumb;
+      document.documentElement.classList.add('lightbox-morph');
+      thumb.style.viewTransitionName = 'lightbox-image';
+      // 変化前の状態(サムネイル)を記録してから、拡大表示を一気に最終状態で開く。
+      // CSSのフェード/ズームが残っていると、拡大画像が透明なまま記録されるため止めておく
+      document.startViewTransition(async () => {
+        thumb.style.viewTransitionName = '';
+        dialog.classList.add('is-morphing');
+        img.style.viewTransitionName = 'lightbox-image';
+        dialog.showModal();
+        setOpenState(true);
+        await img.decode().catch(() => {});
+      }).finished.finally(() => {
+        img.style.viewTransitionName = '';
+        dialog.classList.remove('is-morphing');
+        document.documentElement.classList.remove('lightbox-morph');
+      });
+      return;
+    }
+
+    sourceThumb = null;
+    setOpenState(false);
     dialog.showModal();
     // 初期状態(縮小・透明)を描画してからズームイン/背景フェードインさせる
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        img.classList.add('is-visible');
-        dialog.classList.add('is-open');
-      });
+      requestAnimationFrame(() => setOpenState(true));
     });
   }
 
   function closeWithZoomOut() {
     if (!dialog || !img || !dialog.open) return;
-    img.classList.remove('is-visible');
-    dialog.classList.remove('is-open');
+    const thumb = sourceThumb;
+    sourceThumb = null;
+
+    // 開いた時のサムネイルが画面内に残っていれば、そこへ縮みながら戻る
+    if (canMorph() && thumb && thumb.isConnected) {
+      dialog.classList.add('is-morphing');
+      document.documentElement.classList.add('lightbox-morph', 'lightbox-closing');
+      img.style.viewTransitionName = 'lightbox-image';
+      document.startViewTransition(() => {
+        img.style.viewTransitionName = '';
+        setOpenState(false);
+        dialog.close();
+        thumb.style.viewTransitionName = 'lightbox-image';
+      }).finished.finally(() => {
+        thumb.style.viewTransitionName = '';
+        dialog.classList.remove('is-morphing');
+        document.documentElement.classList.remove('lightbox-morph', 'lightbox-closing');
+      });
+      return;
+    }
+
+    setOpenState(false);
     const onEnd = (e: TransitionEvent) => {
-      if (e.propertyName !== 'transform') return;
+      if (e.propertyName !== 'opacity') return;
       img.removeEventListener('transitionend', onEnd);
       dialog.close();
     };
@@ -199,7 +378,7 @@
     if (!nsfwDialog || !nsfwDialog.open) return;
     nsfwDialog.classList.remove('is-open');
     const onEnd = (e: TransitionEvent) => {
-      if (e.propertyName !== 'transform') return;
+      if (e.propertyName !== 'opacity') return;
       nsfwDialog.removeEventListener('transitionend', onEnd);
       nsfwDialog.close();
       onClosed?.();

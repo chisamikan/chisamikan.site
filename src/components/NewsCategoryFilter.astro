@@ -9,7 +9,7 @@ interface Props {
 const { current, categoryPath, allPath } = Astro.props;
 ---
 
-<nav class="mb-10 flex flex-wrap justify-center gap-2" aria-label="お知らせをカテゴリで絞り込み">
+<nav class="mb-10 flex flex-wrap gap-2" aria-label="お知らせをカテゴリで絞り込み">
   <a href={allPath} class:list={['filter-btn btn-glass-ghost', !current && 'is-active']}>
     すべて
   </a>
@@ -24,6 +24,6 @@ const { current, categoryPath, allPath } = Astro.props;
   @reference '../styles/global.css';
 
   .filter-btn.is-active {
-    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
+    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90 hover:text-on-accent;
   }
 </style>

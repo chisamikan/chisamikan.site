@@ -49,6 +49,9 @@ const structuredData = {
 <!doctype html>
 <html lang="ja" class="no-js">
   <head>
+    <!-- スマホのブラウザの上部バー等の色。サイト内のテーマ切り替えにも追従させるため、
+      media属性で端末設定に任せず、直後のスクリプトとHeader.astroのapplyStateで値を書き換える -->
+    <meta name="theme-color" content="#e8f0fa" />
     <script is:inline>
       // 初回描画前にテーマを確定させ、ちらつき(FOUC)を防ぐ。
       // 明示的な保存済み設定(localStorage)があればそれを優先し、無ければ端末の設定(prefers-color-scheme)に従う。
@@ -56,13 +59,26 @@ const structuredData = {
         var stored = localStorage.getItem('theme');
         var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.classList.toggle('dark', isDark);
+        // global.cssの --color-paper(ライト/ダーク)と同じ色
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#0b0e1a' : '#e8f0fa');
+      })();
+      // 読み込み画面(PageLoader)はセッション中の初回表示だけ見せる。2ページ目以降は
+      // 描画前に印を付けて最初から出さない(印の保存はPageLoader側で行う)。
+      (function () {
+        try {
+          if (sessionStorage.getItem('chisamikan-page-loader-shown')) {
+            document.documentElement.classList.add('skip-page-loader');
+          }
+        } catch (e) {
+          // sessionStorageが使えない場合は毎回表示するが、閲覧には支障がない
+        }
       })();
     </script>
     <script>
       document.documentElement.classList.remove('no-js');
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -93,7 +109,7 @@ const structuredData = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
@@ -109,7 +125,7 @@ const structuredData = {
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
         rel="stylesheet"
       />
       <link
@@ -119,6 +135,9 @@ const structuredData = {
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
       />
+      <!-- 読み込み画面(PageLoader)はJSで消すため、JSが無効な環境では最初から出さない。
+        is:inline が無いとAstroがstyleを<head>へ移してnoscriptの外に出し、常に非表示になってしまう -->
+      <style is:inline>#page-loader { display: none; }</style>
     </noscript>
 
     <script>
@@ -140,14 +159,22 @@ const structuredData = {
 	
   </head>
   <body>
+    <!-- キーボード操作時に、毎ページのナビを飛ばして本文へ移動できるようにする。
+      普段は隠し、Tabキーでフォーカスしたときだけ左上に表示する -->
+    <a
+      href="#main"
+      class="sr-only rounded-full bg-accent-strong px-4 py-2 text-sm font-medium text-on-accent focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-110"
+    >
+      本文へスキップ
+    </a>
     <PageLoader />
     <Header />
-    <main>
+    <main id="main" tabindex="-1" class="outline-none">
       <slot />
     </main>
     <Footer />
     <script>
-      const revealEls = document.querySelectorAll<HTMLElement>('.reveal, .card-reveal');
+      const revealEls = document.querySelectorAll<HTMLElement>('.reveal, .card-reveal, .heading-reveal, .hero-reveal');
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -160,7 +187,24 @@ const structuredData = {
         },
         { threshold: 0.15, rootMargin: '0px 0px -10% 0px' },
       );
-      revealEls.forEach((el) => observer.observe(el));
+      const startReveal = () => revealEls.forEach((el) => observer.observe(el));
+
+      // 読み込み画面(PageLoader)が出ている間に始めると、画面に入っている見出し等の演出が
+      // その下で終わってしまうため、読み込み画面が消え始めてから監視を始める
+      const loader = document.getElementById('page-loader');
+      const loaderShown =
+        loader && !loader.classList.contains('is-hidden') && getComputedStyle(loader).display !== 'none';
+      if (loaderShown) {
+        new MutationObserver((_, mo) => {
+          if (!loader.classList.contains('is-hidden')) return;
+          mo.disconnect();
+          startReveal();
+        }).observe(loader, { attributes: true, attributeFilter: ['class'] });
+        // 読み込み画面のスクリプトが動かず is-hidden が付かない場合(CSSの10秒の安全策で消える)に備える
+        window.setTimeout(startReveal, 10000);
+      } else {
+        startReveal();
+      }
     </script>
   </body>
 </html>

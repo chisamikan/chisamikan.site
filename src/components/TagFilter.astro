@@ -8,36 +8,24 @@
 interface Props {
   tags: string[];
   containerSelector?: string;
-  itemSelector?: string;
   emptySelector?: string;
-  ariaLabel?: string;
-  allLabel?: string;
   class?: string;
 }
 
-const {
-  tags,
-  containerSelector,
-  itemSelector = ':scope > [data-tags]',
-  emptySelector,
-  ariaLabel = 'タグで絞り込み',
-  allLabel = 'すべて',
-  class: wrapperClass = 'mb-4 flex flex-wrap justify-center gap-2',
-} = Astro.props;
+const { tags, containerSelector, emptySelector, class: wrapperClass = 'mb-4 flex flex-wrap gap-2' } = Astro.props;
 ---
 
 {tags.length > 0 && (
   <div
     class={wrapperClass}
     role="group"
-    aria-label={ariaLabel}
+    aria-label="タグで絞り込み"
     data-tag-filter
     data-container={containerSelector}
-    data-item-selector={itemSelector}
     data-empty={emptySelector}
   >
     <button type="button" data-filter="all" class="filter-btn btn-glass-ghost is-active">
-      {allLabel}
+      すべて
     </button>
     {tags.map((tag) => (
       <button type="button" data-filter={tag} class="filter-btn btn-glass-ghost">
@@ -51,7 +39,7 @@ const {
   @reference '../styles/global.css';
 
   .filter-btn.is-active {
-    @apply border-accent/40 bg-accent/80 text-white shadow-glass-accent backdrop-blur-xl hover:bg-accent hover:text-white;
+    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90 hover:text-on-accent;
   }
 </style>
 
@@ -61,7 +49,6 @@ const {
   document.querySelectorAll<HTMLElement>('[data-tag-filter]').forEach((group) => {
     const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>('.filter-btn'));
     const containerSelector = group.dataset.container;
-    const itemSelector = group.dataset.itemSelector || ':scope > [data-tags]';
     const emptySelector = group.dataset.empty;
 
     const container = containerSelector ? document.querySelector<HTMLElement>(containerSelector) : null;
@@ -74,7 +61,7 @@ const {
         const filter = btn.dataset.filter ?? 'all';
 
         if (container) {
-          const items = Array.from(container.querySelectorAll<HTMLElement>(itemSelector));
+          const items = Array.from(container.querySelectorAll<HTMLElement>(':scope > [data-tags]'));
           let visibleCount = 0;
           const itemsToReveal: HTMLElement[] = [];
           items.forEach((item) => {

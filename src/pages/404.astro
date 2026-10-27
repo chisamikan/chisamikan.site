@@ -23,16 +23,16 @@ const omikujiFields = [
 ---
 
 <BaseLayout title="404 Not Found" description="お探しのページが見つかりませんでした。">
-  <section class="mx-auto max-w-3xl px-6 py-24 sm:py-32 text-center">
+  <section class="page-section pb-24 sm:pb-32 text-center">
     <SectionHeading eyebrow="404" title="ページが見つかりません" level={1} />
 
-    <p class="mb-4 leading-relaxed text-ink/80">お探しのページは、移動または削除された可能性があります</p>
-    <p class="mb-10 font-mono text-sm leading-relaxed text-ink-soft">
+    <p class="page-lead mb-4">お探しのページは、移動または削除された可能性があります</p>
+    <p class="mb-10 text-left leading-relaxed text-ink-soft">
       URLが正しいかご確認いただくか、下記のリンクからサイトトップへお戻りください。
     </p>
 
     {omikujiItems.length > 0 && (
-      <div class="omikuji-box mx-auto max-w-xl rounded-2xl border border-glass-border-subtle bg-glass p-6 backdrop-blur-xl sm:p-8 mb-16">
+      <div class="omikuji-box mx-auto max-w-xl rounded-lg border border-glass-border-subtle bg-surface p-6 shadow-card sm:p-8 mb-16">
         <h2 id="omikuji-title" class="mb-4 text-xl font-bold text-ink sm:text-2xl"><i class="fa-solid fa-torii-gate"></i>蛇川神社 おみくじ</h2>
         <div id="omikuji-intro" class="mb-6">
           <div class="line-mock-body">
@@ -50,12 +50,12 @@ const omikujiFields = [
         </h3>
 
         <button id="omikuji-draw" type="button" class="btn-glass btn-glass-accent w-full md:max-w-1/2">
-          <i class="fa-solid fa-scroll pr-1" aria-hidden="true"></i>おみくじを引く
+          <i class="fa-solid fa-scroll" aria-hidden="true"></i>おみくじを引く
         </button>
 
         <div id="omikuji-result" class="hidden mt-6 text-left">
           <div class="mb-6 text-center">
-            <p id="omikuji-fortune" class="omikuji-reveal-item text-4xl font-bold text-accent"></p>
+            <p id="omikuji-fortune" class="omikuji-reveal-item text-4xl font-bold text-accent-text"></p>
           </div>
 
           <div id="omikuji-line" class="omikuji-reveal-item mb-6">
@@ -69,26 +69,26 @@ const omikujiFields = [
             </div>
           </div>
 
-          <dl id="omikuji-detail" class="font-mono text-sm text-ink-soft"></dl>
+          <dl id="omikuji-detail" class="text-sm text-ink-soft"></dl>
 
           <div class="omikuji-reveal-item mt-6 flex flex-col items-center gap-3">
             <button id="omikuji-share" type="button" class="btn-glass btn-glass-accent w-full md:max-w-1/2">
-              <i class="fa-solid fa-share-nodes pr-1" aria-hidden="true"></i>結果をシェアする
+              <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>結果をシェアする
             </button>
             <button id="omikuji-copy" type="button" class="btn-glass w-full md:max-w-1/2">
-              <i class="fa-solid fa-copy pr-1" aria-hidden="true"></i>結果をコピーする
+              <i class="fa-solid fa-copy" aria-hidden="true"></i>結果をコピーする
             </button>
             <button id="omikuji-redraw" type="button" class="btn-glass w-full md:max-w-1/2">
-              <i class="fa-solid fa-rotate-right pr-1" aria-hidden="true"></i>もう一度引く
+              <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>もう一度引く
             </button>
           </div>
         </div>
       </div>
     )}
 
-	<div class="mx-auto max-w-xs">
-      <a href="/" class="btn-glass w-full">
-        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+    <div>
+      <a href="/" class="btn-glass btn-wide">
+        <i class="fa-solid fa-arrow-left"></i>サイトトップへ
       </a>
     </div>
   </section>
@@ -385,7 +385,7 @@ const omikujiFields = [
 
       shareButton.disabled = true;
       const originalHTML = shareButton.innerHTML;
-      shareButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
+      shareButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>作成中…';
 
       try {
         const avatarImg = await loadImage(getAvatarUrl(drawnItem.fortune));
@@ -424,7 +424,7 @@ const omikujiFields = [
 
       copyButton.disabled = true;
       const originalHTML = copyButton.innerHTML;
-      copyButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin pr-1" aria-hidden="true"></i>作成中…';
+      copyButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>作成中…';
 
       // clipboard.write自体はクリックハンドラ内で同期的に呼び、画像生成(非同期)は
       // ClipboardItemにPromiseとして渡すことでSafariのユーザー操作起点を維持する
@@ -435,7 +435,7 @@ const omikujiFields = [
       navigator.clipboard
         .write([new ClipboardItem({ 'image/png': blobPromise, 'text/plain': textBlob })])
         .then(() => {
-          copyButton.innerHTML = '<i class="fa-solid fa-check pr-1" aria-hidden="true"></i>コピーしました';
+          copyButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>コピーしました';
           setTimeout(() => { copyButton.innerHTML = originalHTML; }, 2000);
         })
         .catch((err) => {

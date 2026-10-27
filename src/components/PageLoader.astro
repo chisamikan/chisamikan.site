@@ -35,11 +35,26 @@
   @reference "../styles/global.css";
 
   .page-loader {
-    @apply fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 bg-paper bg-size-[22px_22px] duration-[420ms] ease-[ease];
-    /* radial-gradient()のコンマ、および複数プロパティ分のtransition-propertyの
-       コンマがscoped styleの@apply内では正しく処理できないため、この2行のみプレーンCSSのまま残す */
-    background-image: radial-gradient(circle at 1px 1px, --alpha(var(--color-ink) / 5.5%) 1px, transparent 0);
+    @apply fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 bg-paper duration-[420ms] ease-[ease];
+    /* 複数プロパティ分のtransition-propertyのコンマがscoped styleの@apply内では
+       正しく処理できないため、プレーンCSSのまま残す */
     transition-property: opacity, visibility;
+    /* スクリプトの読み込み失敗などで is-hidden が付かなくてもページが見られなくならないよう、
+       一定時間たったらCSSだけで読み込み画面を消す */
+    animation: page-loader-failsafe 0s 10s forwards;
+  }
+
+  @keyframes page-loader-failsafe {
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  /* セッション中2ページ目以降は出さない(BaseLayoutの<head>のスクリプトがhtmlに付与する) */
+  :global(.skip-page-loader) .page-loader {
+    @apply hidden;
   }
 
   .page-loader.is-hidden {
@@ -69,11 +84,11 @@
   }
 
   .page-loader-gradient-stop-2 {
-    stop-color: var(--color-accent-violet);
+    stop-color: var(--color-accent-2);
   }
 
   .page-loader-gradient-stop-3 {
-    stop-color: var(--color-accent-rose);
+    stop-color: var(--color-accent);
   }
 
   .page-loader-mask-path {
@@ -111,6 +126,12 @@
   const loader = document.getElementById('page-loader');
 
   if (loader) {
+    try {
+      sessionStorage.setItem('chisamikan-page-loader-shown', '1');
+    } catch {
+      // sessionStorageが使えない場合は毎回表示するが、閲覧には支障がない
+    }
+
     const MIN_VISIBLE_MS = 380;
     const shownAt = performance.now();
 

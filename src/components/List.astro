@@ -12,6 +12,12 @@ const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
 // 仕事履歴(work)はNewバッジのスコープ外
 const isNew = props.type !== 'work' && isNewItem(props.item.createdTime);
+const thumbnailLabel =
+  props.type === 'work'
+    ? `${props.item.client}の画像`
+    : props.type === 'novel'
+      ? `${props.item.title}の表紙`
+      : `${props.item.title}の画像`;
 
 // お知らせページからの「/novels#novel-{id}」等の深リンク先として使うスクロールアンカー
 const id = `${props.type}-${props.item.id}`;
@@ -25,41 +31,21 @@ function formatPeriod(start: string | null, end: string | null) {
 }
 ---
 
-<article id={id} class:list={['py-6', entryClass]}>
+<article id={id} class:list={['border-t border-ink/10 py-6', entryClass]}>
   <div class="flex items-start gap-5">
-    {props.type === 'work' && (
-      <Thumbnail
-        imageUrl={props.item.imageUrl}
-        label={`${props.item.client}の画像`}
-        class="w-20 shrink-0 sm:w-36"
-      />
-    )}
-    {props.type === 'novel' && (
-      <Thumbnail
-        imageUrl={props.item.imageUrl}
-        label={`${props.item.title}の表紙`}
-        class="w-20 shrink-0 sm:w-36"
-      />
-    )}
-    {props.type === 'toolbox' && (
-      <Thumbnail
-        imageUrl={props.item.imageUrl}
-        label={`${props.item.title}の画像`}
-        class="w-20 shrink-0 sm:w-36"
-      />
-    )}
+    <Thumbnail imageUrl={props.item.imageUrl} label={thumbnailLabel} class="w-20 shrink-0 sm:w-36" />
 
     <div class="min-w-0 flex-1">
       {props.type === 'work' && (
         <>
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             {formatPeriod(props.item.periodStart, props.item.periodEnd) && (
-              <p class="font-mono text-xs text-graphite">{formatPeriod(props.item.periodStart, props.item.periodEnd)}</p>
+              <p class="font-num text-xs text-graphite">{formatPeriod(props.item.periodStart, props.item.periodEnd)}</p>
             )}
             {props.item.tags.length > 0 && (
               <ul class="flex flex-wrap gap-1.5">
                 {props.item.tags.map((tag) => (
-                  <li class="glass-tag">
+                  <li class="glass-tag" title={tag}>
                     {tag}
                   </li>
                 ))}
@@ -67,14 +53,14 @@ function formatPeriod(start: string | null, end: string | null) {
             )}
           </div>
           <Tag class="mt-1 font-display text-xl font-semibold text-ink">{props.item.client}</Tag>
-          {props.item.role && <p class="mt-0.5 text-sm font-medium text-accent">{props.item.role}</p>}
+          {props.item.role && <p class="mt-0.5 text-sm font-medium text-accent-text">{props.item.role}</p>}
 
           {props.item.url && (
             <a
               href={props.item.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-glass btn-glass-sm mt-4 hover:text-accent"
+              class="btn-glass btn-glass-sm mt-4 hover:text-accent-text"
             >
               詳細を見る
             </a>
@@ -87,7 +73,7 @@ function formatPeriod(start: string | null, end: string | null) {
           {props.item.tags.length > 0 && (
             <ul class="flex flex-wrap gap-1.5">
               {props.item.tags.map((tag) => (
-                <li class="glass-tag">
+                <li class="glass-tag" title={tag}>
                   {tag}
                 </li>
               ))}
@@ -95,7 +81,7 @@ function formatPeriod(start: string | null, end: string | null) {
           )}
 
           <Tag class:list={['flex items-baseline gap-2 font-display text-xl font-semibold text-ink', props.item.tags.length > 0 && 'mt-2']}>
-            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap text-sm">NEW</span>}
+            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap">NEW</span>}
             {props.item.title}
           </Tag>
           {props.item.description && (
@@ -109,7 +95,7 @@ function formatPeriod(start: string | null, end: string | null) {
                   href={props.item.kakuyomuUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-glass btn-glass-sm hover:text-accent"
+                  class="btn-glass btn-glass-sm hover:text-accent-text"
                 >
                   カクヨムで読む
                 </a>
@@ -119,7 +105,7 @@ function formatPeriod(start: string | null, end: string | null) {
                   href={props.item.pixivUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-glass btn-glass-sm hover:text-accent"
+                  class="btn-glass btn-glass-sm hover:text-accent-text"
                 >
                   pixivで読む
                 </a>
@@ -129,7 +115,7 @@ function formatPeriod(start: string | null, end: string | null) {
                   href={props.item.shopUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-glass btn-glass-sm hover:text-accent"
+                  class="btn-glass btn-glass-sm hover:text-accent-text"
                 >
                   通販はこちら
                 </a>
@@ -142,7 +128,7 @@ function formatPeriod(start: string | null, end: string | null) {
       {props.type === 'toolbox' && (
         <>
           <Tag class="flex items-baseline gap-2 font-display text-xl font-semibold text-ink">
-            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap text-sm">NEW</span>}
+            {isNew && <span class="glass-badge glass-badge-accent shrink-0 whitespace-nowrap">NEW</span>}
             {props.item.title}
           </Tag>
           {props.item.description && <p class="mt-1 text-sm text-ink/70">{props.item.description}</p>}
@@ -152,7 +138,7 @@ function formatPeriod(start: string | null, end: string | null) {
               href={props.item.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-glass btn-glass-sm mt-4 hover:text-accent"
+              class="btn-glass btn-glass-sm mt-4 hover:text-accent-text"
             >
               配布先
             </a>

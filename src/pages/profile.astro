@@ -13,17 +13,18 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
 ---
 
 <BaseLayout title="Profile" description="千紗みかんのプロフィールページです。">
-  <section class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+  <section class="page-section">
     <SectionHeading eyebrow="Profile" title="プロフィール" level={1} />
 
-    <div class="mx-auto max-w-2xl text-center">
+    <!-- md以上はトップページのプロフィールと同じ2カラムになるため中央揃えを外す -->
+    <div class="text-center md:text-left">
       <ProfileContent />
     </div>
 
 	<!-- 支援先 -->
-    <div class="mx-auto mt-16 max-w-2xl">
+    <div class="mt-16">
       <h2 class="profile-section-heading">支援先</h2>
-      <ul class="mx-auto mt-6 divide-y divide-ink/10 text-left">
+      <ul class="mt-6 divide-y divide-ink/10 text-left">
         {supportLinks.map((link) => (
           <li class="py-4 first:pt-0 last:pb-0">
             <a
@@ -32,7 +33,7 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
               rel="noopener noreferrer"
               class="no-external-icon group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
             >
-              <span class="flex shrink-0 items-center gap-2 text-ink transition-colors group-hover:text-accent">
+              <span class="flex shrink-0 items-center gap-2 text-ink transition-colors group-hover:text-accent-text">
                 <i class:list={[link.icon]} aria-hidden="true"></i>
                 {link.label}
                 <i class="fa-solid fa-arrow-up-right-from-square text-[0.8em]" aria-hidden="true"></i>
@@ -45,13 +46,13 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
     </div>
 
     <!-- 仕事履歴 -->
-    <div class="mx-auto mt-16 max-w-2xl">
+    <div class="mt-16">
       <h2 class="profile-section-heading">仕事履歴</h2>
 
       <TagFilter tags={workTags} containerSelector="#works-list" emptySelector="#works-empty" />
 
       {works.length > 0 ? (
-        <div id="works-list">
+        <div id="works-list" class="border-b border-ink/10">
           {works.map((item) => (
             <div class="card-reveal" data-tags={item.tags.join('|')}>
               <List type="work" item={item} headingLevel={3} />
@@ -59,21 +60,21 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
           ))}
         </div>
       ) : (
-        <p class="font-mono text-sm text-graphite">まだ実績が登録されていません。</p>
+        <p class="text-sm text-graphite">まだ実績が登録されていません。</p>
       )}
 
-      <p id="works-empty" class="hidden font-mono text-sm text-graphite">
+      <p id="works-empty" class="hidden text-sm text-graphite">
         該当するタグの実績がありません。
       </p>
     </div>
     <div class="mt-8 text-center">
-      <a href="/contact" class="btn-glass btn-glass-accent md:w-1/3 w-full">
-        <i class="fa-solid fa-envelope pr-1"></i>ご依頼はこちら
+      <a href="/contact" class="btn-glass btn-glass-accent btn-wide">
+        <i class="fa-solid fa-envelope"></i>ご依頼はこちら
       </a>
     </div>
     <div class="mt-8 text-center">
-      <a href="/" class="btn-glass md:w-1/3 w-full">
-        <i class="fa-solid fa-circle-chevron-left pr-1"></i>サイトトップへ
+      <a href="/" class="btn-glass btn-wide">
+        <i class="fa-solid fa-arrow-left"></i>サイトトップへ
       </a>
     </div>
   </section>
@@ -85,6 +86,6 @@ const workTags = Array.from(new Set(works.flatMap((i) => i.tags))).sort();
   @reference '../styles/global.css';
 
   .profile-section-heading {
-    @apply mb-4 border-l-4 border-accent pl-3 text-lg font-semibold text-ink;
+    @apply content-heading mt-0;
   }
 </style>

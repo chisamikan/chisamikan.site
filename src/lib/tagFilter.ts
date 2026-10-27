@@ -22,6 +22,8 @@ export function revealItems(targets: HTMLElement[]): void {
   targets.forEach((el) => {
     el.style.transition = 'none';
     el.classList.remove('is-visible');
+    // 再生し直し用の短いタイミング(global.cssの .card-reveal[data-replay])に切り替える
+    el.dataset.replay = '';
   });
   void targets[0].offsetHeight;
 

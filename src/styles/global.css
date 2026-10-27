@@ -7,31 +7,43 @@
    ライト/ダークで値が入れ替わる変数は下の .dark で上書きするため、
    コンポーネント側のクラス(bg-paper, text-ink, shadow-card 等)はそのままテーマ追従する */
 @theme {
+  /* ヘッダーの横並びナビを表示する画面幅(nav: バリアント)。ヘッダーとモバイルメニューの
+     切り替えをこの1か所で調整できるよう独自の区切りとして定義する。
+     英語名を主にした9項目とロゴが、ゆとりのある間隔で1行に収まる1280pxにしている */
+  --breakpoint-nav: 80rem;
+
   --color-paper: rgb(232 240 250);
   --color-paper-dim: rgb(219 229 242);
   --color-ink: rgb(15 23 42);
-  --color-ink-soft: rgb(106 114 129);
-  --color-graphite: rgb(150 158 171);
+  /* 補足の文字色。背景(paper)との明暗差がWCAGの基準(4.5:1)を満たす濃さにする
+     (ink-soft 約6.6:1 / graphite 約4.8:1) */
+  --color-ink-soft: rgb(75 85 99);
+  --color-graphite: rgb(95 105 120);
   --color-accent: rgb(8 145 178);
   --color-accent-2: rgb(37 99 235);
-  --color-accent-violet: rgb(109 40 217);
-  --color-accent-rose: rgb(190 24 93);
-  --color-accent-amber: rgb(180 83 9);
-  --color-accent-lime: rgb(21 128 61);
 
   /* すりガラス面の下地色・境界線色 */
-  --color-glass: rgba(255, 255, 255, 0.62);
   --color-glass-md: rgba(255, 255, 255, 0.78);
-  --color-glass-lg: rgba(255, 255, 255, 0.9);
-  --color-glass-dark: rgba(0, 0, 0, 0.06);
-  --color-glass-dark-md: rgba(15, 23, 42, 0.08);
   --color-glass-border: rgba(15, 23, 42, 0.14);
   --color-glass-border-subtle: rgba(15, 23, 42, 0.09);
-  --color-glass-border-bright: rgba(15, 23, 42, 0.22);
 
-  --font-body: 'Oswald', 'Zen Kaku Gothic New', sans-serif;
+  /* 本文の欧文は字幅の詰まったOswaldだと和文と並べたときにガタつくため、和文に馴染むInter Tightにする */
+  --font-body: 'Inter Tight', 'Zen Kaku Gothic New', sans-serif;
   --font-display: var(--font-body);
-  --font-mono: var(--font-body);
+  /* 日付・数値だけは等幅にして、桁が揃った落ち着いた見た目にする */
+  --font-num: 'IBM Plex Mono', 'Zen Kaku Gothic New', monospace;
+
+  /* Tailwind標準の ease-out は立ち上がりが弱く、もたついて見えるため、より鋭いカーブで上書きする */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* 強いボタン(.btn-glass-accent)の塗り。白文字でも読めるよう accent より一段濃いシアンにする */
+  --color-accent-strong: rgb(14 116 144);
+  --color-on-accent: rgb(255 255 255);
+  /* 文字に使うアクセント色。accent のままだと背景(paper)との明暗差が約3.2:1しかなく
+     読みにくいため、文字には一段濃いシアン(約4.7:1)を使う。下線・点・枠線などの装飾は accent のまま */
+  --color-accent-text: rgb(14 116 144);
+  /* カードなど「中身」を載せる面。ガラスはヘッダー等の浮かぶ操作部品だけに使い、中身は不透明な面に載せる */
+  --color-surface: rgb(255 255 255);
 
   /* CodePen "Liquid Glass UI kit" の radius / blur スケールに合わせる */
   --radius-xs: 6px;
@@ -45,37 +57,75 @@
   --blur-lg: 32px;
   --blur-xl: 60px;
 
-  --shadow-pin: 0 6px 16px -4px rgba(34, 31, 27, 0.25);
+  --shadow-pin: 0 6px 16px -4px rgba(4, 18, 36, 0.25);
 }
 
 /* 影はTailwindがクラスに値を直接埋め込むため、テーマで切り替える値は変数経由で参照させる */
 @theme inline {
-  --shadow-glass: var(--glass-shadow);
-  --shadow-glass-lg: var(--glass-shadow-float);
-  --shadow-glass-accent: var(--glass-shadow-accent);
-  --shadow-glass-accent-lg: var(--glass-shadow-accent-lg);
   --shadow-card: var(--glass-shadow-card);
   --shadow-card-lg: var(--glass-shadow-card-lg);
-  --shadow-float: var(--glass-shadow-float);
-  --shadow-glow: var(--glass-shadow-glow);
+}
+
+/* ページ間の移動を、ブラウザ標準のビュートランジションでなめらかにつなぐ(CSSのみ)。
+   Astroの<ClientRouter />と違いページ遷移は通常どおりなので、各ページのスクリプトは
+   そのまま動く。未対応のブラウザ(Firefox等)では普通のページ移動になる */
+@view-transition {
+  navigation: auto;
+}
+
+/* 既定のクロスフェード(0.25s)を、サイトのUIの動きに合わせて短く鋭いカーブにする */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+/* ダークモードの切り替え(Header.astroがhtmlに .theme-transition を付けてビュートランジションを開始する)。
+   古い画面はそのまま残し、新しい色の画面を押したボタンの位置から円形に広げる。
+   ヘッダーもまとめて切り替えるため、ヘッダー個別のトランジション名は外す。
+   また、背景色などの個別のtransitionが動いていると新しい画面が色の変化途中で記録されるため止める */
+html.theme-transition .site-header {
+  view-transition-name: none;
+}
+
+html.theme-transition,
+html.theme-transition * {
+  transition: none !important;
+}
+
+html.theme-transition::view-transition-old(root) {
+  animation: none;
+}
+
+html.theme-transition::view-transition-new(root) {
+  animation: theme-reveal 600ms var(--ease-out);
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-reveal-x, 100%) var(--theme-reveal-y, 0));
+  }
+  to {
+    clip-path: circle(150vmax at var(--theme-reveal-x, 100%) var(--theme-reveal-y, 0));
+  }
 }
 
 @layer base {
   :root {
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    --glass-shadow-float: 0 20px 60px rgba(0, 0, 0, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
-    --reflection-top: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 50%);
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    --glass-shadow-accent: 0 4px 24px rgba(8, 145, 178, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    --glass-shadow-accent-lg: 0 8px 36px rgba(8, 145, 178, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.04);
-    /* .btn-glass-accent と同じ形状(オフセット/ぼかし+内側ハイライト)に揃えつつ、色は従来の黒系のまま変更しない */
+    /* カードの影。外側の柔らかい影に、上面のハイライト(--reflection-inner)を重ねる */
     --glass-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.1), var(--reflection-inner);
     --glass-shadow-card-lg: 0 8px 36px rgba(0, 0, 0, 0.16), var(--reflection-inner);
-    --glass-shadow-glow: 0 0 40px rgba(8, 145, 178, 0.25);
 
     color-scheme: light;
 
-    --size-body: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
+    --size-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
     --line-height: 1.6;
   }
 
@@ -84,39 +134,34 @@
     --color-paper-dim: rgb(20 24 40);
     --color-ink: rgb(255 255 255);
     --color-ink-soft: rgb(145 147 152);
-    --color-graphite: rgb(96 98 106);
+    --color-graphite: rgb(128 134 145); /* 背景との明暗差 約5.3:1 */
     --color-accent: rgb(94 231 223);
     --color-accent-2: rgb(59 130 246);
-    --color-accent-violet: rgb(180 144 245);
-    --color-accent-rose: rgb(247 168 196);
-    --color-accent-amber: rgb(255 210 127);
-    --color-accent-lime: rgb(168 240 138);
 
-    --color-glass: rgba(255, 255, 255, 0.12);
     --color-glass-md: rgba(255, 255, 255, 0.2);
-    --color-glass-lg: rgba(255, 255, 255, 0.3);
-    --color-glass-dark: rgba(0, 0, 0, 0.18);
-    --color-glass-dark-md: rgba(0, 0, 0, 0.28);
     --color-glass-border: rgba(255, 255, 255, 0.25);
     --color-glass-border-subtle: rgba(255, 255, 255, 0.12);
-    --color-glass-border-bright: rgba(255, 255, 255, 0.5);
 
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    --glass-shadow-float: 0 20px 60px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);
-    --reflection-top: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%);
+    --color-accent-strong: rgb(94 231 223);
+    --color-on-accent: rgb(4 20 26);
+    --color-accent-text: rgb(94 231 223);
+    --color-surface: rgb(19 24 40);
+
     --reflection-inner: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
-    --glass-shadow-accent: 0 4px 24px rgba(94, 231, 223, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
-    --glass-shadow-accent-lg: 0 8px 36px rgba(94, 231, 223, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.1);
-    /* .btn-glass-accent と同じ形状(オフセット/ぼかし+内側ハイライト)に揃えつつ、色は従来の黒系のまま変更しない */
+    /* カードの影。外側の柔らかい影に、上面のハイライト(--reflection-inner)を重ねる */
     --glass-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.28), var(--reflection-inner);
     --glass-shadow-card-lg: 0 8px 36px rgba(0, 0, 0, 0.4), var(--reflection-inner);
-    --glass-shadow-glow: 0 0 40px rgba(120, 200, 255, 0.35);
 
     color-scheme: dark;
   }
 
   html {
     @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
+    /* 内容が短く縦スクロールバーが出ないページ(記事0件のお知らせカテゴリ等)では、
+       スクロールバーの幅だけページが広がり、ナビや中身が横にずれて見える。
+       スクロールバーの有無に関わらずその幅を常に確保して、ページ間で位置を揃える */
+    scrollbar-gutter: stable;
   }
 
   html[lang="ja"] {
@@ -129,15 +174,10 @@
        実際に見えている幅より広くなるブラウザがあり、それがそのままページ全体の横スクロール
        バーとして出てしまう。中身が見切れるわけではない誤差なので、横方向のoverflowを隠して防ぐ */
     @apply overflow-x-hidden bg-paper text-ink font-body antialiased transition-colors duration-300;
-    /* ガラス面が光を透かして見えるよう、固定位置のカラーブロブを紙のドット柄の奥に敷く */
-    background-image:
-      radial-gradient(ellipse 60% 45% at 12% -8%, --alpha(var(--color-accent) / 18%), transparent 100%),
-      radial-gradient(ellipse 55% 42% at 100% 12%, --alpha(var(--color-accent-violet) / 14%), transparent 100%),
-      radial-gradient(ellipse 60% 48% at 45% 100%, --alpha(var(--color-accent-amber) / 12%), transparent 100%),
-      radial-gradient(circle at 1px 1px, --alpha(var(--color-ink) / 5%) 1px, transparent 0);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-    background-attachment: fixed, fixed, fixed, scroll;
+    /* 色数を増やすと濁るため、右上から差す水色の光1つだけを固定で敷く */
+    background-image: radial-gradient(60% 40% at 85% 0%, --alpha(var(--color-accent) / 12%), transparent 70%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     font-size: var(--size-body);
     line-height: var(--line-height);
   }
@@ -146,12 +186,32 @@
     @apply bg-accent/25 text-ink;
   }
 
+  /* ダブルタップでの拡大の判定待ちをなくし、タップしたらすぐ反応させる */
+  a, button, label, summary, [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* 操作部品(ボタン・絞り込み・アコーディオンの見出し)は、長押しで文字が選択されないようにする。
+     本文やリンクの文字は、コピーできるよう選択可能なままにする */
+  button, summary, .btn-glass, .btn-glass-ghost, .nav-icon-toggle {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* iPhoneを横向きにした時、本文がノッチ等に重ならないよう安全領域の分だけ内側に寄せる
+     (BaseLayoutのviewport-fit=coverとセット。縦向きでは値が0なので変化しない) */
+  main, footer {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
   :focus-visible {
     @apply rounded-[2px] outline-[2.5px] outline-accent outline-offset-[3px];
   }
 
+  /* 大きな文字ほど字間が開いて見えるため、見出しはわずかに詰める */
   h1, h2, h3, h4 {
-    @apply font-display text-ink;
+    @apply font-display text-ink tracking-[-0.01em];
   }
 
   p {
@@ -160,54 +220,81 @@
 }
 
 @layer components {
-  /* すりガラス調ボタンの共通土台。色は .btn-glass-* 修飾クラスで指定する */
+  /* 子ページの外枠。文章が読みやすい幅に絞り、見出しと本文を同じ幅に揃える。
+     ギャラリーのようにカードを横に並べるページだけ、呼び出し側で max-w-5xl に広げる */
+  .page-section {
+    @apply mx-auto max-w-3xl px-6 pt-4 pb-16 sm:pt-12 sm:pb-24;
+  }
+
+  /* 子ページの見出し(h1)直下のリード文。ページ間で大きさを揃え、本文(--size-body)より一回り大きくする */
+  .page-lead {
+    @apply mb-10 text-left text-lg leading-[1.8] text-ink/80 sm:text-xl;
+  }
+
+  /* ボタンの共通土台。強いボタンなどの塗りは .btn-glass-* 修飾クラスで指定する */
+  /* ホバーで浮かせる代わりに、押した瞬間に縮めて「押せた」手応えを返す */
+  /* 無地の背景の上ではすりガラスのぼかしが見えずただの白いボタンになるため、
+     タグ・入力欄と同じく細い枠線だけで示す。ホバーではごく薄く塗る */
   .btn-glass {
-    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-glass-border bg-glass px-5 py-2.5 font-mono text-sm text-ink shadow-card backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-glass-border-bright hover:bg-glass-md hover:shadow-card-lg;
+    @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-ink/20 px-5 py-2.5 font-body text-sm font-medium text-ink transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out hover:border-ink/35 hover:bg-ink/5 active:scale-[0.97];
+  }
+
+  /* ページ下部の導線やフォーム送信などの単独で置くボタンの横幅。親要素の幅(ページごとに異なる)の
+     割合で決めると幅が揃わないため、固定幅にする。狭い画面では横幅いっぱいに広げる */
+  .btn-wide {
+    @apply w-full sm:w-80;
+  }
+
+  /* ページ送りの現在のページ。絞り込みの選択中(.filter-btn.is-active)と同じ塗りで示す */
+  .btn-glass-current {
+    @apply cursor-default rounded-full border border-transparent bg-accent-strong px-3 py-1.5 text-xs font-medium text-on-accent;
   }
 
   .btn-glass-sm {
     @apply px-3.5 py-1.5 text-xs;
   }
 
-  /* accent → accent-2 の斜めグラデーション + 上面のガラス反射(::before)で構成する */
+  /* 1画面に1つだけ置く強いボタン。半透明のグラデーションだと白文字が読みづらいため、不透明な塗りにする */
   .btn-glass-accent {
-    @apply border-accent/45 text-white shadow-glass-accent active:scale-95 hover:shadow-glass-accent-lg;
-    position: relative;
-    background-image: linear-gradient(135deg, --alpha(var(--color-accent) / 50%) 0%, --alpha(var(--color-accent-2) / 50%) 100%);
-  }
-
-  .btn-glass-accent:hover {
-    background-image: linear-gradient(135deg, --alpha(var(--color-accent) / 70%) 0%, --alpha(var(--color-accent-2) / 70%) 100%);
-  }
-
-  .btn-glass-accent::before {
-    @apply content-[''] absolute inset-0 rounded-[inherit] pointer-events-none [background:var(--reflection-top)];
+    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90;
+    box-shadow: 0 8px 24px -8px --alpha(var(--color-accent-strong) / 60%);
   }
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
   .btn-glass-ghost {
-    @apply cursor-pointer rounded-full border border-glass-border-subtle bg-glass px-4 py-1.5 font-mono text-xs text-ink/70 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:bg-glass-md hover:text-accent;
+    @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-150 ease-out hover:border-accent/50 hover:text-accent-text active:scale-[0.97];
   }
 
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
 
-  /* タグ・バッジ: Card/WorkItem/ProfileContent のスキルタグに使用 */
+  /* タグ: カード・実績・スキル・お知らせのカテゴリに共通で使う。ガラスの面は持たせず、細い枠線だけで示す。
+     長いタグが丸いタグの中で2行に折れていびつにならないよう、1行に固定して入りきらない分は「…」で省略する
+     (全文は呼び出し側で title 属性に入れる) */
   .glass-tag {
-    @apply inline-flex items-center rounded-full border border-glass-border-subtle bg-glass px-2.5 py-0.5 font-mono text-[11px] text-ink/80 backdrop-blur-sm transition-colors duration-300;
+    @apply inline-block max-w-full truncate rounded-full border border-ink/15 px-2.5 py-0.5 align-middle font-body text-xs text-ink-soft;
   }
 
+  /* 暗い画像の上(カードのサムネイルに重ねる部分)に置くタグ。枠線と文字を白にする */
+  .glass-tag-inverse {
+    @apply border-white/45 text-white;
+  }
+
+  /* 「NEW」などのバッジ。トップのファーストビューの「NEW」の札(NewsTicker)と同じ塗り・文字組みに揃える */
   .glass-badge {
-    @apply inline-flex items-center gap-1 rounded-full border border-glass-border bg-glass-md px-2 py-0.5 text-xs font-medium text-ink backdrop-blur-sm;
+    @apply inline-flex items-center gap-1 rounded-full bg-glass-md px-2.5 py-1 text-[11px] font-semibold tracking-wider text-ink;
   }
 
   .glass-badge-accent {
-    @apply border-accent/30 bg-accent/15 text-accent;
+    @apply bg-accent-strong text-on-accent;
   }
 
-  /* フォーム部品 */
+  /* フォーム部品。入力欄は中身を書き込む面なので、ガラスではなくカードと同じ不透明な面にする。
+     枠線の色の変化だけでは入力中の欄が分かりにくいため、フォーカス時は淡いリングも添える。
+     文字は16px(text-base)以上にする。iOS Safariは16px未満の入力欄にフォーカスすると画面を拡大し、
+     入力後も元に戻さないため(拡大自体を禁止するのはアクセシビリティを損なうので使わない) */
   .glass-input,
   .glass-textarea {
-    @apply w-full rounded-md border border-glass-border-subtle bg-glass px-3.5 py-2.5 text-ink outline-none backdrop-blur-sm transition-colors duration-300 placeholder:text-ink/40 focus:border-accent;
+    @apply w-full rounded-md border border-ink/15 bg-surface px-3.5 py-2.5 text-base text-ink outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink/60 focus:border-accent focus:ring-3 focus:ring-accent/20;
   }
 
   .glass-textarea {
@@ -215,28 +302,57 @@
   }
 
   .glass-checkbox {
-    @apply mt-1 h-4 w-4 shrink-0 rounded-xs border border-glass-border bg-glass backdrop-blur-sm transition-colors duration-300 accent-accent focus:outline-none focus:ring-2 focus:ring-accent;
+    @apply mt-1 h-4 w-4 shrink-0 rounded-xs border border-ink/25 bg-surface transition-colors duration-200 accent-accent focus:outline-none focus:ring-2 focus:ring-accent;
   }
 
   /* アコーディオン: <details class="glass-accordion-item"><summary class="glass-accordion-trigger"> で組む(JS不要) */
-  .glass-accordion {
-    @apply flex flex-col gap-2;
-  }
-
+  /* ガラスの箱ではなく、お知らせ一覧と同じ細い区切り線の行として並べる */
   .glass-accordion-item {
-    @apply overflow-hidden rounded-lg border border-glass-border-subtle bg-glass backdrop-blur-md transition-shadow duration-300;
+    @apply border-b border-ink/10 first-of-type:border-t;
   }
 
   .glass-accordion-trigger {
-    @apply flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-body text-sm font-medium text-ink transition-colors duration-300 hover:bg-glass-md;
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 py-5 font-body text-sm font-medium text-ink transition-colors duration-200 hover:text-accent-text;
   }
 
   .glass-accordion-trigger::-webkit-details-marker {
     @apply hidden;
   }
 
+  /* 開閉を示す矢印。開いている間は上向きに回す */
+  .glass-accordion-icon {
+    @apply shrink-0 text-sm text-accent transition-transform duration-250 ease-out;
+  }
+
+  .glass-accordion-item[open] .glass-accordion-icon {
+    @apply rotate-180;
+  }
+
+  /* 中身の開閉を高さのアニメーションでつなぐ。::details-content と interpolate-size に
+     対応していないブラウザでは、これまでどおり一瞬で開閉する(表示そのものは崩れない) */
+  .glass-accordion-item {
+    interpolate-size: allow-keywords;
+  }
+
+  .glass-accordion-item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size 250ms var(--ease-out), content-visibility 250ms allow-discrete;
+  }
+
+  .glass-accordion-item[open]::details-content {
+    block-size: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-accordion-icon,
+    .glass-accordion-item::details-content {
+      transition: none;
+    }
+  }
+
   .glass-accordion-content {
-    @apply px-5 pb-4 text-sm leading-relaxed text-ink/75;
+    @apply pb-6 leading-[1.9] text-ink/75;
   }
 
   /* おみくじ結果(404ページ)のラベル/値の行。JSがinnerHTMLで生成するDOM向けのため、
@@ -254,15 +370,15 @@
   }
 
   /* 「もう一度引く」クリック時にscrollIntoViewで見出しへ戻る際、sticky headerの
-     裏に隠れないよう Header.astro が実測する --mobile-header-h でオフセットする */
+     裏に隠れないよう、ヘッダーの高さ(h-18)+1remだけオフセットする */
   #omikuji-title {
-    @apply scroll-mt-[calc(var(--mobile-header-h,4.5rem)+1rem)];
+    @apply scroll-mt-22;
   }
 
   /* ページネーション操作時にscrollIntoViewでグリッド先頭へ戻る際、sticky headerの
-     裏に隠れないよう Header.astro が実測する --mobile-header-h でオフセットする */
+     裏に隠れないよう、ヘッダーの高さ(h-18)+1remだけオフセットする */
   #gallery-grid {
-    @apply scroll-mt-[calc(var(--mobile-header-h,4.5rem)+1rem)];
+    @apply scroll-mt-22;
   }
 
   /* おみくじ結果の各項目を時間差でフェードインアップさせる。.reveal はスクロール連動
@@ -302,6 +418,13 @@
 
   .line-mock-bubble::before {
     @apply content-[''] absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
+  }
+
+  /* ファーストビュー(index.astro)のイラスト上に重ねる、浮かぶガラスの部品(ナビ・お知らせの札)。
+     背景の明暗に関わらず読めるよう、すりガラスを白く曇らせて文字は ink 色で載せる */
+  .glass-float {
+    @apply border border-glass-border-subtle bg-glass-md backdrop-blur-xl backdrop-saturate-[1.8];
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 8px 24px rgba(4, 18, 36, 0.12);
   }
 
   /* ファーストビューのレンズフレア(HeroSlideshow.astro)。色付きの円を重ねてmix-blend-mode:overlayで馴染ませ、ゆっくり回転させる */
@@ -345,20 +468,17 @@
 }
 
 @layer utilities {
-  /* 見出しの左右に配置する飾り線。border色は before:border-* / after:border-* で呼び出し側から指定する */
-  .heading-lines {
-    @apply relative inline-block px-13.75 before:absolute before:top-1/2 before:left-0 before:h-0.5 before:w-11.25 before:border-y before:content-[''] after:absolute after:top-1/2 after:right-0 after:h-0.5 after:w-11.25 after:border-y after:content-[''];
-  }
-
-  /* 音楽プレーヤーのアルバムカードを思わせる、すりガラス調カードの共通ホバー挙動。
-     ボタン(.btn-glass)と同じ transition-all + duration-300 でイージングを揃える */
-  .glass-card {
-    @apply cursor-pointer transition-all duration-300 will-change-transform hover:-translate-y-1.5;
-  }
-
-  /* カード/サムネイルの共通の見た目(角丸・枠線・背景・影・ぼかし)。ホバー演出は .glass-card 側で付与 */
+  /* カードの見た目とホバー挙動。ガラスは浮かぶ操作部品だけに使い、作品を載せるカードは
+     不透明な面にして画像を主役にする。ホバーではカード自体は浮かせず影だけ深くし、
+     中の画像を少し拡大する(Card.astro側) */
   .glass-panel {
-    @apply rounded-2xl border border-glass-border bg-glass shadow-card backdrop-blur-xl hover:border-glass-border-bright hover:shadow-card-lg;
+    @apply cursor-pointer rounded-lg border border-glass-border-subtle bg-surface shadow-card transition-[box-shadow,transform] duration-150 ease-out hover:shadow-card-lg active:scale-[0.99] motion-reduce:active:scale-100;
+  }
+
+  /* カードのサムネイル下部に重ねる、タグ・タイトル・説明文の帯。暗いグラデーションの上に白文字で載せる。
+     クリック操作はサムネイル本体が担うため pointer-events-none にする */
+  .card-overlay {
+    @apply pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-1.5 bg-linear-to-t from-black/75 via-black/35 to-transparent p-3 pt-8;
   }
 
   /* カード下部(figcaption/div)の共通レイアウト。
@@ -372,12 +492,12 @@
   /* リストUI(List.astro/Thumbnail.astro)専用のサムネイル枠。
      カードUI(.glass-card/.glass-panel)とは角丸の値が異なるため独立させている */
   .thumbnail-frame {
-    @apply cursor-pointer rounded-lg border border-glass-border bg-glass shadow-card backdrop-blur-xl transition-all duration-300 will-change-transform hover:-translate-y-1.5 hover:border-glass-border-bright hover:shadow-card-lg sm:rounded-2xl;
+    @apply cursor-pointer rounded-lg border border-glass-border-subtle bg-surface shadow-card transition-shadow duration-300 ease-out hover:shadow-card-lg;
   }
 
   /* 画像未設定時のプレースホルダー枠。ホバー演出は持たせない */
   .thumbnail-frame-static {
-    @apply cursor-default rounded-lg border border-glass-border bg-glass shadow-card backdrop-blur-xl sm:rounded-2xl;
+    @apply cursor-default rounded-lg border border-glass-border-subtle bg-surface shadow-card;
   }
 
   /* ライトボックス(拡大表示)が紐づくサムネイル画像。button要素用にカーソルを明示する */
@@ -386,108 +506,262 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .glass-card,
-    .glass-card:hover,
-    .thumbnail-frame,
-    .thumbnail-frame:hover,
     .btn-glass,
-    .btn-glass:hover,
-    .btn-glass-accent:active {
+    .btn-glass:active,
+    .btn-glass-ghost,
+    .btn-glass-ghost:active {
       @apply transition-none! transform-none!;
     }
   }
 
-  /* スクロールで画面に入ったセクションをフワッと浮かび上がらせる(JSが .is-visible を付与) */
-  .reveal {
-    @apply opacity-0 translate-y-7 transition-[opacity,transform] duration-800 ease-[cubic-bezier(0.22,1,0.36,1)];
+  /* ---- スクロール演出(JSの監視が画面に入った要素に .is-visible を付与する) ----
+     スクロールで現れる演出は1回の訪問で数回しか見ないため、UIの操作(〜300ms)より長めにして
+     「見せる」演出にする。カーブは全体の --ease-out(強いease-out)で揃える */
+
+  /* セクション: セクション全体ではなく中身(スライダー・本文・ボタン等)を、見出しのあとに
+     順番にせり上げる。見出し(.heading-reveal)は自前の演出を持つため対象から外す。
+     遅延は並び順(sibling-index())から計算し、未対応のブラウザでは時間差なしで現れる */
+  .reveal > :not(.heading-reveal) {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity 700ms ease,
+      transform 900ms var(--ease-out);
+    transition-delay: calc(min(sibling-index(), 5) * 110ms);
   }
 
-  .reveal.is-visible {
-    @apply opacity-100 translate-y-0;
+  .reveal.is-visible > :not(.heading-reveal) {
+    opacity: 1;
+    transform: none;
   }
 
-  .no-js .reveal {
-    @apply opacity-100 transform-none;
+  /* 見出し: 英語名がマスクの中を下からせり上がり、少し遅れて日本語名がぼかしの晴れるように現れ、
+     最後に右端のリンク(「すべて見る」等)が横から滑り込む */
+  .heading-reveal-mask {
+    display: inline-block;
+    /* せり上がる英語名を、この枠の外では見せない。overflow:hiddenだと枠自体のベースラインが
+       下端に変わり日本語名との文字の下揃えが崩れるため、clip-pathで切り抜く。
+       下側は g・y などの下に伸びる文字が欠けないよう少し広げる */
+    clip-path: inset(-0.1em -0.2em -0.22em -0.2em);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .reveal {
-      @apply opacity-100 transform-none transition-none;
+  .heading-reveal-en {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(125%);
+    transition:
+      opacity 500ms ease,
+      transform 1000ms var(--ease-out);
+  }
+
+  .heading-reveal-ja {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(6px);
+    transition:
+      opacity 700ms ease 180ms,
+      transform 900ms var(--ease-out) 180ms,
+      filter 700ms ease 180ms;
+  }
+
+  .heading-reveal-link {
+    opacity: 0;
+    transform: translateX(-12px);
+    transition:
+      opacity 600ms ease 320ms,
+      transform 800ms var(--ease-out) 320ms;
+  }
+
+  .heading-reveal.is-visible :is(.heading-reveal-en, .heading-reveal-ja, .heading-reveal-link) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* トップのファーストビュー: 1回の訪問で1度しか見ない第一印象の場面なので、見出しと同じ演出の言葉づかいで
+     少し長めに見せる。小さな英字→サイト名(1行ずつマスクの中をせり上がる)→「NEW」の札の順に現れる */
+  .hero-reveal-eyebrow {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 700ms ease 100ms,
+      transform 900ms var(--ease-out) 100ms;
+  }
+
+  .hero-reveal-line {
+    display: block;
+    /* 下に伸びる文字(行間0.9のため g などが行の外にはみ出す)が欠けないよう、下側を広げて切り抜く */
+    clip-path: inset(-0.1em -0.2em -0.25em -0.2em);
+  }
+
+  .hero-reveal-line-inner {
+    display: inline-block;
+    transform: translateY(115%);
+    transition: transform 1200ms var(--ease-out);
+  }
+
+  .hero-reveal-line:nth-child(1) .hero-reveal-line-inner {
+    transition-delay: 220ms;
+  }
+
+  .hero-reveal-line:nth-child(2) .hero-reveal-line-inner {
+    transition-delay: 340ms;
+  }
+
+  .hero-reveal-chip {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 700ms ease 700ms,
+      transform 1000ms var(--ease-out) 700ms;
+  }
+
+  .hero-reveal.is-visible :is(.hero-reveal-eyebrow, .hero-reveal-line-inner, .hero-reveal-chip) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* お問い合わせの送信完了画面(ContactForm.astro): 送信は1回きりの操作なので、「ちゃんと届いた」ことが
+     伝わるよう、完了画面をせり上げて見せ、チェックアイコンを少し遅れて小さく弾ませる */
+  #contact-complete:not([hidden]) {
+    animation: contact-complete-in 700ms var(--ease-out) both;
+  }
+
+  #contact-complete:not([hidden]) .contact-complete-icon {
+    display: inline-block;
+    animation: contact-complete-icon-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms both;
+  }
+
+  @keyframes contact-complete-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
     }
   }
 
-  /* カード一覧(ギャラリー/小説/ツールボックス/実績など)を、画面に入ったタイミングで
-     並び順に応じて回転させながら時間差でフェードインさせる。.reveal と同じくJSが
-     is-visible を付与するが、遅延と回転角はCSSのsibling-index()で並び順から自動計算する
-     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count)。
+  @keyframes contact-complete-icon-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6) rotate(-12deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #contact-complete:not([hidden]),
+    #contact-complete:not([hidden]) .contact-complete-icon {
+      animation: fade-in 300ms ease both;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* カード一覧(ギャラリー/小説/ツールボックス/実績など): 並び順に応じた時間差で、せり上がりながら
+     現れる。カードはわずかに縮んだ状態から元の大きさへ戻り、中のイラストは少し拡大した状態から
+     ゆっくり引いて「ピントが合う」ように落ち着く(一覧の行は横幅が広く縮みが目立つため、移動のみ)。
      ギャラリーは絞り込み/ページ送り用に全件を常にDOMへ描画しており、sibling-index()は
-     表示中の件数ではなくグリッド内の全カード中のDOM位置を返してしまう。そのため
-     100件目以降のカードでは遅延が数秒単位に達し、ロード完了後もカードが表示され
-     ないという不具合になっていた。9件(1ページ分)相当の値で頭打ちにして防ぐ */
+     表示中の件数ではなくグリッド内の全カード中のDOM位置を返してしまうため、遅延は上限で頭打ちにする
+     (参考: https://github.com/ics-creative/260116_sibling-index_sibling-count) */
   .card-reveal {
-    @apply opacity-0 transition-[opacity,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)];
-    /* will-changeで事前にコンポジットレイヤーを確保しておかないと、
-       display:none解除と同時にトランジションが始まる際、レイヤー昇格が
-       アニメーション開始と同一フレームで発生し、前半のフレームが
-       まとめて省略されて瞬間的に終端値へワープして見えることがある */
-    will-change: opacity, transform;
-    /* sibling-index()の演算結果を丸ごとクラス名化するとTailwindの矢括弧記法が
-       極端に読みづらくなるため、この2行のみプレーンCSSのまま残す。
-       --card-reveal-index を経由させているのは、CardSlider.astro
-       (無限ループ用に複製カードをDOM上の前後へ挿入するため、本物カードの
-       sibling-index()がずれてしまう)がJSから並び順を明示的に上書きできるようにするため。
-       未指定時はこれまで通りsibling-index()から自動計算する */
+    /* --card-reveal-index はギャラリー(gallery.astro)がJSで表示中の並び順を上書きできるよう、
+       変数を経由させる。未指定時はsibling-index()から自動計算する */
     --card-reveal-index: calc(sibling-index() - 1);
-    /* --card-reveal-indexは0始まりのため、素の (index * 1.5deg) だと1枚目
-       (index 0)だけ回転角が常に0degになり、フェードするだけで回転による
-       スタッガー感が出ない。+1してから掛けることで1枚目にも回転を持たせる */
-    transform: rotate(clamp(0deg, calc((var(--card-reveal-index) + 1) * 1.5deg), 12deg));
-    /* transition-delayが0の要素は、lib/tagFilter.tsのrevealItemsが
-       transitionを戻す→is-visibleを付与するのを同一フレームで行うと、
-       ブラウザが変化前の状態を観測できずワープすることがある
-       (revealItems側でこの2つを別フレームに分けて根本対応済み)。
-       ここでは下限を0sではなく0.05sにして、さらに余裕を持たせる。
-       calcの引数を+1しているのは、下限のクランプにより index 0 と
-       index 1 が両方0.05sになって段差が消えるのを防ぐため */
-    transition-delay: clamp(0.05s, calc((var(--card-reveal-index) + 1) * 0.05s), 0.4s);
+    /* 下限を0sではなく0.06sにするのは、lib/tagFilter.tsのrevealItemsで表示状態を戻した直後に
+       ブラウザが変化前の状態を観測できず、トランジションを省略してワープするのを防ぐ余裕のため */
+    --card-reveal-delay: clamp(0.06s, calc((var(--card-reveal-index) + 1) * 0.07s), 0.5s);
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 600ms ease var(--card-reveal-delay),
+      transform 900ms var(--ease-out) var(--card-reveal-delay);
+    /* display:none解除と同時にトランジションが始まる際、レイヤー昇格が開始と同一フレームで起きると
+       前半のフレームがまとめて省略されることがあるため、事前にコンポジットレイヤーを確保しておく */
+    will-change: opacity, transform;
   }
 
-  .card-reveal.is-visible {
-    @apply opacity-100;
-    /* Tailwindのrotate-0はtransformではなく別プロパティrotateを設定してしまい、
-       上のtransform(rotate(clamp(...)))を打ち消せないため、プレーンCSSで上書きする */
-    transform: rotate(0deg);
+  .card-reveal:has(> .glass-panel) {
+    transform: translateY(28px) scale(0.96);
   }
 
-  .no-js .card-reveal {
-    @apply opacity-100 transform-none;
+  /* イラストのピント合わせ。ホバー時の拡大はTailwindの scale プロパティ(transformとは別)なので、
+     ここでは transform を使い、両方のトランジションを指定して干渉しないようにする */
+  .card-reveal img {
+    transform: scale(1.12);
+    transition:
+      transform 1400ms var(--ease-out) var(--card-reveal-delay),
+      scale 300ms var(--ease-out);
   }
 
+  .card-reveal.is-visible,
+  .card-reveal.is-visible img {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* 絞り込み/ページ送りで再生し直す時(lib/tagFilter.tsのrevealItemsがdata-replayを付与)は、
+     続けて何度も押される操作への反応なので、短く・時間差も詰め、せり上がりとフェードだけにする。
+     カードの縮小やイラストの拡大を入れると、途中の端数の位置でサムネイルとカード下部の境目に
+     1pxの隙間が開き、ダークモードでは区切り線が一瞬白い線として見えてしまうため */
+  .card-reveal[data-replay] {
+    --card-reveal-delay: clamp(0.03s, calc((var(--card-reveal-index) + 1) * 0.035s), 0.18s);
+    transition-duration: 220ms, 280ms;
+  }
+
+  .card-reveal[data-replay]:not(.is-visible),
+  .card-reveal[data-replay]:not(.is-visible):has(> .glass-panel) {
+    transform: translateY(12px);
+  }
+
+  .card-reveal[data-replay] img {
+    transform: none;
+    transition: scale 300ms var(--ease-out);
+  }
+
+  .no-js :is(.reveal > *, .heading-reveal-en, .heading-reveal-ja, .heading-reveal-link, .card-reveal, .card-reveal img, .hero-reveal-eyebrow, .hero-reveal-line-inner, .hero-reveal-chip) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* 視差効果を減らす設定では、移動・拡大・ぼかしをなくし、透明度の変化だけを短く残す */
   @media (prefers-reduced-motion: reduce) {
-    .card-reveal {
-      @apply opacity-100 transition-none transform-none;
+    .reveal > :not(.heading-reveal),
+    .heading-reveal-en,
+    .heading-reveal-ja,
+    .heading-reveal-link,
+    .card-reveal,
+    .card-reveal:has(> .glass-panel),
+    .card-reveal img,
+    .hero-reveal-eyebrow,
+    .hero-reveal-line-inner,
+    .hero-reveal-chip {
+      transform: none !important;
+      filter: none !important;
+      transition: opacity 300ms ease !important;
     }
   }
 
-  /* .card-reveal の回転は表示前(opacity:0)は見えないはずだが、回転による見た目の
-     はみ出しはレイアウト上は健在なため、ギャラリーのように表示前カードが画面外に
-     大量に控えている一覧では、そのはみ出し分がページの横スクロールを生んでしまう
-     (狭い画面で顕著)。.card-reveal を data-tags を持つ親(.card-clip)でもう1枚
-     包み、その親が「まだ表示されていない(is-visible前の)子」を持つ間だけ切り詰める。
-     is-visible化した瞬間に切り詰めをやめるため、表示アニメーションやホバー時の
-     ドロップシャドウ・せり上がりはそのまま(見えている間は一切クリップしない) */
-  .card-clip:has(> .card-reveal:not(.is-visible)) {
-    @apply overflow-hidden;
-  }
-
-  /* 外部リンク(href が http/https始まり)に自動でアイコンを表示する。除外したい場合は
-     .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')はLightning CSS
-     の圧縮バグでPUA文字が空文字に潰され本番ビルドで消えるため、SVGマスクで代替する */
+  /* 外部リンク(href が http/https始まり)のテキストの右隣に、自動でアイコンを表示する。
+     除外したい場合は .no-external-icon を付与する。Font Awesomeのグリフ(content: '\f08e')は
+     Lightning CSSの圧縮バグでPUA文字が空文字に潰され本番ビルドで消えるため、
+     手動で置く fa-arrow-up-right-from-square と見た目が揃うよう、同じアイコンのSVG
+     (Font Awesome Free 7.3.1 / CC BY 4.0)をマスクにして代替する */
   a[href^="http://"]:not(.no-external-icon)::after,
   a[href^="https://"]:not(.no-external-icon)::after {
     @apply content-[''] inline-block bg-current ml-[0.3em] align-[-0.125em] w-[0.8em] h-[0.8em];
     /* data URI中の引用符・スペースがTailwindの矢括弧記法の値パースと衝突するため、
        maskの1行のみプレーンCSSのまま残す */
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0-201.4 201.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 96C35.8 96 0 131.8 0 176L0 432c0 44.2 35.8 80 80 80l256 0c44.2 0 80-35.8 80-80l0-80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 80c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l80 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 96z'/%3E%3C/svg%3E") center / contain no-repeat;
   }
+}
+
+/* 文章ページ(このサイトについて・プライバシーポリシー等)の小見出し。各ページのスコープ付き
+   styleから @apply content-heading で使えるよう @utility で定義する。お知らせ一覧と同じ
+   細い区切り線を見出しの下に引き、ページの見出し(SectionHeading)より一段控えめにする */
+@utility content-heading {
+  @apply mt-12 mb-5 border-b border-ink/10 pb-3 text-xl font-bold text-ink;
 }
