@@ -7,6 +7,7 @@ import {
 } from './notion';
 import Parser from 'rss-parser';
 import { zennFeedUrl } from './config';
+import { safeLinkUrl } from './url';
 
 export type NewsCategory = 'site' | 'note' | 'zenn' | 'manual';
 
@@ -119,7 +120,7 @@ async function getFeedItems(feedUrl: string, limit: number): Promise<NewsItem[]>
     const feed = await parser.parseURL(feedUrl);
     return (feed.items ?? []).slice(0, limit).map((item) => ({
       title: item.title?.trim() ?? '(無題)',
-      link: item.link ?? '#',
+      link: safeLinkUrl(item.link) ?? '#',
       date: item.isoDate ?? item.pubDate ?? null,
     }));
   } catch (err) {

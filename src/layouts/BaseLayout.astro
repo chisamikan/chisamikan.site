@@ -149,8 +149,10 @@ const structuredData = {
 
       window.dataLayer = window.dataLayer || [];
 
-      function gtag(...args: unknown[]) {
-        window.dataLayer.push(args);
+      // gtag.js は配列ではなく arguments オブジェクトのみをコマンドとして扱うため、
+      // 残余引数(...args)を push すると計測が行われない
+      function gtag(..._args: unknown[]) {
+        window.dataLayer.push(arguments);
       }
       gtag('js', new Date());
       gtag('config', 'G-XZSD8BQ5DE');

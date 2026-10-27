@@ -452,12 +452,19 @@ const omikujiFields = [
       drawnItem = item;
 
       fortuneEl.textContent = item.fortune;
-      detailEl.innerHTML = fields
-        .map(({ key, label }) => {
-          const value = item[key] || '—';
-          return `<div class="omikuji-detail-row omikuji-reveal-item"><dt>${label}</dt><dd>${value}</dd></div>`;
+      // Notionの文言はHTMLとして解釈させないよう、textContentで入れる
+      detailEl.replaceChildren(
+        ...fields.map(({ key, label }) => {
+          const row = document.createElement('div');
+          row.className = 'omikuji-detail-row omikuji-reveal-item';
+          const dt = document.createElement('dt');
+          dt.textContent = label;
+          const dd = document.createElement('dd');
+          dd.textContent = item[key] || '—';
+          row.append(dt, dd);
+          return row;
         })
-        .join('');
+      );
 
       lineAvatar.style.backgroundImage = `url(${getAvatarUrl(item.fortune)})`;
       lineMessage.textContent = '';
