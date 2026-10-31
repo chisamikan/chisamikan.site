@@ -456,6 +456,96 @@ html.theme-transition::view-transition-new(root) {
       @apply animate-none;
     }
   }
+
+  /* ---- 背景の模様(BackgroundDecor.astro) ----
+     画面に固定して本文の後ろ(z-index:-1)に敷く。文字の邪魔にならないよう、
+     文字色の部品はごく薄く、アクセント色の部品だけ少し濃くして色の差で模様を見せる */
+  .bg-decor {
+    @apply pointer-events-none fixed inset-0 -z-1 overflow-hidden;
+  }
+
+  .decor-ink {
+    color: --alpha(var(--color-ink) / 9%);
+  }
+
+  .decor-accent {
+    color: --alpha(var(--color-accent) / 38%);
+  }
+
+  .dark .decor-ink {
+    color: --alpha(var(--color-ink) / 13%);
+  }
+
+  .dark .decor-accent {
+    color: --alpha(var(--color-accent) / 30%);
+  }
+
+  /* ---- 背景の模様の動き ----
+     常に視界にある背景なので、文字を読む目を引かないよう、周期を16〜28秒と長くする。
+     周期と開始位置は部品ごとに style の --dur / --delay でずらす。きらめきは明滅させない */
+
+  /* 斜線: 流れ星のように、右上から左下へ傾きに沿って流れて消える。
+     周期の大半は消えたまま休み、時々ひと筋だけ流れるようにする。
+     右上がりに傾け、進む方向(左下)の先端を濃く、後ろを薄くして尾を引いて見せる。
+     流れるのは周期のうちの一瞬だけなので、ほかの文字色の部品より少しだけ太くして形を見せる */
+  .decor-slash {
+    @apply absolute block;
+    height: 1.5px;
+    transform: rotate(-45deg);
+    color: --alpha(var(--color-ink) / 14%);
+    background: linear-gradient(to right, currentColor, transparent);
+    animation: decor-shoot var(--dur) linear var(--delay) infinite;
+  }
+
+  .dark .decor-slash {
+    color: --alpha(var(--color-ink) / 20%);
+  }
+
+  /* 流れ始めは速く、消える間際にゆるめる(強い ease-out)。光り始めと消え際は透明度で溶かす。
+     流れるのは周期の8%(周期16〜28秒で約1.3〜2.2秒)で、残りは消えたまま休む */
+  @keyframes decor-shoot {
+    0% {
+      translate: 3rem -3rem;
+      opacity: 0;
+      animation-timing-function: var(--ease-out);
+    }
+    1.5%,
+    4.5% {
+      opacity: 1;
+    }
+    8%,
+    100% {
+      translate: -3rem 3rem;
+      opacity: 0;
+    }
+  }
+
+  /* きらめき: 本文のスクロールに合わせて上へずらす。奥行き(--depth)が大きい部品ほど大きく動き、
+     手前に浮いて見える。スクロールしている間だけ動くので、読んでいる最中の目を引かない。
+     ずらす量はページの長さに関わらず、ページの最後までスクロールしたときに --depth × 2.5rem。
+     スクロール連動アニメーション非対応のブラウザでは、ずらさずにそのまま表示する */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .bg-decor > svg,
+      .bg-decor > div {
+        animation: decor-parallax linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  }
+
+  @keyframes decor-parallax {
+    to {
+      transform: translateY(calc(var(--depth, 1) * -2.5rem));
+    }
+  }
+
+  /* 視差効果を減らす設定では、背景は動かさない */
+  @media (prefers-reduced-motion: reduce) {
+    .bg-decor * {
+      animation: none;
+    }
+  }
 }
 
 @keyframes flare-spin-top {
@@ -565,6 +655,91 @@ html.theme-transition::view-transition-new(root) {
       filter 700ms ease 180ms;
   }
 
+  /* ホバーで文字の下に細い線を左から引くリンク(見出し右端の「すべて見る」等)。
+     見出しの下の罫線・ナビの現在地の線と同じ「左から引かれる」動きにそろえる。
+     離したときは待たせず素早く消す。タップでホバーが残るタッチ端末では線を引かない */
+  .link-draw {
+    position: relative;
+  }
+
+  /* 消えるときは右へ抜けるように縮め、引くとき(ホバー)だけ左から伸ばす。
+     線が戻るように見えず、左から右へ流れて見える */
+  .link-draw::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 150ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a:hover > .link-draw::after {
+      transform: none;
+      transform-origin: left;
+      transition-duration: 250ms;
+    }
+  }
+
+  /* 英語名の最後の文字の右上に添えるきらめき。腕の先が文字の角に少し掛かる位置に置き、文字の後ろ(z-index:-1)に回す。
+     英語名がせり上がりきる頃に、少し回りながら膨らんで現れる */
+  .heading-reveal-spark {
+    position: absolute;
+    z-index: -1;
+    top: -0.14em;
+    right: -0.36em;
+    width: 0.44em;
+    height: 0.44em;
+    color: var(--color-accent);
+    opacity: 0;
+    transform: scale(0.5) rotate(-45deg);
+    transition:
+      opacity 400ms ease 300ms,
+      transform 900ms var(--ease-out) 300ms;
+  }
+
+  /* 英語名と日本語名の間の斜線。背景の流れ星の斜線と同じモチーフ。日本語名と一緒に現れる */
+  .heading-reveal-slash {
+    display: inline-block;
+    width: 1.5px;
+    height: 1.1em;
+    margin-right: 0.45em;
+    vertical-align: -0.2em;
+    background: currentColor;
+    opacity: 0.5;
+    rotate: 30deg;
+  }
+
+  /* 見出しの下の罫線。全幅の細い線の上に、アクセント色の短い線を左端だけ重ねる。
+     英語名がせり上がるのに続けて、アクセント色の線→細い線の順に左から引かれる */
+  .heading-reveal-rule,
+  .heading-reveal-bar {
+    position: absolute;
+    left: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .heading-reveal-rule {
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: --alpha(var(--color-ink) / 12%);
+    transition: transform 1400ms var(--ease-out) 280ms;
+  }
+
+  .heading-reveal-bar {
+    bottom: -1px;
+    width: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    height: 3px;
+    background: var(--color-accent);
+    transition: transform 900ms var(--ease-out) 160ms;
+  }
+
   .heading-reveal-link {
     opacity: 0;
     transform: translateX(-12px);
@@ -573,7 +748,7 @@ html.theme-transition::view-transition-new(root) {
       transform 800ms var(--ease-out) 320ms;
   }
 
-  .heading-reveal.is-visible :is(.heading-reveal-en, .heading-reveal-ja, .heading-reveal-link) {
+  .heading-reveal.is-visible :is(.heading-reveal-en, .heading-reveal-ja, .heading-reveal-spark, .heading-reveal-rule, .heading-reveal-bar, .heading-reveal-link) {
     opacity: 1;
     transform: none;
     filter: none;
@@ -721,7 +896,7 @@ html.theme-transition::view-transition-new(root) {
     transition: scale 300ms var(--ease-out);
   }
 
-  .no-js :is(.reveal > *, .heading-reveal-en, .heading-reveal-ja, .heading-reveal-link, .card-reveal, .card-reveal img, .hero-reveal-eyebrow, .hero-reveal-line-inner, .hero-reveal-chip) {
+  .no-js :is(.reveal > *, .heading-reveal-en, .heading-reveal-ja, .heading-reveal-spark, .heading-reveal-rule, .heading-reveal-bar, .heading-reveal-link, .card-reveal, .card-reveal img, .hero-reveal-eyebrow, .hero-reveal-line-inner, .hero-reveal-chip) {
     opacity: 1;
     transform: none;
     filter: none;
@@ -732,6 +907,9 @@ html.theme-transition::view-transition-new(root) {
     .reveal > :not(.heading-reveal),
     .heading-reveal-en,
     .heading-reveal-ja,
+    .heading-reveal-spark,
+    .heading-reveal-rule,
+    .heading-reveal-bar,
     .heading-reveal-link,
     .card-reveal,
     .card-reveal:has(> .glass-panel),

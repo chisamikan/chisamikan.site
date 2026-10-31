@@ -145,9 +145,25 @@ const isTop = currentPath === '/';
     @apply opacity-100;
   }
 
-  /* 現在地は項目の下にアクセント色の短い線を引いて示す */
-  .site-nav-link[aria-current]::after {
+  /* 現在地は項目の下にアクセント色の短い線を引いて示す。ほかの項目は、ホバーで同じ線が
+     左から引かれる(見出しの下の罫線と同じ動き)。離したときは待たせず、右へ抜けるように素早く消す
+     (隣の項目へ移ると、線が左から右へ流れて見える) */
+  .site-nav-link::after {
     @apply absolute inset-x-4 -bottom-1.5 h-0.5 rounded-full bg-accent content-[''];
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 150ms var(--ease-out);
+  }
+  .site-nav-link[aria-current]::after {
+    transform: none;
+  }
+  /* タップでホバーが残るタッチ端末では線を引かない */
+  @media (hover: hover) and (pointer: fine) {
+    .site-nav-link:hover::after {
+      transform: none;
+      transform-origin: left;
+      transition-duration: 250ms;
+    }
   }
 
   /* iPhoneを横向きにした時、ロゴやナビがノッチ等に重ならないよう、安全領域の分だけ内側に寄せる。
