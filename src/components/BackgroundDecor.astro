@@ -1,0 +1,58 @@
+---
+import Sparkle from './Sparkle.astro';
+
+// ページ全体の背景に散らす模様(きらめき・流れ星の斜線)。
+// 画面に固定して本文の後ろに敷き、スクロールしても壁紙のように同じ位置に見せる。
+// 色は2系統だけにする: 文字色(.decor-ink)をごく薄く、アクセント色(.decor-accent)を少し濃く。
+// 配置は左右の余白を中心に、上下左右で偏りや対称が出ないよう散らす。
+// スマホ幅でもパソコンと同じ配置にする。位置は画面に対する割合、大きさは画面幅に応じて伸び縮みする。
+// 斜線が流れる動き(global.css の .decor-slash)は線ごとに周期と開始位置(t)をずらし、時々ひと筋ずつ流れるようにする。
+// きらめきは、スクロールに合わせて奥行き(depth)ごとに違う量だけずらし、模様に奥行きを出す
+
+// 縦に3つ連なるきらめき。腕の先が隣のきらめきに触れないよう、上下に間隔をあける
+const stackSparkle = 'my-[6%] size-[clamp(1.75rem,3.5vw,3.25rem)]';
+// 動きの周期(秒)と、読み込み直後から動きの途中に見せるための開始位置(負の遅延・秒)
+const t = (dur: number, delay: number) => `--dur:${dur}s;--delay:-${delay}s`;
+// スクロールに合わせてずらす量の倍率(奥行き)。大きく手前に見せたい部品ほど大きくする
+const depth = (n: number) => `--depth:${n}`;
+---
+
+<div class="bg-decor" aria-hidden="true">
+  <!-- 左側 -->
+  <Sparkle class="decor-ink absolute top-[12%] left-[5%] size-[clamp(3.5rem,9vw,7.5rem)]" style={depth(3)} />
+  <div style={depth(2)} class="decor-accent absolute top-[41%] left-[3%] flex flex-col items-center">
+    <Sparkle class={stackSparkle} />
+    <Sparkle class={stackSparkle} />
+    <Sparkle class={stackSparkle} />
+  </div>
+  <Sparkle class="decor-ink absolute top-[66%] left-[4%] size-[clamp(1.5rem,3.5vw,3rem)]" style={depth(1.5)} />
+  <Sparkle class="decor-accent absolute top-[78%] left-[14%] size-[clamp(2rem,4.5vw,4rem)]" style={depth(2)} />
+
+  <!-- 右側 -->
+  <Sparkle class="decor-accent absolute top-[11%] right-[21%] size-6" style={depth(0.75)} />
+  <Sparkle class="decor-ink absolute top-[28%] right-[6%] size-[clamp(3.5rem,9vw,7.5rem)]" style={depth(3)} />
+  <Sparkle class="decor-accent absolute top-[55%] right-[15%] size-[clamp(1.75rem,4vw,3.5rem)]" style={depth(2)} />
+  <div style={depth(2.5)} class="decor-accent absolute top-[64%] right-[4%] flex flex-col items-center">
+    <Sparkle class={stackSparkle} />
+    <Sparkle class={stackSparkle} />
+    <Sparkle class={stackSparkle} />
+  </div>
+
+  <!-- 本文に重なる位置には、薄く小さいきらめきだけ -->
+  <Sparkle class="decor-ink absolute top-[47%] left-[22%] size-[clamp(1.25rem,2.5vw,2rem)]" style={depth(0.75)} />
+  <Sparkle class="decor-ink absolute top-[31%] right-[25%] size-[clamp(1.5rem,3.5vw,3rem)]" style={depth(1.5)} />
+  <Sparkle class="decor-ink absolute top-[80%] left-[31%] size-[clamp(1.25rem,2.5vw,2rem)]" style={depth(0.75)} />
+
+  <!-- 流れ星の斜線。読んでいる目を引かないよう、本文の上は避けて左右の余白に置く。
+    周期を 16〜28秒でばらばらにし、同時に流れるのは平均1本未満(時々ひと筋)にする -->
+  <span class="decor-slash top-[8%] left-[18%] w-[clamp(3rem,6vw,5.5rem)]" style={t(22, 15)}></span>
+  <span class="decor-slash top-[10%] right-[7%] w-[clamp(2.5rem,5vw,4.5rem)]" style={t(18, 3)}></span>
+  <span class="decor-slash top-[20%] right-[17%] w-[clamp(3rem,6vw,5.5rem)]" style={t(25, 9)}></span>
+  <span class="decor-slash top-[30%] left-[9%] w-[clamp(2.5rem,5vw,4.5rem)]" style={t(19, 13)}></span>
+  <span class="decor-slash top-[45%] right-[8%] w-[clamp(2rem,4vw,4rem)]" style={t(16, 1)}></span>
+  <span class="decor-slash top-[60%] left-[14%] w-[clamp(3rem,6vw,5.5rem)]" style={t(21, 6)}></span>
+  <span class="decor-slash top-[66%] right-[19%] w-[clamp(3rem,6vw,5.5rem)]" style={t(28, 24)}></span>
+  <span class="decor-slash top-[74%] left-[6%] w-[clamp(2rem,4vw,4rem)]" style={t(27, 20)}></span>
+  <span class="decor-slash top-[87%] right-[12%] w-[clamp(3rem,6vw,5.5rem)]" style={t(17, 11)}></span>
+  <span class="decor-slash top-[89%] left-[20%] w-[clamp(2rem,4vw,4rem)]" style={t(24, 4)}></span>
+</div>

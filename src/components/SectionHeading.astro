@@ -1,6 +1,8 @@
 ---
+import Sparkle from './Sparkle.astro';
+
 interface Props {
-  eyebrow?: string;
+  eyebrow: string;
   title: string;
   level?: 1 | 2;
   // 指定するとトップページのセクション用に左寄せになり、右端に一覧への導線を置く
@@ -14,24 +16,23 @@ const Tag = `h${level}` as 'h1' | 'h2';
 const hasAction = Astro.slots.has('action');
 ---
 
-<!-- heading-reveal: 画面に入ったら(BaseLayoutの監視がis-visibleを付与)、英語名→日本語名→リンクの順に現れる。
-  演出の中身は global.css の .heading-reveal-* を参照 -->
-<div class:list={['heading-reveal mb-10', (href || hasAction) && 'flex flex-wrap items-end justify-between gap-x-4 gap-y-2']}>
+<!-- heading-reveal: 画面に入ったら(BaseLayoutの監視がis-visibleを付与)、英語名→きらめき・日本語名→下の罫線→リンクの順に現れる。
+  演出の中身は global.css の .heading-reveal-* を参照。
+  背景の模様(BackgroundDecor)と揃え、英語名と日本語名の間を斜線で区切り、下に左端だけアクセント色の罫線を引く -->
+<div class:list={['heading-reveal relative mb-10 pb-5', (href || hasAction) && 'flex flex-wrap items-end justify-between gap-x-4 gap-y-2']}>
   <!-- 「英語名 日本語名」を左揃えの1行に並べ、英語名を大きく見せる。狭い画面でも改行せず収まるよう、
-    英語名は画面幅に応じて縮める(最長の「Privacy Policy プライバシーポリシー」が375px幅に収まる大きさ) -->
-  <Tag class="flex items-baseline gap-x-3 whitespace-nowrap">
-    {eyebrow ? (
-      <>
-        <span class="heading-reveal-mask">
-          <span class="heading-reveal-en text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-semibold leading-none tracking-[-0.03em]">{eyebrow}</span>
-        </span>
-        <span class="heading-reveal-ja text-sm font-bold text-accent-text sm:text-lg lg:text-xl">{title}</span>
-      </>
-    ) : (
+    英語名は画面幅に応じて縮める(最長の「Privacy Policy / プライバシーポリシー」が375px幅に収まる大きさ。
+    そのため狭い画面では英語名と日本語名の間も詰める) -->
+  <Tag class="flex items-baseline gap-x-2 whitespace-nowrap sm:gap-x-3">
+    <span class="relative isolate mr-[0.15em] leading-none text-[clamp(1.75rem,0.75rem+4.5vw,4rem)]">
       <span class="heading-reveal-mask">
-        <span class="heading-reveal-en text-[clamp(1.75rem,0.75rem+4.5vw,4rem)] font-bold leading-none">{title}</span>
+        <span class="heading-reveal-en font-semibold leading-none tracking-[-0.03em]">{eyebrow}</span>
       </span>
-    )}
+      <Sparkle class="heading-reveal-spark" />
+    </span>
+    <span class="heading-reveal-ja text-sm font-bold text-accent-text sm:text-lg lg:text-xl">
+      <span class="heading-reveal-slash" aria-hidden="true"></span>{title}
+    </span>
   </Tag>
   {href && (
     <a
@@ -39,7 +40,7 @@ const hasAction = Astro.slots.has('action');
       class="heading-reveal-link group no-external-icon ml-auto shrink-0 text-sm font-medium text-accent-text"
       {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
-      {linkLabel}
+      <span class="link-draw">{linkLabel}</span>
       <i
         class:list={[
           'fa-solid ml-1.5 inline-block text-[0.85em] transition-transform duration-200 ease-out group-hover:translate-x-1',
@@ -54,4 +55,6 @@ const hasAction = Astro.slots.has('action');
       <slot name="action" />
     </span>
   )}
+  <span class="heading-reveal-rule" aria-hidden="true"></span>
+  <span class="heading-reveal-bar" aria-hidden="true"></span>
 </div>

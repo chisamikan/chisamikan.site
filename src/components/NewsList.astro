@@ -10,8 +10,10 @@ interface Props {
 const { items, emptyText = 'お知らせはまだありません。' } = Astro.props;
 ---
 
+<!-- 見出し(SectionHeading)の直後に置かれたとき(トップのお知らせ)は、見出しの下の罫線が区切りを兼ねるため、
+  一覧の上の区切り線を引かず、横線が2本続いて見えないようにする -->
 {items.length > 0 ? (
-  <ul class="border-y border-ink/10 divide-y divide-ink/10">
+  <ul class="border-y border-ink/10 divide-y divide-ink/10 [.heading-reveal+&]:border-t-0">
     {items.map((item) => {
       const meta = getCategoryMeta(item.category);
       const formattedDate = new Date(item.date)
