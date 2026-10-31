@@ -66,6 +66,8 @@ export interface ManualNewsItem {
   id: string;
   title: string;
   body: string;
+  // 個別ページで本文中のリンクを再現するための、テキストとリンク先の組
+  bodySegments: { text: string; href: string | null }[];
   date: string | null;
   url: string | null;
   createdTime: string;
@@ -302,6 +304,10 @@ export async function getManualNewsItems(): Promise<ManualNewsItem[]> {
       id: page.id,
       title: titleProp(props, 'Name'),
       body: richTextProp(props, 'Body'),
+      bodySegments:
+        props.Body?.type === 'rich_text'
+          ? props.Body.rich_text.map((t) => ({ text: t.plain_text, href: safeLinkUrl(t.href) }))
+          : [],
       date: dateProp(props, 'Date')?.start ?? null,
       url: urlProp(props, 'URL'),
       createdTime: page.created_time,

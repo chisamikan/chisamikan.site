@@ -1,0 +1,67 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getManualNewsItems } from '../../lib/notion';
+import { getCategoryMeta } from '../../lib/news';
+
+// Notionの手動投稿DBの記事ごとの個別ページ。一覧(/news/[...page])のページ番号とはIDの形式が異なるため衝突しない
+export const getStaticPaths = (async () => {
+  const items = await getManualNewsItems();
+  return items.map((item) => ({ params: { id: item.id }, props: { item } }));
+}) satisfies GetStaticPaths;
+
+const { item } = Astro.props;
+const meta = getCategoryMeta('manual');
+const date = item.date ?? item.createdTime;
+const formattedDate = new Date(date)
+  .toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  .replaceAll('/', '.');
+const isExternal = Boolean(item.url?.startsWith('http'));
+---
+
+<BaseLayout title={item.title} description={item.body.slice(0, 120) || 'お知らせ'}>
+  <article class="page-section">
+    <div class="flex items-baseline gap-4">
+      <time datetime={date} class="font-num text-[13px] text-ink-soft">{formattedDate}</time>
+      <span class="glass-tag whitespace-nowrap">
+        <i class={`${meta.icon} mr-1`} aria-hidden="true"></i>
+        {meta.label}
+      </span>
+    </div>
+    <h1 class="mt-4 text-2xl font-medium leading-snug text-ink">{item.title}</h1>
+
+    {item.body && (
+      <p class="mt-8 whitespace-pre-line leading-[1.9] text-ink">
+        {item.bodySegments.map((seg) =>
+          seg.href ? (
+            <a
+              href={seg.href}
+              class="text-accent-text underline underline-offset-4 hover:text-ink"
+              {...(seg.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >{seg.text}</a>
+          ) : (
+            seg.text
+          )
+        )}
+      </p>
+    )}
+
+    {item.url && (
+      <p class="mt-8">
+        <a
+          href={item.url}
+          class="btn-glass"
+          {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        >
+          関連リンクを開く
+        </a>
+      </p>
+    )}
+
+    <div class="mt-16 text-center">
+      <a href="/news" class="btn-glass btn-wide">
+        <i class="fa-solid fa-arrow-left"></i>お知らせ一覧へ
+      </a>
+    </div>
+  </article>
+</BaseLayout>
