@@ -182,8 +182,9 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       title: item.title,
       body: item.body || null,
       date: item.date ?? item.createdTime,
-      link: item.url,
-      external: Boolean(item.url?.startsWith('http')),
+      // 本文・URLは個別ページ(/news/[id])に載せる
+      link: `/news/${item.id}`,
+      external: false,
     })),
     ...toFeedNewsItems(noteItems, 'note'),
     ...toFeedNewsItems(zennItems, 'zenn'),
