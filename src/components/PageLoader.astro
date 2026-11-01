@@ -164,12 +164,14 @@
       .filter((img) => !img.complete)
       .map(loaded);
     // Google FontsのCSSは非同期で読み込む(BaseLayout)ため、CSSが届いてから、ページで使われている
-    // フォントの読み込みを待つ。レイアウトを確定させないとフォントの読み込みが始まらないため、先に確定させる
+    // フォントの読み込みを待つ。フォントの読み込みはレイアウトが決まってから始まるため、次の描画(レイアウト)が
+    // 終わるのを待ってから document.fonts.ready を見る。offsetHeight 等でその場でレイアウトさせると、
+    // ページ全体のレイアウトをスクリプトの中で強制する(強制リフロー)ことになり、メインスレッドを長く止める
     const fontCss = document.querySelector<HTMLLinkElement>('link[href^="https://fonts.googleapis.com/"]');
-    const fonts = (fontCss && !fontCss.sheet ? loaded(fontCss) : Promise.resolve()).then(() => {
-      void document.body.offsetHeight;
-      return document.fonts.ready;
-    });
+    const afterNextLayout = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve)));
+    const fonts = (fontCss && !fontCss.sheet ? loaded(fontCss) : Promise.resolve())
+      .then(afterNextLayout)
+      .then(() => document.fonts.ready);
     Promise.race([
       Promise.all([...images, fonts]),
       new Promise((resolve) => window.setTimeout(resolve, MAX_WAIT_MS)),
