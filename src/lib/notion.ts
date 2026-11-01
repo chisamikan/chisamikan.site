@@ -20,6 +20,9 @@ export interface ArtworkItem {
   id: string;
   title: string;
   imageUrl: string | null;
+  // 画像の取得元の直接のURL。Notionへアップロードした画像は数時間で失効する署名付きURLのため、
+  // ページには書き出さず、ビルド中の画像変換(ファーストビュー)の取得元にだけ使う
+  sourceImageUrl: string | null;
   tags: string[];
   description: string;
   date: string | null;
@@ -113,10 +116,20 @@ function tagsProp(props: Props): string[] {
 // リクエストの都度最新URLを取得し直す /api/image/[kind]/[id] 経由に差し替える。
 // 外部URL(file.type === 'external')は失効しないためそのまま使用する。
 function imageProp(page: PageObjectResponse, kind: ImageKind): string | null {
-  const prop = page.properties.Image;
-  if (prop?.type !== 'files' || prop.files.length === 0) return null;
-  const file = prop.files[0];
+  const file = imageFile(page);
+  if (!file) return null;
   return file.type === 'external' ? file.external.url : `/api/image/${kind}/${page.id}`;
+}
+
+function sourceImageProp(page: PageObjectResponse): string | null {
+  const file = imageFile(page);
+  if (!file) return null;
+  return file.type === 'external' ? file.external.url : file.file.url;
+}
+
+function imageFile(page: PageObjectResponse) {
+  const prop = page.properties.Image;
+  return prop?.type === 'files' ? prop.files[0] : undefined;
 }
 
 // Notion APIはデータベースを直接クエリできないため、まずデータソースIDを取得してからクエリする。
@@ -177,6 +190,7 @@ export async function getGalleryItems(): Promise<ArtworkItem[]> {
       id: page.id,
       title: titleProp(props, 'Name'),
       imageUrl: imageProp(page, 'gallery'),
+      sourceImageUrl: sourceImageProp(page),
       tags: tagsProp(props),
       description: richTextProp(props, 'Description'),
       date: dateProp(props, 'Date')?.start ?? null,

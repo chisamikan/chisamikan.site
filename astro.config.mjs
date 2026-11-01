@@ -8,6 +8,14 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://chisamikan.site',
   adapter: cloudflare({ imageService: 'compile' }),
+  // ファーストビューの画像(src/lib/heroImages.ts)をビルド時に取得・変換するため、Notionへアップロードした画像の配信元を許可する。
+  // ここに無い配信元の画像は変換されず、そのままのURLで表示される
+  image: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com' },
+      { protocol: 'https', hostname: 'prod-files-secure-apne1.s3.ap-northeast-1.amazonaws.com' },
+    ],
+  },
   integrations: [
     sitemap({
       // /secret は隠しページ、/404 はエラーページのためサイトマップから除外する
