@@ -176,10 +176,7 @@ html.theme-transition::view-transition-new(root) {
     @apply overflow-x-hidden bg-paper text-ink font-body antialiased transition-colors duration-300;
     /* 色数を増やすと濁るため、右上から差す水色の光1つだけを固定で敷く */
     background-image: radial-gradient(60% 40% at 85% 0%, --alpha(var(--color-accent) / 12%), transparent 70%);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    font-size: var(--size-body);
-    line-height: var(--line-height);
+    @apply bg-no-repeat bg-fixed text-(length:--size-body) leading-(--line-height);
   }
 
   ::selection {
@@ -188,21 +185,19 @@ html.theme-transition::view-transition-new(root) {
 
   /* ダブルタップでの拡大の判定待ちをなくし、タップしたらすぐ反応させる */
   a, button, label, summary, [role="button"] {
-    touch-action: manipulation;
+    @apply touch-manipulation;
   }
 
   /* 操作部品(ボタン・絞り込み・アコーディオンの見出し)は、長押しで文字が選択されないようにする。
      本文やリンクの文字は、コピーできるよう選択可能なままにする */
   button, summary, .btn-glass, .btn-glass-ghost, .nav-icon-toggle {
-    -webkit-user-select: none;
-    user-select: none;
+    @apply select-none;
   }
 
   /* iPhoneを横向きにした時、本文がノッチ等に重ならないよう安全領域の分だけ内側に寄せる
      (BaseLayoutのviewport-fit=coverとセット。縦向きでは値が0なので変化しない) */
   main, footer {
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
+    @apply pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)];
   }
 
   :focus-visible {
@@ -216,6 +211,15 @@ html.theme-transition::view-transition-new(root) {
 
   p {
     @apply tracking-[0.04em];
+  }
+
+  /* モーダル(拡大表示・注意書き)の背後の暗い覆い。開く時は280ms、閉じる時(基本の状態へ戻る時)は200msと、閉じる側を速くする */
+  dialog::backdrop {
+    @apply bg-[rgba(4,18,36,0.85)] opacity-0 transition-opacity duration-200 ease-[ease];
+  }
+
+  dialog.is-open::backdrop {
+    @apply opacity-100 duration-280;
   }
 }
 
@@ -256,8 +260,7 @@ html.theme-transition::view-transition-new(root) {
 
   /* 1画面に1つだけ置く強いボタン。半透明のグラデーションだと白文字が読みづらいため、不透明な塗りにする */
   .btn-glass-accent {
-    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90;
-    box-shadow: 0 8px 24px -8px --alpha(var(--color-accent-strong) / 60%);
+    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90 shadow-[0_8px_24px_-8px] shadow-accent-strong/60;
   }
 
   /* 絞り込み/ページ送り用の控えめなガラスピル。アクティブ時は .btn-glass-accent を重ねる */
@@ -303,6 +306,34 @@ html.theme-transition::view-transition-new(root) {
 
   .glass-checkbox {
     @apply mt-1 h-4 w-4 shrink-0 rounded-xs border border-ink/25 bg-surface transition-colors duration-200 accent-accent focus:outline-none focus:ring-2 focus:ring-accent;
+  }
+
+  /* 注意書きのモーダル(キリ番・閲覧注意)。開閉はJSが .is-open を付け外しする。
+     Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
+     打ち消してしまうため、中央寄せを明示的に指定し直す。
+     開閉で opacity と transform のカーブを変えるため、transform/transition はプレーンCSSのまま残す */
+  .modal-dialog {
+    @apply fixed inset-0 m-auto max-w-[min(90vw,420px)] rounded-lg border border-ink/10 bg-paper p-7 text-ink opacity-0 shadow-[0_12px_32px_-8px_rgba(4,18,36,0.5)] motion-reduce:transform-none!;
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+
+  .modal-dialog.is-open {
+    @apply opacity-100;
+    transform: scale(1);
+    transition-duration: 0.28s;
+  }
+
+  .modal-title {
+    @apply mb-2 font-display text-lg font-semibold;
+  }
+
+  .modal-body {
+    @apply text-sm leading-[1.6] text-ink/75;
+  }
+
+  .modal-close {
+    @apply absolute top-3 right-3 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-xl leading-none text-ink/50 hover:bg-ink/8 hover:text-ink;
   }
 
   /* アコーディオン: <details class="glass-accordion-item"><summary class="glass-accordion-trigger"> で組む(JS不要) */
@@ -423,8 +454,7 @@ html.theme-transition::view-transition-new(root) {
   /* ファーストビュー(index.astro)のイラスト上に重ねる、浮かぶガラスの部品(ナビ・お知らせの札)。
      背景の明暗に関わらず読めるよう、すりガラスを白く曇らせて文字は ink 色で載せる */
   .glass-float {
-    @apply border border-glass-border-subtle bg-glass-md backdrop-blur-xl backdrop-saturate-[1.8];
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 8px 24px rgba(4, 18, 36, 0.12);
+    @apply border border-glass-border-subtle bg-glass-md backdrop-blur-xl backdrop-saturate-[1.8] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_8px_24px_rgba(4,18,36,0.12)];
   }
 
   /* ファーストビューのレンズフレア(HeroSlideshow.astro)。色付きの円を重ねてmix-blend-mode:overlayで馴染ませ、ゆっくり回転させる */
@@ -465,19 +495,11 @@ html.theme-transition::view-transition-new(root) {
   }
 
   .decor-ink {
-    color: --alpha(var(--color-ink) / 9%);
+    @apply text-ink/9 dark:text-ink/13;
   }
 
   .decor-accent {
-    color: --alpha(var(--color-accent) / 38%);
-  }
-
-  .dark .decor-ink {
-    color: --alpha(var(--color-ink) / 13%);
-  }
-
-  .dark .decor-accent {
-    color: --alpha(var(--color-accent) / 30%);
+    @apply text-accent/38 dark:text-accent/30;
   }
 
   /* ---- 背景の模様の動き ----
@@ -489,16 +511,7 @@ html.theme-transition::view-transition-new(root) {
      右上がりに傾け、進む方向(左下)の先端を濃く、後ろを薄くして尾を引いて見せる。
      流れるのは周期のうちの一瞬だけなので、ほかの文字色の部品より少しだけ太くして形を見せる */
   .decor-slash {
-    @apply absolute block;
-    height: 1.5px;
-    transform: rotate(-45deg);
-    color: --alpha(var(--color-ink) / 14%);
-    background: linear-gradient(to right, currentColor, transparent);
-    animation: decor-shoot var(--dur) linear var(--delay) infinite;
-  }
-
-  .dark .decor-slash {
-    color: --alpha(var(--color-ink) / 20%);
+    @apply absolute block h-[1.5px] -rotate-45 bg-[linear-gradient(to_right,currentColor,transparent)] text-ink/14 animate-[decor-shoot_var(--dur)_linear_var(--delay)_infinite] dark:text-ink/20;
   }
 
   /* 流れ始めは速く、消える間際にゆるめる(強い ease-out)。光り始めと消え際は透明度で溶かす。
@@ -628,7 +641,7 @@ html.theme-transition::view-transition-new(root) {
   /* 見出し: 英語名がマスクの中を下からせり上がり、少し遅れて日本語名がぼかしの晴れるように現れ、
      最後に右端のリンク(「すべて見る」等)が横から滑り込む */
   .heading-reveal-mask {
-    display: inline-block;
+    @apply inline-block;
     /* せり上がる英語名を、この枠の外では見せない。overflow:hiddenだと枠自体のベースラインが
        下端に変わり日本語名との文字の下揃えが崩れるため、clip-pathで切り抜く。
        下側は g・y などの下に伸びる文字が欠けないよう少し広げる */
@@ -636,7 +649,7 @@ html.theme-transition::view-transition-new(root) {
   }
 
   .heading-reveal-en {
-    display: inline-block;
+    @apply inline-block;
     opacity: 0;
     transform: translateY(125%);
     transition:
@@ -645,7 +658,7 @@ html.theme-transition::view-transition-new(root) {
   }
 
   .heading-reveal-ja {
-    display: inline-block;
+    @apply inline-block;
     opacity: 0;
     transform: translateY(10px);
     filter: blur(6px);
@@ -659,19 +672,13 @@ html.theme-transition::view-transition-new(root) {
      見出しの下の罫線・ナビの現在地の線と同じ「左から引かれる」動きにそろえる。
      離したときは待たせず素早く消す。タップでホバーが残るタッチ端末では線を引かない */
   .link-draw {
-    position: relative;
+    @apply relative;
   }
 
   /* 消えるときは右へ抜けるように縮め、引くとき(ホバー)だけ左から伸ばす。
      線が戻るように見えず、左から右へ流れて見える */
   .link-draw::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px;
-    height: 1px;
-    background: currentColor;
+    @apply absolute inset-x-0 -bottom-0.5 h-px bg-current content-[''];
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 150ms var(--ease-out);
@@ -688,13 +695,7 @@ html.theme-transition::view-transition-new(root) {
   /* 英語名の最後の文字の右上に添えるきらめき。腕の先が文字の角に少し掛かる位置に置き、文字の後ろ(z-index:-1)に回す。
      英語名がせり上がりきる頃に、少し回りながら膨らんで現れる */
   .heading-reveal-spark {
-    position: absolute;
-    z-index: -1;
-    top: -0.14em;
-    right: -0.36em;
-    width: 0.44em;
-    height: 0.44em;
-    color: var(--color-accent);
+    @apply absolute -z-1 top-[-0.14em] right-[-0.36em] size-[0.44em] text-accent;
     opacity: 0;
     transform: scale(0.5) rotate(-45deg);
     transition:
@@ -704,39 +705,25 @@ html.theme-transition::view-transition-new(root) {
 
   /* 英語名と日本語名の間の斜線。背景の流れ星の斜線と同じモチーフ。日本語名と一緒に現れる */
   .heading-reveal-slash {
-    display: inline-block;
-    width: 1.5px;
-    height: 1.1em;
-    margin-right: 0.45em;
-    vertical-align: -0.2em;
-    background: currentColor;
-    opacity: 0.5;
-    rotate: 30deg;
+    @apply mr-[0.45em] inline-block h-[1.1em] w-[1.5px] rotate-30 bg-current align-[-0.2em] opacity-50;
   }
 
   /* 見出しの下の罫線。全幅の細い線の上に、アクセント色の短い線を左端だけ重ねる。
      英語名がせり上がるのに続けて、アクセント色の線→細い線の順に左から引かれる */
   .heading-reveal-rule,
   .heading-reveal-bar {
-    position: absolute;
-    left: 0;
+    @apply absolute left-0;
     transform: scaleX(0);
     transform-origin: left;
   }
 
   .heading-reveal-rule {
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: --alpha(var(--color-ink) / 12%);
+    @apply right-0 bottom-0 h-px bg-ink/12;
     transition: transform 1400ms var(--ease-out) 280ms;
   }
 
   .heading-reveal-bar {
-    bottom: -1px;
-    width: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-    height: 3px;
-    background: var(--color-accent);
+    @apply -bottom-px h-0.75 w-[clamp(2.5rem,1.5rem+3vw,4.5rem)] bg-accent;
     transition: transform 900ms var(--ease-out) 160ms;
   }
 
@@ -765,13 +752,13 @@ html.theme-transition::view-transition-new(root) {
   }
 
   .hero-reveal-line {
-    display: block;
+    @apply block;
     /* 下に伸びる文字(行間0.9のため g などが行の外にはみ出す)が欠けないよう、下側を広げて切り抜く */
     clip-path: inset(-0.1em -0.2em -0.25em -0.2em);
   }
 
   .hero-reveal-line-inner {
-    display: inline-block;
+    @apply inline-block;
     transform: translateY(115%);
     transition: transform 1200ms var(--ease-out);
   }
@@ -804,7 +791,7 @@ html.theme-transition::view-transition-new(root) {
   }
 
   #contact-complete:not([hidden]) .contact-complete-icon {
-    display: inline-block;
+    @apply inline-block;
     animation: contact-complete-icon-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms both;
   }
 

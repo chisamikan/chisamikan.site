@@ -35,10 +35,7 @@
   @reference "../styles/global.css";
 
   .page-loader {
-    @apply fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 bg-paper duration-[420ms] ease-[ease];
-    /* 複数プロパティ分のtransition-propertyのコンマがscoped styleの@apply内では
-       正しく処理できないため、プレーンCSSのまま残す */
-    transition-property: opacity, visibility;
+    @apply fixed inset-0 z-100 flex flex-col items-center justify-center gap-3 bg-paper transition-[opacity,visibility] duration-[420ms] ease-[ease];
     /* スクリプトの読み込み失敗などで is-hidden が付かなくてもページが見られなくならないよう、
        一定時間たったらCSSだけで読み込み画面を消す */
     animation: page-loader-failsafe 0s 10s forwards;
@@ -62,9 +59,7 @@
   }
 
   .page-loader-signature {
-    @apply h-auto;
-    /* min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    width: min(260px, 60vw);
+    @apply h-auto w-[min(260px,60vw)];
   }
 
   .page-loader-text {
