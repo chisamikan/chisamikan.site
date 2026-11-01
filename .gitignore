@@ -21,3 +21,5 @@ worker-configuration.d.ts
 
 # Others
 manual.md
+# scripts/build-icons.mjs が生成する
+src/styles/icons.css
