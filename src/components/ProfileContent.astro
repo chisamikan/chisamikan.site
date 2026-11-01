@@ -1,7 +1,11 @@
 ---
 // プロフィールの内容はGit管理するためコード上に直接記述する
 // (以前はNotionページから取得していたが、変更履歴をGitで追えるようにするため廃止)
+import { Image } from 'astro:assets';
 import SnsLinks from './SnsLinks.astro';
+// 元画像は1024pxあり、表示(最大192px)に対して大きすぎるため、ビルド時に表示サイズに合わせて縮小する。
+// public/images/profile-icon.webp は構造化データ(config.ts)の画像URLとして残している
+import profileIcon from '../assets/profile-icon.webp';
 
 interface Props {
   // トップページでは抜粋表示のため、Softwares/Skillsセクションを省略できるようにする
@@ -53,11 +57,14 @@ const skills = [
   center: プロフィールページ用。狭い画面では中央揃えの縦積み、md以上ではsplitと同じく
   アイコンを左・本文を右に置く2カラムにする -->
 <div class:list={[split ? 'grid items-center gap-8' : 'prose-custom md:grid md:items-start', 'md:grid-cols-[auto_1fr] md:gap-14 md:text-left']}>
-  <img
-    src="/images/profile-icon.webp"
+  <Image
+    src={profileIcon}
     alt="千紗みかん"
-    width="192"
-    height="192"
+    width={192}
+    height={192}
+    widths={[112, 192, 256, 384]}
+    sizes={split ? '(min-width: 768px) 192px, 112px' : '(min-width: 768px) 192px, (min-width: 640px) 128px, 96px'}
+    format="avif"
     class:list={['rounded-full object-cover shadow-pin md:h-48 md:w-48', split ? 'h-28 w-28' : 'mx-auto h-24 w-24 sm:h-32 sm:w-32 md:mx-0']}
   />
   <div class={split ? 'space-y-4' : 'space-y-6'}>
