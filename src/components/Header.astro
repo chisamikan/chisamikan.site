@@ -264,10 +264,16 @@ const isTop = currentPath === '/';
 
   // トップページでは、ファーストビュー(画面の高さ)を過ぎたら帯を表示する
   if (siteHeader?.classList.contains('is-overlay')) {
+    // ヘッダーの高さはResizeObserverで受け取る。offsetHeightを直接読むと、読み込み中に
+    // ページ全体のレイアウト計算を前倒しさせる(強制リフロー)ため。初回の判定もこの通知で行う
+    let headerHeight = 0;
     const updateSolid = () => {
-      siteHeader.classList.toggle('is-solid', window.scrollY > window.innerHeight - siteHeader.offsetHeight);
+      siteHeader.classList.toggle('is-solid', window.scrollY > window.innerHeight - headerHeight);
     };
-    updateSolid();
+    new ResizeObserver(([entry]) => {
+      headerHeight = entry.borderBoxSize[0].blockSize;
+      updateSolid();
+    }).observe(siteHeader);
     window.addEventListener('scroll', updateSolid, { passive: true });
     window.addEventListener('resize', updateSolid);
   }
