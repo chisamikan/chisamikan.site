@@ -62,8 +62,9 @@ const isTop = currentPath === '/';
       <label
         for="nav-toggle"
         class="nav-icon-toggle flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-[background-color,transform] duration-150 ease-out hover:bg-current/12 active:scale-[0.97] nav:hidden"
-        aria-label="メニューを開閉する"
       >
+        <!-- labelにはaria-labelを付けられないため、読み上げ用の文字は中に置く -->
+        <span class="sr-only">メニューを開閉する</span>
         <span class="nav-icon-bars">
           <span></span>
           <span></span>
