@@ -21,6 +21,20 @@ const { images } = Astro.props;
     />
   ))}
 </div>
+<!-- 静的生成のため、最初に見せる1枚はここで描画前にランダムに選び直す(以降はその次から順番通りに進む) -->
+<script is:inline>
+  document.querySelectorAll('.hero-slideshow').forEach((container) => {
+    const slides = container.querySelectorAll('.hero-slide');
+    const k = Math.floor(Math.random() * slides.length);
+    if (k === 0) return;
+    slides[0].classList.remove('is-active');
+    slides[0].style.opacity = '0';
+    slides[0].fetchPriority = 'low';
+    slides[k].classList.add('is-active');
+    slides[k].style.opacity = '';
+    slides[k].fetchPriority = 'high';
+  });
+</script>
 
 <!-- レンズフレア: グラデーションの円を重ねてゆっくり回転させるだけの演出。mix-blend-mode:overlayで下の写真と馴染ませる -->
 <div class="lens-flare pointer-events-none absolute inset-0" aria-hidden="true">
@@ -65,7 +79,7 @@ const { images } = Astro.props;
     const slides = container.querySelectorAll<HTMLImageElement>('.hero-slide');
     if (slides.length <= 1) return;
 
-    let current = 0;
+    let current = Array.from(slides).findIndex((slide) => slide.classList.contains('is-active'));
     setInterval(() => {
       const next = (current + 1) % slides.length;
       // 読み込みが終わっていない画像に切り替えると、その画像の遅い読み込み完了がLCPとして計測されてしまうため待つ
