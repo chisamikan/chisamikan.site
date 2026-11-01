@@ -1,38 +1,72 @@
 ---
 // ファーストビューの全画面イラストをスライドショー表示する。
 // 画像が1枚のみの場合は静止画のまま(不要なアニメーションを避ける)。
+import type { HeroImage } from '../lib/heroImages';
+
 interface Props {
-  images: string[];
+  images: HeroImage[];
 }
 
 const { images } = Astro.props;
 ---
 
+<!-- 画像のURLはdata-*に持たせておき、表示する画像にだけスクリプトでsrc/srcsetを入れる。
+  最初からURLを書くと、使わない画像までページの読み込み直後に一斉に読み込まれ、最初の1枚と回線を取り合うため -->
 <div class="hero-slideshow absolute inset-0 h-full w-full">
-  {images.map((src, i) => (
+  {images.map((image, i) => (
     <img
-      src={src}
+      data-src={image.src}
+      data-srcset={image.srcset}
+      sizes={image.sizes}
       alt="ファーストビューのイラスト"
       class={`hero-slide absolute inset-0 h-full w-full object-cover object-top${i === 0 ? ' is-active' : ''}`}
       style={i === 0 ? undefined : 'opacity: 0;'}
-      loading={i === 0 ? 'eager' : 'lazy'}
-      fetchpriority={i === 0 ? 'high' : 'low'}
+      fetchpriority="low"
       decoding="async"
     />
   ))}
 </div>
-<!-- 静的生成のため、最初に見せる1枚はここで描画前にランダムに選び直す(以降はその次から順番通りに進む) -->
+<!-- 静的生成のため、最初に見せる1枚はここで描画前にランダムに選び、その1枚だけ読み込みを始める。
+  以降はその次から順番通りに進み、表示中の画像の読み込みが終わってから次の1枚だけを読み込む -->
 <script is:inline>
+  function load(img) {
+    if (img.hasAttribute('src')) return;
+    if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+    img.src = img.dataset.src;
+  }
+
   document.querySelectorAll('.hero-slideshow').forEach((container) => {
     const slides = container.querySelectorAll('.hero-slide');
-    const k = Math.floor(Math.random() * slides.length);
-    if (k === 0) return;
-    slides[0].classList.remove('is-active');
-    slides[0].style.opacity = '0';
-    slides[0].fetchPriority = 'low';
-    slides[k].classList.add('is-active');
-    slides[k].style.opacity = '';
-    slides[k].fetchPriority = 'high';
+    let current = Math.floor(Math.random() * slides.length);
+    if (current !== 0) {
+      slides[0].classList.remove('is-active');
+      slides[0].style.opacity = '0';
+      slides[current].classList.add('is-active');
+      slides[current].style.opacity = '';
+    }
+    slides[current].fetchPriority = 'high';
+    load(slides[current]);
+    if (slides.length <= 1) return;
+
+    const loadNext = () => load(slides[(current + 1) % slides.length]);
+    if (slides[current].complete) loadNext();
+    else slides[current].addEventListener('load', loadNext, { once: true });
+
+    setInterval(() => {
+      const next = (current + 1) % slides.length;
+      // 読み込みが終わっていない画像に切り替えると、その画像の遅い読み込み完了がLCPとして計測されてしまうため待つ
+      // (srcが未設定のimgもcompleteがtrueになるため、srcの有無もあわせて確認する)
+      if (!slides[next].hasAttribute('src') || !slides[next].complete) return;
+      // current側はis-activeを外さない: 外すとズームが一瞬元に戻ってフェードアウトが不自然になる
+      slides[current].style.opacity = '0';
+      slides[next].style.opacity = '1';
+      // クラスを一度外して再度付けることでズームアニメーションを最初から再生させる(この時点ではopacity:0で不可視)
+      slides[next].classList.remove('is-active');
+      void slides[next].offsetWidth;
+      slides[next].classList.add('is-active');
+      current = next;
+      loadNext();
+    }, 5000);
   });
 </script>
 
@@ -73,25 +107,3 @@ const { images } = Astro.props;
     }
   }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLElement>('.hero-slideshow').forEach((container) => {
-    const slides = container.querySelectorAll<HTMLImageElement>('.hero-slide');
-    if (slides.length <= 1) return;
-
-    let current = Array.from(slides).findIndex((slide) => slide.classList.contains('is-active'));
-    setInterval(() => {
-      const next = (current + 1) % slides.length;
-      // 読み込みが終わっていない画像に切り替えると、その画像の遅い読み込み完了がLCPとして計測されてしまうため待つ
-      if (!slides[next].complete) return;
-      // current側はis-activeを外さない: 外すとズームが一瞬元に戻ってフェードアウトが不自然になる
-      slides[current].style.opacity = '0';
-      slides[next].style.opacity = '1';
-      // クラスを一度外して再度付けることでズームアニメーションを最初から再生させる(この時点ではopacity:0で不可視)
-      slides[next].classList.remove('is-active');
-      void slides[next].offsetWidth;
-      slides[next].classList.add('is-active');
-      current = next;
-    }, 5000);
-  });
-</script>

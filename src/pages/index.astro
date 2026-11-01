@@ -13,6 +13,7 @@ import { getGalleryItems, getNovelItems, getToolboxItems } from '../lib/notion';
 import { getAllNewsItems } from '../lib/news';
 import { getBoothItems } from '../lib/booth';
 import { site } from '../lib/config';
+import { optimizeHeroImage, type HeroImage } from '../lib/heroImages';
 
 const [gallery, novels, toolbox, news, shopItems] = await Promise.all([
   getGalleryItems(),
@@ -35,13 +36,13 @@ const featuredToolbox = toolbox.slice(0, 10);
 
 // ファーストビュー: ギャラリーで「slideshow」がオンの作品(NSFWは除外)をスライドショー表示する。
 // 対象が無ければ先頭作品、それも無ければ用意したイラストを使用する
-const slideshowImages = gallery
-  .filter((item) => item.slideshow && !item.nsfw && item.imageUrl)
-  .map((item) => item.imageUrl as string);
-const heroImages =
-  slideshowImages.length > 0
-    ? slideshowImages
-    : [gallery.find((item) => !item.nsfw && item.imageUrl)?.imageUrl ?? '/images/work-placeholder.svg'];
+const slideshowSources = gallery.filter((item) => item.slideshow && !item.nsfw && item.sourceImageUrl);
+const heroSources =
+  slideshowSources.length > 0 ? slideshowSources : gallery.filter((item) => !item.nsfw && item.sourceImageUrl).slice(0, 1);
+const heroImages: HeroImage[] =
+  heroSources.length > 0
+    ? await Promise.all(heroSources.map((item) => optimizeHeroImage(item.sourceImageUrl!, item.imageUrl!)))
+    : [{ src: '/images/work-placeholder.svg' }];
 ---
 
 <BaseLayout>
