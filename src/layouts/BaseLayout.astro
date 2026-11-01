@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PageLoader from '../components/PageLoader.astro';
+import signaturePathUrl from '../assets/loader-signature-path.txt?url';
 import BackgroundDecor from '../components/BackgroundDecor.astro';
 import '../styles/global.css';
 import { site, person, snsLinks } from '../lib/config';
@@ -74,6 +75,13 @@ const structuredData = {
           // sessionStorageが使えない場合は毎回表示するが、閲覧には支障がない
         }
       })();
+    </script>
+    <!-- 読み込み画面を出すときは、サインの文字の形(PageLoader)をここで高い優先度で取得し始める。
+      HTMLを読み終えてから取得すると、遅い回線では画像やフォントと回線を取り合い、読み込み画面が消えるまでに間に合わない -->
+    <script is:inline define:vars={{ signaturePathUrl }}>
+      if (!document.documentElement.classList.contains('skip-page-loader')) {
+        window.__loaderSignature = fetch(signaturePathUrl, { priority: 'high' }).then((res) => res.text());
+      }
     </script>
     <script>
       document.documentElement.classList.remove('no-js');
