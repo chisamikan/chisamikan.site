@@ -6,6 +6,7 @@ main = "./src/worker.ts"
 
 # Notion/RSSの更新を反映するため、30分おきにDeploy Hookを叩いて再ビルドする(src/worker.ts)
 # Deploy Hook URLはシークレット CF_DEPLOY_HOOK_URL で指定する
+# あわせて/rss.xmlの新着をDiscordへ通知する(Webhook URLはシークレット DISCORD_NEWS_WEBHOOK_URL。未設定なら通知しない)
 [triggers]
 crons = ["*/30 * * * *"]
 
@@ -14,7 +15,7 @@ directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "404-page"
 
-# アクセスカウンターの集計値を保存するKV namespace
+# アクセスカウンターの集計値と、Discordへ通知済みのお知らせの記録を保存するKV namespace
 [[kv_namespaces]]
 binding = "COUNTER_KV"
 id = "cd4e79834fdf48aca8f7d84620519502"
@@ -52,6 +53,6 @@ allowed_sender_addresses = ["no-reply@chisamikan.site"]
 # - ビルド時に使うもの(NOTION_TOKEN・各DB ID・RSS_FEED_URL・BOOTH_SHOP_URL・TURNSTILE_SITE_KEY):
 #   Workers & Pages > このWorker > Settings > Build > Variables and secrets
 # - API(/api/*)が実行時に使うシークレット(NOTION_TOKEN・TURNSTILE_SECRET_KEY・CONTACT_ADMIN_EMAIL・
-#   CONTACT_FALLBACK_EMAIL・DISCORD_WEBHOOK_URL・CF_DEPLOY_HOOK_URL):
+#   CONTACT_FALLBACK_EMAIL・DISCORD_WEBHOOK_URL・DISCORD_NEWS_WEBHOOK_URL・CF_DEPLOY_HOOK_URL):
 #   Workers & Pages > このWorker > Settings > Variables and Secrets(または wrangler secret put)
 #   ビルド時の値はWorkerのコードに埋め込まないため、こちらに無いとAPIが動きません。
