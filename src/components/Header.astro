@@ -19,7 +19,7 @@ const isTop = currentPath === '/';
 <header id="site-header" class:list={['site-header sticky top-0 z-40 h-18', isTop && 'is-overlay']}>
   <div class="site-header-inner flex h-full items-center gap-6 px-4 sm:px-8 lg:px-12">
     <a href="/" class="flex shrink-0 items-center gap-2.5 text-[22px] font-semibold tracking-[-0.02em]">
-      <img src="/favicon.svg" alt="" width="28" height="28" class="h-7 w-7 rounded-[5px]" />
+      <img id="site-logo" src="/favicon.svg" alt="" width="28" height="28" class="h-7 w-7 rounded-[5px]" />
       <span>chisamikan<span class="text-accent">.site</span></span>
     </a>
 
@@ -379,5 +379,22 @@ const isTop = currentPath === '/';
     if (!isSamePageAnchor) return;
 
     link.addEventListener('click', () => setMenuOpen(false));
+  });
+
+  // コナミコマンド(↑↑↓↓←→←→BA)を入力すると、ロゴを右回りに1回転させる(#201)。
+  // 直近10キーを保持して末尾と比較するため、途中で打ち間違えても続けて入力し直せる
+  const konami = 'arrowup,arrowup,arrowdown,arrowdown,arrowleft,arrowright,arrowleft,arrowright,b,a';
+  const recentKeys: string[] = [];
+  const siteLogo = document.getElementById('site-logo');
+
+  window.addEventListener('keydown', (event) => {
+    recentKeys.push(event.key.toLowerCase());
+    if (recentKeys.length > 10) recentKeys.shift();
+    if (recentKeys.join() !== konami) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    siteLogo?.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(360deg)' }], {
+      duration: 800,
+      easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+    });
   });
 </script>
