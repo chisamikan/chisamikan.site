@@ -21,7 +21,7 @@ export interface ArtworkItem {
   title: string;
   imageUrl: string | null;
   // 画像の取得元の直接のURL。Notionへアップロードした画像は数時間で失効する署名付きURLのため、
-  // ページには書き出さず、ビルド中の画像変換(ファーストビュー)の取得元にだけ使う
+  // ページには書き出さず、ビルド中の画像変換(ファーストビュー・トップページのカード)の取得元にだけ使う
   sourceImageUrl: string | null;
   tags: string[];
   description: string;
@@ -37,6 +37,8 @@ export interface ToolboxItem {
   title: string;
   url: string | null;
   imageUrl: string | null;
+  // ArtworkItem.sourceImageUrl と同じ(ビルド中の画像変換の取得元にだけ使う)
+  sourceImageUrl: string | null;
   description: string;
   createdTime: string;
 }
@@ -45,6 +47,8 @@ export interface NovelItem {
   id: string;
   title: string;
   imageUrl: string | null;
+  // ArtworkItem.sourceImageUrl と同じ(ビルド中の画像変換の取得元にだけ使う)
+  sourceImageUrl: string | null;
   tags: string[];
   description: string;
   kakuyomuUrl: string | null;
@@ -225,6 +229,7 @@ export async function getNovelItems(): Promise<NovelItem[]> {
       id: page.id,
       title: titleProp(props, 'Name'),
       imageUrl: imageProp(page, 'novels'),
+      sourceImageUrl: sourceImageProp(page),
       tags: tagsProp(props),
       description: richTextProp(props, 'Description'),
       kakuyomuUrl: urlProp(props, 'kakuyomu'),
@@ -291,6 +296,7 @@ export async function getToolboxItems(): Promise<ToolboxItem[]> {
       title: titleProp(props, 'Name'),
       url: urlProp(props, 'URL'),
       imageUrl: imageProp(page, 'toolbox'),
+      sourceImageUrl: sourceImageProp(page),
       description: richTextProp(props, 'Description'),
       createdTime: page.created_time,
     };

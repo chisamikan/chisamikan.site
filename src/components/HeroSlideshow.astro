@@ -1,10 +1,10 @@
 ---
 // ファーストビューの全画面イラストをスライドショー表示する。
 // 画像が1枚のみの場合は静止画のまま(不要なアニメーションを避ける)。
-import type { HeroImage } from '../lib/heroImages';
+import type { OptimizedImage } from '../lib/optimizeImages';
 
 interface Props {
-  images: HeroImage[];
+  images: OptimizedImage[];
 }
 
 const { images } = Astro.props;

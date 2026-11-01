@@ -13,7 +13,7 @@ import { getGalleryItems, getNovelItems, getToolboxItems } from '../lib/notion';
 import { getAllNewsItems } from '../lib/news';
 import { getBoothItems } from '../lib/booth';
 import { site } from '../lib/config';
-import { optimizeHeroImage, type HeroImage } from '../lib/heroImages';
+import { optimizeHeroImage, type OptimizedImage } from '../lib/optimizeImages';
 
 const [gallery, novels, toolbox, news, shopItems] = await Promise.all([
   getGalleryItems(),
@@ -39,7 +39,7 @@ const featuredToolbox = toolbox.slice(0, 10);
 const slideshowSources = gallery.filter((item) => item.slideshow && !item.nsfw && item.sourceImageUrl);
 const heroSources =
   slideshowSources.length > 0 ? slideshowSources : gallery.filter((item) => !item.nsfw && item.sourceImageUrl).slice(0, 1);
-const heroImages: HeroImage[] =
+const heroImages: OptimizedImage[] =
   heroSources.length > 0
     ? await Promise.all(heroSources.map((item) => optimizeHeroImage(item.sourceImageUrl!, item.imageUrl!)))
     : [{ src: '/images/work-placeholder.svg' }];
@@ -95,7 +95,7 @@ const heroImages: HeroImage[] =
       <CardSlider id="home-gallery-slider" count={featuredGallery.length}>
         {featuredGallery.map((item) => (
           <div class="h-full">
-            <Card type="artwork" item={item} />
+            <Card type="artwork" item={item} optimizeImage />
           </div>
         ))}
       </CardSlider>
@@ -111,7 +111,7 @@ const heroImages: HeroImage[] =
       <CardSlider id="home-novels-slider" count={featuredNovels.length}>
         {featuredNovels.map((item) => (
           <div class="h-full">
-            <Card type="novel" item={item} />
+            <Card type="novel" item={item} optimizeImage />
           </div>
         ))}
       </CardSlider>
@@ -127,7 +127,7 @@ const heroImages: HeroImage[] =
       <CardSlider id="home-toolbox-slider" count={featuredToolbox.length}>
         {featuredToolbox.map((item) => (
           <div class="h-full">
-            <Card type="toolbox" item={item} />
+            <Card type="toolbox" item={item} optimizeImage />
           </div>
         ))}
       </CardSlider>
