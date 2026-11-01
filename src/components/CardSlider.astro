@@ -187,9 +187,10 @@ const isSlider = count > 3;
       // 複製側になるため、inertにすると「見えているのに反応しない」カードができてしまう
       const cloneAll = () => originals.map((el) => el.cloneNode(true) as HTMLElement);
 
-      slider.prepend(...cloneAll());
+      // 本物の1枚目の手前に順に差し込むことで、複製ブロックの並び順を本物と揃える
+      cloneAll().forEach((el) => slider.insertBefore(el, originals[0]));
       const tailClones = cloneAll();
-      slider.append(...tailClones);
+      tailClones.forEach((el) => slider.appendChild(el));
 
       // 初期状態は1枚目(最新)のカードの左端が、セクションの見出しの左端に揃うようにする。
       // スライダーは見出しより左右にはみ出している(card-slider-fullbleed)ため、その
