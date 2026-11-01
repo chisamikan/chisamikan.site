@@ -6,6 +6,8 @@ export interface BoothItem {
   price: string;
   category: string | null;
   imageUrl: string | null;
+  // サムネイル(300px)の元になった、切り抜き前の大きな画像。トップページのカード画像はこれから変換する
+  sourceImageUrl: string | null;
   url: string;
 }
 
@@ -45,12 +47,15 @@ export async function getBoothItems(limit = 3): Promise<BoothItem[]> {
         const raw = JSON.parse(decodeHtmlEntities(match[1]));
         const url = safeLinkUrl(raw.shop_item_url ?? raw.url);
         if (!url) continue;
+        const imageUrl: string | null = raw.thumbnail_image_urls?.[0] ?? null;
         items.push({
           id: raw.id,
           title: raw.name,
           price: raw.price,
           category: raw.category?.name?.ja ?? raw.category?.name?.en ?? null,
-          imageUrl: raw.thumbnail_image_urls?.[0] ?? null,
+          imageUrl,
+          // サムネイルのURL(https://booth.pximg.net/c/300x300_a2_g5/…)から大きさ指定の部分を除くと元の画像になる
+          sourceImageUrl: imageUrl?.replace(/\/c\/[^/]+\//, '/') ?? null,
           url,
         });
       } catch {
