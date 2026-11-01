@@ -2,18 +2,28 @@
 import type { ArtworkItem, NovelItem, ToolboxItem } from '../lib/notion';
 import type { BoothItem } from '../lib/booth';
 import { isNewItem } from '../lib/isNew';
+import { optimizeCardImage } from '../lib/optimizeImages';
 
-type Props =
+type Props = (
   | { type: 'artwork'; item: ArtworkItem; headingLevel?: 2 | 3 }
   | { type: 'novel'; item: NovelItem; headingLevel?: 2 | 3 }
   | { type: 'toolbox'; item: ToolboxItem; headingLevel?: 2 | 3 }
-  | { type: 'shop'; item: BoothItem; headingLevel?: 2 | 3 };
+  | { type: 'shop'; item: BoothItem; headingLevel?: 2 | 3 }
+) & { optimizeImage?: boolean };
 
 const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
 const PLACEHOLDER = '/images/work-placeholder.svg';
 // 画像の配信元が404等を返した時に、壊れた画像アイコンではなく代わりの画像を出す
-const onImageError = `this.onerror=null;this.src='${PLACEHOLDER}'`;
+// (srcsetがあるとsrcの差し替えが効かないため、srcsetも外す)
+const onImageError = `this.onerror=null;this.removeAttribute('srcset');this.src='${PLACEHOLDER}'`;
+// optimizeImage(トップページ)では、ビルド時に変換したサムネイルを表示する。拡大表示(Lightbox)には元の画像を使う
+const thumbnail =
+  props.optimizeImage && props.type !== 'shop' && props.item.sourceImageUrl
+    ? await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!)
+    : undefined;
+const thumbSrc = thumbnail?.src ?? props.item.imageUrl;
+const thumbAttrs = { srcset: thumbnail?.srcset, sizes: thumbnail?.sizes };
 // サムネイル上に重ねるタグの上限。多いと重ね表示が膨らんでイラストを覆うため、残りは「+N」にまとめる
 const MAX_TAGS = 3;
 // BOOTH商品(shop)は追加日時を取得できないため対象外
@@ -34,7 +44,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
           aria-label={props.item.nsfw ? `${props.item.title}(NSFW)を拡大表示` : `${props.item.title}を拡大表示`}
         >
           <img
-            src={props.item.imageUrl}
+            src={thumbSrc}
+            {...thumbAttrs}
             alt={props.item.title}
             loading="lazy"
             onerror={onImageError}
@@ -121,7 +132,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
   >
     <div class="relative aspect-square w-full overflow-hidden bg-paper-dim">
       <img
-        src={props.item.imageUrl ?? PLACEHOLDER}
+        src={thumbSrc ?? PLACEHOLDER}
+        {...thumbAttrs}
         alt={props.item.imageUrl ? props.item.title : ''}
         loading="lazy"
             onerror={onImageError}
@@ -171,7 +183,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
           aria-label={`${props.item.title}を開く`}
         >
           <img
-            src={props.item.imageUrl ?? PLACEHOLDER}
+            src={thumbSrc ?? PLACEHOLDER}
+            {...thumbAttrs}
             alt={props.item.imageUrl ? props.item.title : ''}
             loading="lazy"
             onerror={onImageError}
@@ -183,7 +196,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         </a>
       ) : (
         <div class="relative flex aspect-square w-full cursor-default items-center justify-center overflow-hidden bg-paper-dim" aria-hidden="true">
-          <img src={props.item.imageUrl ?? PLACEHOLDER} alt="" loading="lazy" onerror={onImageError} class="h-full w-full object-cover object-top" />
+          <img src={thumbSrc ?? PLACEHOLDER} {...thumbAttrs} alt="" loading="lazy" onerror={onImageError} class="h-full w-full object-cover object-top" />
         </div>
       )}
       {isNew && (
