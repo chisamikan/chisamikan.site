@@ -61,8 +61,9 @@ export function optimizeHeroImage(sourceUrl: string, fallbackUrl: string): Promi
 }
 
 // トップページのカードのサムネイル。カードは正方形に上端揃えで切り抜いて表示する(object-cover object-top)ため、
-// 同じ切り抜き方の正方形にして無駄な部分を送らない。表示幅はスマホで画面幅の85%、PCで約19〜24rem
-const CARD_WIDTHS = [400, 800, 1200];
+// 同じ切り抜き方の正方形にして無駄な部分を送らない。表示幅はスマホで画面幅の85%、PCで約19〜24rem。
+// スマホ(表示約350px×画素密度1.75〜2)では600〜700px必要になり、400の次が800だと大きすぎるものを送るため640を挟む
+const CARD_WIDTHS = [400, 640, 800, 1200];
 
 export function optimizeCardImage(sourceUrl: string, fallbackUrl: string): Promise<OptimizedImage> {
   return optimize(sourceUrl, fallbackUrl, async (width, height) => {
