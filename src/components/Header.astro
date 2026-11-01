@@ -17,7 +17,9 @@ const isTop = currentPath === '/';
 <!-- 高さは下端の区切り線込みで h-18(4.5rem)に固定する。トップのファーストビューの引き上げや
   メニュー位置・スクロール位置の補正は、この値を前提にしている -->
 <header id="site-header" class:list={['site-header sticky top-0 z-40 h-18', isTop && 'is-overlay']}>
-  <div class="site-header-inner flex h-full items-center gap-6 px-4 sm:px-8 lg:px-12">
+  <!-- iPhoneを横向きにした時、ロゴやナビがノッチ等に重ならないよう、左右の余白(--header-px)を安全領域の分だけ広げる。
+    帯の背景(.site-header)は画面の端まで伸ばしたままにする -->
+  <div class="flex h-full items-center gap-6 [--header-px:1rem] pl-[max(var(--header-px),env(safe-area-inset-left,0px))] pr-[max(var(--header-px),env(safe-area-inset-right,0px))] sm:[--header-px:2rem] lg:[--header-px:3rem]">
     <a href="/" class="flex shrink-0 items-center gap-2.5 text-[22px] font-semibold tracking-[-0.02em]">
       <img id="site-logo" src="/favicon.svg" alt="" width="28" height="28" class="h-7 w-7 rounded-[5px]" />
       <span>chisamikan<span class="text-accent">.site</span></span>
@@ -73,14 +75,17 @@ const isTop = currentPath === '/';
   </div>
 </header>
 
+<!-- 画面全体を覆い、ヘッダー(z-40)はその上に重ねる。トップページのヘッダーは
+  透明なため、ヘッダーの下から始めると上端に裏のページが帯状に覗いてしまう -->
 <nav
   aria-label="サイト内ナビゲーション（モバイル）"
-  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 z-30 -translate-y-4 bg-paper/80 opacity-0 backdrop-blur-xl transition duration-200 ease-out motion-reduce:translate-y-0 peer-checked:pointer-events-auto peer-checked:duration-250 peer-checked:translate-y-0 peer-checked:opacity-100 nav:hidden"
+  class="mobile-nav-overlay pointer-events-none fixed inset-x-0 top-0 z-30 h-dvh pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)] -translate-y-4 bg-paper/80 opacity-0 backdrop-blur-xl transition duration-200 ease-out motion-reduce:translate-y-0 peer-checked:pointer-events-auto peer-checked:duration-250 peer-checked:translate-y-0 peer-checked:opacity-100 nav:hidden"
 >
   <!-- 区切り線を画面の横幅いっぱいに引くため、左右の余白はリスト側ではなく各行(リンク)に持たせる。
     行全体をリンクにしてタップできる範囲も広げる。表示中のページは、行の左端のアクセント色の線と
-    文字色・ごく薄い色の敷きで示す -->
-  <ul class="mobile-nav-list absolute inset-x-0 flex -translate-y-1/2 flex-col divide-y divide-ink/10 border-y border-ink/10">
+    文字色・ごく薄い色の敷きで示す。
+    項目の中央揃えは、ヘッダーに隠れない見えている範囲を基準にするため、ヘッダーの高さ(h-18 = 4.5rem)の半分だけ下にずらす -->
+  <ul class="mobile-nav-list absolute inset-x-0 top-[calc(50%+2.25rem)] flex -translate-y-1/2 flex-col divide-y divide-ink/10 border-y border-ink/10">
     {nav.map((item) => (
       <li>
         <a
@@ -118,8 +123,7 @@ const isTop = currentPath === '/';
   @reference "../styles/global.css";
 
   .site-header {
-    @apply border-b border-ink/10 bg-paper/80 text-ink backdrop-blur-xl;
-    transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+    @apply border-b border-ink/10 bg-paper/80 text-ink backdrop-blur-xl transition-[background-color,color,border-color] duration-250 ease-[ease];
     /* ページ間のビュートランジション(global.css)で、ヘッダーだけはページと一緒に
        フェードさせず、その場に留めて見せる */
     view-transition-name: site-header;
@@ -127,9 +131,8 @@ const isTop = currentPath === '/';
 
   /* トップページでファーストビューに重なっている間は、帯を消してイラストを見せる */
   .site-header.is-overlay:not(.is-solid) {
-    @apply border-transparent bg-transparent text-white backdrop-blur-none;
     /* 明るいイラストの上でも白文字が読めるよう、ごく薄い影を添える */
-    text-shadow: 0 1px 8px rgba(4, 18, 36, 0.45);
+    @apply border-transparent bg-transparent text-white backdrop-blur-none text-shadow-[0_1px_8px_rgba(4,18,36,0.45)];
   }
 
   /* メニュー展開中は紙色のメニューの上に重なるため、トップページでも通常の帯に戻す */
@@ -166,29 +169,6 @@ const isTop = currentPath === '/';
     }
   }
 
-  /* iPhoneを横向きにした時、ロゴやナビがノッチ等に重ならないよう、安全領域の分だけ内側に寄せる。
-     帯の背景(.site-header)は画面の端まで伸ばしたままにする */
-  .site-header-inner {
-    padding-left: max(var(--header-px), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--header-px), env(safe-area-inset-right, 0px));
-    --header-px: 1rem;
-  }
-  @media (min-width: 640px) {
-    .site-header-inner { --header-px: 2rem; }
-  }
-  @media (min-width: 1024px) {
-    .site-header-inner { --header-px: 3rem; }
-  }
-
-  .mobile-nav-overlay {
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-    /* 画面全体を覆い、ヘッダー(z-40)はその上に重ねる。トップページのヘッダーは
-       透明なため、ヘッダーの下から始めると上端に裏のページが帯状に覗いてしまう */
-    top: 0;
-    height: 100dvh;
-  }
-
   /* メニューを開いた時、項目を上から順に少しずつ時間差で現れさせる(全体で0.3秒以内)。
      閉じる時は待たせず、まとめて素早く消す */
   .mobile-nav-list > li {
@@ -212,12 +192,6 @@ const isTop = currentPath === '/';
     .mobile-nav-list > li {
       transform: none !important;
     }
-  }
-
-  .mobile-nav-list {
-    /* 項目の中央揃えは、ヘッダーに隠れない見えている範囲を基準にするため、
-       ヘッダーの高さ(h-18 = 4.5rem)の半分だけ下にずらす */
-    top: calc(50% + 2.25rem);
   }
 
   /* 横向きで縦の表示領域が狭い端末では9項目の縦積みが画面に収まらないため、
@@ -252,7 +226,7 @@ const isTop = currentPath === '/';
 
   .nav-icon-bars span:nth-child(2),
   .nav-icon-bars span:nth-child(3) {
-    @apply top-[7px];
+    @apply top-1.75;
   }
 
   /* span:nth-child(3) は span:nth-child(2) と完全に重なるため、両方表示すると
@@ -262,7 +236,7 @@ const isTop = currentPath === '/';
   }
 
   .nav-icon-bars span:nth-child(4) {
-    @apply top-[14px];
+    @apply top-3.5;
   }
 
   /* 開くと上下の線は中央へ寄りながら縮んで消え、真ん中の2本が×に交差する */

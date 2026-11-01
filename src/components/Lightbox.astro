@@ -19,15 +19,15 @@
   </figure>
 </dialog>
 
-<dialog id="nsfw-warning" class="nsfw-warning-dialog">
-  <button type="button" id="nsfw-warning-close" aria-label="閉じる" class="nsfw-warning-close">
+<dialog id="nsfw-warning" class="modal-dialog">
+  <button type="button" id="nsfw-warning-close" aria-label="閉じる" class="modal-close">
     <i class="fa-solid fa-xmark"></i>
   </button>
-  <p class="nsfw-warning-title"><i class="fa-solid fa-triangle-exclamation"></i>閲覧注意</p>
-  <p class="nsfw-warning-body">
+  <p class="modal-title"><i class="fa-solid fa-triangle-exclamation"></i>閲覧注意</p>
+  <p class="modal-body">
     この作品には、性的・暴力的な表現など、閲覧に注意が必要な内容が含まれています。
   </p>
-  <div class="nsfw-warning-actions">
+  <div class="mt-6 flex justify-end gap-3">
     <button type="button" id="nsfw-warning-cancel" class="btn-glass-ghost">やめる</button>
     <button type="button" id="nsfw-warning-confirm" class="btn-glass btn-glass-accent">同意して見る</button>
   </div>
@@ -39,28 +39,12 @@
   .lightbox-dialog {
     /* Tailwindのpreflight(* { margin: 0 })がdialogのUAデフォルト margin: auto を
        打ち消してしまうため、中央寄せを明示的に指定し直す */
-    @apply fixed inset-0 m-auto max-h-[85dvh] p-0 overflow-visible border-none bg-transparent;
-    /* min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    max-width: min(90vw, 900px);
-  }
-
-  .lightbox-dialog::backdrop {
-    @apply opacity-0 transition-opacity duration-200 ease-[ease];
-    /* rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    background: rgba(4, 18, 36, 0.85);
-  }
-
-  /* 開く時は280ms、閉じる時(基本の状態へ戻る時)は200msと、閉じる側を速くする */
-  .lightbox-dialog.is-open::backdrop {
-    @apply opacity-100 duration-280;
+    @apply fixed inset-0 m-auto max-h-[85dvh] max-w-[min(90vw,900px)] p-0 overflow-visible border-none bg-transparent;
   }
 
   .lightbox-dialog img {
-    @apply block max-h-[85dvh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0;
-    /* min()/rgba()のコンマ、および is-visible時の transform: scale(1) と同じプロパティを
-       扱う都合上、この3行のみプレーンCSSのまま残す */
-    max-width: min(90vw, 900px);
-    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
+    @apply block max-h-[85dvh] w-auto h-auto rounded-[2px] cursor-zoom-out opacity-0 max-w-[min(90vw,900px)] shadow-[0_12px_32px_-8px_rgba(4,18,36,0.5)];
+    /* 開閉で opacity と transform のカーブを変えるため、transform/transition はプレーンCSSのまま残す */
     transform: scale(0.95);
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
@@ -90,10 +74,8 @@
   }
 
   .lightbox-caption {
-    @apply mt-3 w-full text-left opacity-0;
-    /* 縦長の画像でも文章が細く折り返されすぎないよう最小幅を持たせる。
-       min()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    min-width: min(80vw, 20rem);
+    /* 縦長の画像でも文章が細く折り返されすぎないよう最小幅を持たせる */
+    @apply mt-3 w-full min-w-[min(80vw,20rem)] text-left opacity-0;
     transform: translateY(8px);
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
@@ -110,7 +92,7 @@
   }
 
   .lightbox-close {
-    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-white bg-transparent border-none cursor-pointer opacity-0;
+    @apply absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-2xl leading-none text-white bg-transparent border-none cursor-pointer opacity-0 hover:text-accent;
     transform: scale(0.95);
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   }
@@ -121,67 +103,13 @@
     transition-duration: 0.28s;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .lightbox-close:hover {
-      @apply text-accent;
-    }
-  }
-
-  .nsfw-warning-dialog {
-    @apply fixed inset-0 m-auto p-7 border border-ink/10 rounded-lg bg-paper text-ink opacity-0;
-    /* min()/rgba()のコンマがscoped styleの@apply内では正しく処理できないため、プレーンCSSのまま残す */
-    max-width: min(90vw, 420px);
-    box-shadow: 0 12px 32px -8px rgba(4, 18, 36, 0.5);
-    transform: scale(0.95);
-    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
-  }
-
-  .nsfw-warning-dialog.is-open {
-    @apply opacity-100;
-    transform: scale(1);
-    transition-duration: 0.28s;
-  }
-
-  .nsfw-warning-dialog::backdrop {
-    @apply opacity-0 transition-opacity duration-200 ease-[ease];
-    background: rgba(4, 18, 36, 0.85);
-  }
-
-  .nsfw-warning-dialog.is-open::backdrop {
-    @apply opacity-100 duration-280;
-  }
-
   /* 視差効果を減らす設定では、拡大・せり上がりをなくして透明度の変化だけで開閉する
      (閉じる処理はopacityのtransitionendを待つため、transition自体は無効にしない) */
   @media (prefers-reduced-motion: reduce) {
     .lightbox-dialog img,
     .lightbox-caption,
-    .lightbox-close,
-    .nsfw-warning-dialog {
+    .lightbox-close {
       transform: none !important;
-    }
-  }
-
-  .nsfw-warning-title {
-    @apply text-lg font-semibold mb-2;
-    font-family: var(--font-display, inherit);
-  }
-
-  .nsfw-warning-body {
-    @apply text-sm leading-[1.6] text-ink/75;
-  }
-
-  .nsfw-warning-actions {
-    @apply flex justify-end gap-3 mt-6;
-  }
-
-  .nsfw-warning-close {
-    @apply absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-xl leading-none text-ink/50 bg-transparent border-none rounded-full cursor-pointer;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .nsfw-warning-close:hover {
-      @apply text-ink bg-ink/8;
     }
   }
 

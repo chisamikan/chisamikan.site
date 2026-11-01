@@ -90,25 +90,19 @@ const isSlider = count > 3;
      されたセクション)の幅に対する割合だが、そのセクション自体が画面中央に配置されているため、
      この方法でも画面全体を基準に中央寄せできる。画面が狭い場合はmin()により100vwに収まる */
   .card-slider-fullbleed {
-    width: min(100vw, 76rem);
-    margin-left: calc(50% - min(50vw, 38rem));
+    @apply w-[min(100vw,76rem)] ml-[calc(50%-min(50vw,38rem))] -mt-11;
     /* 内側のスライダーに付けているpy-11(影・ホバー用の余白)がそのままレイアウト上の高さにも
        乗ってしまい、前後の要素(見出し/「すべて見る」ボタン)を押し下げてしまうため、
        同じ分だけ上のマージンを引いて打ち消す。見た目の余白(影の逃げ場)自体は
        内側のoverflowにより保たれたまま、見出しとの間隔だけ元の位置に戻る */
-    margin-top: -2.75rem;
-    /* 下側は同じ-2.75remにすると、下に続く要素側のmt-10(隣接マージンの相殺)と合わさって
-       ページネーションドットとボタンが近づきすぎ、誤タップしやすくなってしまう。
-       打ち消しをやめて0にすることで、隣接マージンがmt-10の40pxそのまま活き、
-       ドットとボタンの間に元のカード〜ボタン間と同じだけの間隔を確保する */
-    margin-bottom: 0;
+    /* 下側は打ち消さない。下に続く要素のmt-10と相殺され、ドットとボタンが近づきすぎて誤タップしやすくなるため */
   }
 
   .card-slider {
     scrollbar-width: none;
   }
   .card-slider::-webkit-scrollbar {
-    display: none;
+    @apply hidden;
   }
 
   /* 両端のカードがoverflow-x-autoの境界でぶつ切りにならないよう、端をグラデーションで
@@ -141,18 +135,9 @@ const isSlider = count > 3;
     /* カードの左端を見出しの左端に揃えて止める。スライダーは見出しより左右にはみ出して
        いるため、スライダーの左端ではなく、JSでscroll-padding-inline-startに設定する
        はみ出し分(--card-slider-inset)だけ内側の位置にスナップさせる */
-    scroll-snap-align: start;
-    flex: none;
-    width: 85%;
-    height: auto;
     /* flexアイテムはmin-heightの初期値がauto(0ではない)のため、中身(説明文など)が
-       stretchされた高さより大きいと箱ごと膨らんでしまう。0にして確実に高さを揃える */
-    min-height: 0;
-  }
-  @media (min-width: 640px) {
-    .card-slider > :global(*) {
-      width: 19rem;
-    }
+       stretchされた高さより大きいと箱ごと膨らんでしまう。min-h-0にして確実に高さを揃える */
+    @apply snap-start flex-none w-[85%] h-auto min-h-0 sm:w-76;
   }
 
   .card-slider-nav {
