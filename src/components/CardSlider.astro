@@ -68,7 +68,7 @@ const isSlider = count > 3;
 
   {/* カルーセルであることを示すためのページネーションドット。本物のカード1枚につき1つ表示し、
       現在左端(見出しの左端の位置)に表示されているカードに合わせてJSからis-activeを切り替える */}
-  <div class="mt-3 flex flex-wrap items-center justify-center gap-2" data-slider-dots role="tablist" aria-label="表示中のカード">
+  <div class="mt-3 flex flex-wrap items-center justify-center gap-2" data-slider-dots role="group" aria-label="表示中のカード">
     {Array.from({ length: count }).map((_, i) => (
       <button
         type="button"
