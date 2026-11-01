@@ -141,8 +141,13 @@ const structuredData = {
       }
       gtag('js', new Date());
       gtag('config', 'G-XZSD8BQ5DE');
+
+      // gtag.js(約170KB)は、最初の表示に必要な読み込みと回線・CPUを取り合わないよう、ページの読み込み後に読み込む。
+      // それまでの gtag() の呼び出しは dataLayer に溜まり、読み込まれた時点でまとめて送信される
+      window.addEventListener('load', () =>
+        document.head.append(Object.assign(document.createElement('script'), { src: 'https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE' })),
+      );
     </script>
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE"></script>
 	
   </head>
   <body>
