@@ -7,8 +7,10 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
+    "predev": "node scripts/build-icons.mjs",
     "dev": "astro dev",
-    "start": "astro dev",
+    "start": "npm run dev",
+    "prebuild": "node scripts/build-icons.mjs",
     "build": "astro build",
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
@@ -27,6 +29,9 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261023.1",
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/free-regular-svg-icons": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "wrangler": "^4.152.0"
   },
   "overrides": {

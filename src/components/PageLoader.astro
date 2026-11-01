@@ -1,7 +1,7 @@
 ---
 // 全ページ共通の初回表示ローディング演出。手描きのサインをペンでなぞるように、
 // マスク用の線をstroke-dasharray/dashoffsetで少しずつ描画し、その下のサイン文字を
-// 徐々に浮かび上がらせる。ページの読み込み完了(window load)を待ってフェードアウトする。
+// 徐々に浮かび上がらせる。最初に見せる画像とフォントの読み込みを待ってフェードアウトする。
 // 参考: https://knap.jp/blog/seisaku-fujii-20240521
 ---
 
@@ -138,11 +138,30 @@
       }, wait);
     };
 
-    if (document.readyState === 'complete') {
-      hide();
-    } else {
-      window.addEventListener('load', hide, { once: true });
-    }
+    // 最初に見せる画像(fetchpriority="high"。トップのファーストビューの1枚)とフォントの読み込みを待って消す。
+    // window の load はページ下部のカード画像まで待つため、待ち時間が長くなりすぎる。
+    // フォントは待たないと、読み込み画面が消えた後に文字が描き直されてカクついて見える。
+    // 回線が遅くなかなか届かない場合も、MAX_WAIT_MS で打ち切ってページを見せる
+    const MAX_WAIT_MS = 3000;
+    const loaded = (el: HTMLImageElement | HTMLLinkElement) =>
+      new Promise((resolve) => {
+        el.addEventListener('load', resolve, { once: true });
+        el.addEventListener('error', resolve, { once: true });
+      });
+    const images = Array.from(document.querySelectorAll<HTMLImageElement>('img[fetchpriority="high"]'))
+      .filter((img) => !img.complete)
+      .map(loaded);
+    // Google FontsのCSSは非同期で読み込む(BaseLayout)ため、CSSが届いてから、ページで使われている
+    // フォントの読み込みを待つ。レイアウトを確定させないとフォントの読み込みが始まらないため、先に確定させる
+    const fontCss = document.querySelector<HTMLLinkElement>('link[href^="https://fonts.googleapis.com/"]');
+    const fonts = (fontCss && !fontCss.sheet ? loaded(fontCss) : Promise.resolve()).then(() => {
+      void document.body.offsetHeight;
+      return document.fonts.ready;
+    });
+    Promise.race([
+      Promise.all([...images, fonts]),
+      new Promise((resolve) => window.setTimeout(resolve, MAX_WAIT_MS)),
+    ]).then(hide);
 
     // bfcacheで復元された場合はアニメーションなしで即座に非表示にする
     window.addEventListener('pageshow', (event) => {

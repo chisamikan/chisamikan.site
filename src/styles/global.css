@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* 使っているアイコンだけをSVGにしたCSS(scripts/build-icons.mjs が生成)。Tailwindのユーティリティ(hidden など)で上書きできるよう components 層に置く */
+@import './icons.css' layer(components);
 
 /* ヘッダーのトグル/端末のダーク設定で <html> に付与する .dark クラスでダークモードを切り替える */
 @custom-variant dark (&:where(.dark, .dark *));

@@ -18,6 +18,9 @@ const WIDTHS = [640, 960, 1280, 1920];
  * @param fallbackUrl 変換できなかった場合に表示するURL
  */
 export async function optimizeHeroImage(sourceUrl: string, fallbackUrl: string): Promise<HeroImage> {
+  // 開発サーバーでは画像を表示のたびにその場で変換するうえ、Notionの署名付きURLがリロードのたびに変わって
+  // ブラウザのキャッシュも効かないため、毎回約1秒待たされる。開発中は変換せずに表示する
+  if (import.meta.env.DEV) return { src: fallbackUrl };
   try {
     // 元画像の大きさを取得する。ここで取得できない画像は、ビルドの最後にまとめて行われる変換でも
     // 失敗してビルド全体が止まるため、この時点で変換の対象から外す

@@ -27,7 +27,7 @@ const { images } = Astro.props;
   ))}
 </div>
 <!-- 静的生成のため、最初に見せる1枚はここで描画前にランダムに選び、その1枚だけ読み込みを始める。
-  以降はその次から順番通りに進み、表示中の画像の読み込みが終わってから次の1枚だけを読み込む -->
+  以降はその次から順番通りに進み、次の1枚だけを先に読み込んでおく -->
 <script is:inline>
   function load(img) {
     if (img.hasAttribute('src')) return;
@@ -49,8 +49,8 @@ const { images } = Astro.props;
     if (slides.length <= 1) return;
 
     const loadNext = () => load(slides[(current + 1) % slides.length]);
-    if (slides[current].complete) loadNext();
-    else slides[current].addEventListener('load', loadNext, { once: true });
+    // 2枚目はページ全体の読み込み(表示中の1枚目を含む)が終わってから読み込み、最初の表示に必要な読み込みと回線を取り合わない
+    window.addEventListener('load', loadNext, { once: true });
 
     setInterval(() => {
       const next = (current + 1) % slides.length;
