@@ -91,7 +91,9 @@ const structuredData = {
         window.__loaderSignature = fetch(signaturePathUrl, { priority: 'high' }).then((res) => res.text());
       }
     </script>
-    <script>
+    <!-- is:inline が無いとAstroが type="module" にしてHTMLを読み終えるまで実行を遅らせるため、
+      HTMLの大きいページ(ギャラリー等)では、見出し等がJS無効時の表示済みの状態で出たあと、no-jsが外れた瞬間に隠れる状態へ動いてしまう -->
+    <script is:inline>
       document.documentElement.classList.remove('no-js');
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
