@@ -57,6 +57,10 @@ const structuredData = {
       media属性で端末設定に任せず、直後のスクリプトとHeader.astroのapplyStateで値を書き換える -->
     <meta name="theme-color" content="#e8f0fa" />
     <script is:inline>
+      // no-js はここ(初回描画前)で外す。is:inline でないスクリプトはAstroが type="module" にしてHTMLを読み終えるまで
+      // 実行を遅らせるため、HTMLの大きいページ(ギャラリー等)では、見出し等がJS無効時の表示済みの状態で出たあと、
+      // no-jsが外れた瞬間に隠れる状態へ動いてしまう
+      document.documentElement.classList.remove('no-js');
       // 初回描画前にテーマを確定させ、ちらつき(FOUC)を防ぐ。
       // 明示的な保存済み設定(localStorage)があればそれを優先し、無ければ端末の設定(prefers-color-scheme)に従う。
       (function () {
@@ -90,11 +94,6 @@ const structuredData = {
       if (!document.documentElement.classList.contains('skip-page-loader')) {
         window.__loaderSignature = fetch(signaturePathUrl, { priority: 'high' }).then((res) => res.text());
       }
-    </script>
-    <!-- is:inline が無いとAstroが type="module" にしてHTMLを読み終えるまで実行を遅らせるため、
-      HTMLの大きいページ(ギャラリー等)では、見出し等がJS無効時の表示済みの状態で出たあと、no-jsが外れた瞬間に隠れる状態へ動いてしまう -->
-    <script is:inline>
-      document.documentElement.classList.remove('no-js');
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
