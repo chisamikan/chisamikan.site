@@ -1,6 +1,6 @@
 import { isFullDatabase, isFullPage, iteratePaginatedAPI } from '@notionhq/client';
 import type { PageObjectResponse, QueryDataSourceParameters } from '@notionhq/client/build/src/api-endpoints';
-import { createNotionClient, type ImageKind } from './notionClient';
+import { createNotionClient, directImageUrl, imageFile, type ImageKind } from './notionClient';
 import { safeLinkUrl } from './url';
 
 // ビルド時(静的ページの生成)専用のモジュール。Workerで動くAPIルートからは import しないこと
@@ -8,7 +8,7 @@ import { safeLinkUrl } from './url';
 // トークンが無い場合はエラーで止めず空の一覧を返す
 const token = import.meta.env.NOTION_TOKEN;
 
-export const notion = token ? createNotionClient(token) : null;
+const notion = token ? createNotionClient(token) : null;
 
 function warnMissingToken(context: string) {
   console.warn(`[notion] NOTION_TOKEN が設定されていないため "${context}" は空で表示します。`);
@@ -125,17 +125,6 @@ function imageProp(page: PageObjectResponse, kind: ImageKind): string | null {
   return file.type === 'external' ? file.external.url : `/api/image/${kind}/${page.id}`;
 }
 
-function sourceImageProp(page: PageObjectResponse): string | null {
-  const file = imageFile(page);
-  if (!file) return null;
-  return file.type === 'external' ? file.external.url : file.file.url;
-}
-
-function imageFile(page: PageObjectResponse) {
-  const prop = page.properties.Image;
-  return prop?.type === 'files' ? prop.files[0] : undefined;
-}
-
 // Notion APIはデータベースを直接クエリできないため、まずデータソースIDを取得してからクエリする。
 // 1回の取得上限は100件のため、iteratePaginatedAPIで全ページを辿って全件取得する。
 async function queryDatabase(
@@ -194,7 +183,7 @@ export async function getGalleryItems(): Promise<ArtworkItem[]> {
       id: page.id,
       title: titleProp(props, 'Name'),
       imageUrl: imageProp(page, 'gallery'),
-      sourceImageUrl: sourceImageProp(page),
+      sourceImageUrl: directImageUrl(page),
       tags: tagsProp(props),
       description: richTextProp(props, 'Description'),
       date: dateProp(props, 'Date')?.start ?? null,
@@ -229,7 +218,7 @@ export async function getNovelItems(): Promise<NovelItem[]> {
       id: page.id,
       title: titleProp(props, 'Name'),
       imageUrl: imageProp(page, 'novels'),
-      sourceImageUrl: sourceImageProp(page),
+      sourceImageUrl: directImageUrl(page),
       tags: tagsProp(props),
       description: richTextProp(props, 'Description'),
       kakuyomuUrl: urlProp(props, 'kakuyomu'),
@@ -296,7 +285,7 @@ export async function getToolboxItems(): Promise<ToolboxItem[]> {
       title: titleProp(props, 'Name'),
       url: urlProp(props, 'URL'),
       imageUrl: imageProp(page, 'toolbox'),
-      sourceImageUrl: sourceImageProp(page),
+      sourceImageUrl: directImageUrl(page),
       description: richTextProp(props, 'Description'),
       createdTime: page.created_time,
     };
@@ -320,14 +309,15 @@ export async function getManualNewsItems(): Promise<ManualNewsItem[]> {
   const pages = await queryPublishedDatabase(dbId, 'Date');
   return pages.map((page) => {
     const props = page.properties;
+    const bodySegments =
+      props.Body?.type === 'rich_text'
+        ? props.Body.rich_text.map((t) => ({ text: t.plain_text, href: safeLinkUrl(t.href) }))
+        : [];
     return {
       id: page.id,
       title: titleProp(props, 'Name'),
-      body: richTextProp(props, 'Body'),
-      bodySegments:
-        props.Body?.type === 'rich_text'
-          ? props.Body.rich_text.map((t) => ({ text: t.plain_text, href: safeLinkUrl(t.href) }))
-          : [],
+      body: bodySegments.map((seg) => seg.text).join(''),
+      bodySegments,
       date: dateProp(props, 'Date')?.start ?? null,
       url: urlProp(props, 'URL'),
       createdTime: page.created_time,

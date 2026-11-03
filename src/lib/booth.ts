@@ -1,3 +1,4 @@
+import { decodeEntities } from './decodeEntities';
 import { safeLinkUrl } from './url';
 
 export interface BoothItem {
@@ -17,15 +18,6 @@ export interface BoothItem {
 const DATA_ITEM_PATTERN =
   /<li class="js-mount-point-shop-item-card contents"[^>]*data-item="([^"]*)"/g;
 
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&');
-}
-
 export async function getBoothItems(limit = 3): Promise<BoothItem[]> {
   const shopUrl = import.meta.env.BOOTH_SHOP_URL;
   if (!shopUrl) {
@@ -44,7 +36,7 @@ export async function getBoothItems(limit = 3): Promise<BoothItem[]> {
 
     for (const match of html.matchAll(DATA_ITEM_PATTERN)) {
       try {
-        const raw = JSON.parse(decodeHtmlEntities(match[1]));
+        const raw = JSON.parse(decodeEntities(match[1]));
         const url = safeLinkUrl(raw.shop_item_url ?? raw.url);
         if (!url) continue;
         const imageUrl: string | null = raw.thumbnail_image_urls?.[0] ?? null;

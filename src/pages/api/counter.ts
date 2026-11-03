@@ -8,10 +8,7 @@ export const prerender = false;
 const COUNTER_KEY = 'top-page-views';
 
 function jsonResponse(count: number, status = 200): Response {
-  return new Response(JSON.stringify({ count }), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-  });
+  return Response.json({ count }, { status, headers: { 'Cache-Control': 'no-store' } });
 }
 
 async function getCurrentCount(): Promise<number> {

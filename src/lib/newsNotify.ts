@@ -1,5 +1,7 @@
 // お知らせ(/rss.xml)の新着をDiscordのチャンネルへ通知する。
 // Cron Trigger(src/worker.ts)から呼ばれ、前回までに見た記事をKVに覚えておき、増えた分だけを送る。
+import { decodeEntities } from './decodeEntities';
+import { notifyDiscord } from './notify';
 
 interface FeedItem {
   title: string;
@@ -21,24 +23,14 @@ const MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
 // 投稿時にカテゴリ名を付けないカテゴリ
 const HIDDEN_CATEGORY = 'その他';
 
-function decodeXml(text: string): string {
-  return text
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&amp;/g, '&')
-    .trim();
-}
-
 function pickTag(xml: string, tag: string): string | null {
   const match = xml.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`));
-  return match ? decodeXml(match[1]) : null;
+  return match ? decodeEntities(match[1]).trim() : null;
 }
 
 // 自サイトの@astrojs/rssが出力する形式だけを想定した、最小限のRSSパーサー
 // (Workers上ではrss-parserやDOMParserが使えないため)
-export function parseFeed(xml: string): FeedItem[] {
+function parseFeed(xml: string): FeedItem[] {
   return Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/g)).flatMap(([, itemXml]) => {
     const title = pickTag(itemXml, 'title');
     const link = pickTag(itemXml, 'link');
@@ -64,19 +56,6 @@ function formatItem(item: FeedItem): string {
   return `${heading}\n${item.link}`;
 }
 
-// 記事1件を1メッセージとして送る
-async function postToDiscord(item: FeedItem, webhookUrl: string): Promise<void> {
-  const res = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    // タイトル中の@everyone等で一斉通知が飛ばないよう、メンションは無効にしておく
-    body: JSON.stringify({ content: formatItem(item), allowed_mentions: { parse: [] } }),
-  });
-  if (!res.ok) {
-    throw new Error(`Discord Webhook error (${res.status})`);
-  }
-}
-
 /**
  * 公開中の/rss.xmlを読み、前回から増えたお知らせをDiscordへ通知します。
  * 初回(KVに記録が無い時)は今ある記事を記録するだけで、通知はしません。
@@ -96,11 +75,11 @@ export async function notifyNewNews(assets: Fetcher, kv: KVNamespace, webhookUrl
         .sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime())
     : [];
 
-  // 古い順に1件ずつ送る。途中で失敗した時は、送れた分だけ記録して残りは次回のCronで送り直す
+  // 古い順に1件ずつ、1件1メッセージで送る。途中で失敗した時は、送れた分だけ記録して残りは次回のCronで送り直す
   // (一時的にフィードから消えた記事が復帰した時に再通知しないよう、過去の記録も残しておく)
   try {
     for (const item of newItems) {
-      await postToDiscord(item, webhookUrl);
+      await notifyDiscord(formatItem(item), webhookUrl);
       seen.add(itemKey(item));
     }
     items.forEach((item) => seen.add(itemKey(item)));
