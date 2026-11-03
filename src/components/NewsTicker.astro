@@ -100,7 +100,8 @@ const isExternal = Boolean(item.link && item.external);
       const textWidth = copy.offsetWidth - parseFloat(getComputedStyle(copy).paddingRight);
       ticker.classList.toggle('is-static', textWidth <= viewport.clientWidth);
     };
-    update();
+    // 初回の判定はResizeObserverの最初の通知で行う。読み込み中にすぐ幅を読むと、
+    // ページ全体のレイアウト計算を前倒しさせる(強制リフロー)ため
     // Webフォントの読み込みで文字幅が変わるため、読み込み後と、札の幅が変わった時に判定し直す
     document.fonts?.ready.then(update);
     new ResizeObserver(update).observe(viewport);
