@@ -102,43 +102,31 @@ function buildSiteNewsItems(items: GroupableSiteItem[], config: SiteNewsGroupCon
   });
 }
 
-interface NewsItem {
-  title: string;
-  link: string;
-  date: string | null;
-}
-
 const parser = new Parser();
 
 /**
- * 指定したRSSフィードから記事(タイトル・日付・リンク)を取得します。
- * ビルド時に取得するため、更新を反映するには再デプロイ(再ビルド)が必要です。
- * (Cloudflare Pages の Deploy Hooks + 定期実行で自動再ビルドさせる運用がおすすめです)
+ * 指定したRSSフィードの記事を、お知らせの項目として取得します。
+ * ビルド時に取得するため、更新を反映するには再ビルドが必要です(src/worker.ts のCronで定期的に再ビルドしている)。
  */
-async function getFeedItems(feedUrl: string, limit: number): Promise<NewsItem[]> {
+async function getFeedItems(feedUrl: string, category: 'note' | 'zenn'): Promise<RawNewsItem[]> {
   try {
     const feed = await parser.parseURL(feedUrl);
-    return (feed.items ?? []).slice(0, limit).map((item) => ({
-      title: item.title?.trim() ?? '(無題)',
-      link: safeLinkUrl(item.link) ?? '#',
-      date: item.isoDate ?? item.pubDate ?? null,
-    }));
+    return (feed.items ?? []).slice(0, EXTERNAL_FEED_LIMIT).map((item, index) => {
+      const link = safeLinkUrl(item.link) ?? '#';
+      return {
+        id: `${category}-${index}-${link}`,
+        category,
+        title: item.title?.trim() ?? '(無題)',
+        body: null,
+        date: item.isoDate ?? item.pubDate ?? null,
+        link,
+        external: true,
+      };
+    });
   } catch (err) {
     console.error(`[rss] フィードの取得に失敗しました (${feedUrl}):`, err);
     return [];
   }
-}
-
-function toFeedNewsItems(items: NewsItem[], category: 'note' | 'zenn'): RawNewsItem[] {
-  return items.map((item, index) => ({
-    id: `${category}-${index}-${item.link}`,
-    category,
-    title: item.title,
-    body: null,
-    date: item.date,
-    link: item.link,
-    external: true,
-  }));
 }
 
 /**
@@ -155,8 +143,8 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
     getToolboxItems(),
     getWorkHistory(),
     getManualNewsItems(),
-    noteFeedUrl ? getFeedItems(noteFeedUrl, EXTERNAL_FEED_LIMIT) : Promise.resolve([]),
-    getFeedItems(zennFeedUrl, EXTERNAL_FEED_LIMIT),
+    noteFeedUrl ? getFeedItems(noteFeedUrl, 'note') : Promise.resolve([]),
+    getFeedItems(zennFeedUrl, 'zenn'),
   ]);
 
   const items: RawNewsItem[] = [
@@ -186,8 +174,8 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       link: `/news/${item.id}`,
       external: false,
     })),
-    ...toFeedNewsItems(noteItems, 'note'),
-    ...toFeedNewsItems(zennItems, 'zenn'),
+    ...noteItems,
+    ...zennItems,
   ];
 
   return items

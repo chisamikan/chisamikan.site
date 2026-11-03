@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { APIErrorCode, isFullPage, isNotionClientError } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import { createNotionClient, IMAGE_KINDS, type ImageKind } from '../../../../lib/notionClient';
+import { createNotionClient, directImageUrl, IMAGE_KINDS, type ImageKind } from '../../../../lib/notionClient';
 import { runtimeEnv } from '../../../../lib/env';
 import { isRateLimited } from '../../../../lib/apiGuard';
 
@@ -48,13 +48,6 @@ function isListedPage(page: PageObjectResponse, kind: ImageKind): boolean {
   return published?.type === 'checkbox' && published.checkbox;
 }
 
-function imageUrlOf(page: PageObjectResponse): string | null {
-  const prop = page.properties.Image;
-  if (prop?.type !== 'files' || prop.files.length === 0) return null;
-  const file = prop.files[0];
-  return file.type === 'external' ? file.external.url : file.file.url;
-}
-
 export const GET: APIRoute = async ({ params, request, locals }) => {
   const { kind, id } = params;
   if (!id || !PAGE_ID_PATTERN.test(id) || !IMAGE_KINDS.includes(kind as ImageKind)) {
@@ -85,7 +78,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 
   try {
     const page = await notion.pages.retrieve({ page_id: id });
-    const url = isFullPage(page) && isListedPage(page, kind as ImageKind) ? imageUrlOf(page) : null;
+    const url = isFullPage(page) && isListedPage(page, kind as ImageKind) ? directImageUrl(page) : null;
     if (!url) {
       return notFound();
     }

@@ -1,5 +1,5 @@
 // カードに「NEW」バッジを表示する期間(日数)
-export const NEW_BADGE_THRESHOLD_DAYS = 7;
+const NEW_BADGE_THRESHOLD_DAYS = 7;
 
 // Notionのcreated_time(サイトへの追加日時)から、New表示すべきか判定する
 export function isNewItem(createdTime: string): boolean {

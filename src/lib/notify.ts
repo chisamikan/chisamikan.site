@@ -2,7 +2,7 @@
 // - 管理者宛メール(Cloudflare Email Routing の send_email): お問い合わせ内容の唯一の保管先
 // - Discord: 新着・送信失敗を知らせるだけで、個人情報(名前・メールアドレス・本文)は含めない
 
-export interface ContactNotifyPayload {
+interface ContactNotifyPayload {
   name: string;
   email: string;
   message: string;
@@ -41,13 +41,14 @@ export async function sendAdminEmail(
 }
 
 /**
- * Discordに定型文だけを送ります。問い合わせ者の入力内容は含めないでください。
+ * DiscordのWebhookへメッセージを送ります(お問い合わせ通知とお知らせ通知で共用)。
+ * お問い合わせ通知では定型文だけを渡し、問い合わせ者の入力内容は含めないでください。
  */
 export async function notifyDiscord(content: string, webhookUrl: string): Promise<void> {
   const res = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // 定型文のみだが、念のためメンションは無効にしておく
+    // お知らせのタイトル中の@everyone等で一斉通知が飛ばないよう、メンションは無効にしておく
     body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
   });
   if (!res.ok) {

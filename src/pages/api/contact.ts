@@ -18,10 +18,7 @@ const MAX_BODY_BYTES = 32 * 1024;
  * JSONレスポンスを返します。お問い合わせの結果はキャッシュさせないため no-store を付けます。
  */
 function json(body: Record<string, unknown>, status = 200, headers: Record<string, string> = {}): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...headers },
-  });
+  return Response.json(body, { status, headers: { 'Cache-Control': 'no-store', ...headers } });
 }
 
 // 文字列以外(数値・配列・オブジェクト等)が送られてきた場合は未入力として扱う
