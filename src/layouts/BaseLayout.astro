@@ -81,15 +81,7 @@ const structuredData = {
       // pagereveal は最初の描画の直前に発火し、本文末尾のスクリプトより先になることがあるため、ここで受け取っておく
       // (BaseLayout末尾の見出し等の演出の開始で使う)
       if ('onpagereveal' in window) {
-        window.__pageRevealed = new Promise(function (resolve) {
-          window.addEventListener(
-            'pagereveal',
-            function (e) {
-              resolve(e.viewTransition && e.viewTransition.finished);
-            },
-            { once: true },
-          );
-        });
+        window.__pageRevealed = new Promise((r) => addEventListener('pagereveal', (e) => r(e.viewTransition && e.viewTransition.finished), { once: true }));
       }
     </script>
     <!-- 読み込み画面を出すときは、サインの文字の形(PageLoader)をここで高い優先度で取得し始める。
@@ -220,12 +212,10 @@ const structuredData = {
         }).observe(loader, { attributes: true, attributeFilter: ['class'] });
         // 読み込み画面のスクリプトが動かず is-hidden が付かない場合(CSSの10秒の安全策で消える)に備える
         window.setTimeout(startReveal, 10000);
-      } else if (window.__pageRevealed) {
+      } else {
         // 読み込み画面を出さない2ページ目以降は、ページ間のビュートランジションの最中に始めると、
         // iOS Safariで見出し等の演出がトランジションの終了時にもう一度再生されるため、終わってから始める
-        window.__pageRevealed.then(startReveal, startReveal);
-      } else {
-        startReveal();
+        (window.__pageRevealed || Promise.resolve()).then(startReveal);
       }
     </script>
   </body>
