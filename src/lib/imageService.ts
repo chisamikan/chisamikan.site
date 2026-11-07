@@ -13,7 +13,10 @@ const service: LocalImageService = {
     const { src } = validated;
     // 変換の設定(AVIFのeffortなど)を変えたときに、使い回さず変換し直すため設定も含める
     const cacheKey = [typeof src === 'string' ? src.split('?')[0] : src, args[1].service.config];
-    return { ...validated, cacheKey };
+    if (typeof src !== 'string') return { ...validated, cacheKey };
+    // 変換後のファイル名は、URLから最後の「?」以降を除いた最後の「/」以降の部分になり、元のファイル名が見えてしまう。
+    // 取得時に送られない「#」以降に名前を付け足し、末尾の「?」でその後ろを除かせて「img_<ハッシュ>.avif」にする
+    return { ...validated, cacheKey, src: `${src}#/img?` };
   },
   // 既定では知らない指定をimgの属性としてHTMLへ書き出すため、cacheKeyを除く
   getHTMLAttributes({ cacheKey, ...options }, ...rest) {

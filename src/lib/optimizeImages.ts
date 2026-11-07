@@ -1,7 +1,7 @@
 import { getImage, inferRemoteSize } from 'astro:assets';
 
 // Notionの画像をビルド中に取得してサイズ違いのAVIFへ変換し、自サイトの静的ファイルとして配信する
-// (/api/image のリダイレクトとNotionへの問い合わせを通さない)。
+// (/api/image とNotionへの問い合わせを通さない)。
 // AVIFは主要ブラウザがすべて対応しているため、WebPなどのフォールバックは用意しない
 export interface OptimizedImage {
   // 変換できなかった画像は src だけを持ち、従来どおりその URL を表示する

@@ -7,11 +7,11 @@ import { runtimeEnv } from '../../../../lib/env';
 import { isRateLimited } from '../../../../lib/apiGuard';
 
 // Notionへアップロードした画像のURLは数時間で失効するため、ビルド時に埋め込まず、
-// 表示の都度このエンドポイント経由でNotionへ問い合わせて最新URLへ302リダイレクトする。
+// 表示の都度このエンドポイント経由でNotionへ問い合わせて画像を取得し、そのまま返す。
+// 最新URLへリダイレクトしないのは、URLに元のファイル名が入っていて見えてしまうため
 export const prerender = false;
 
-// Notion側の実際の有効期限(通常1時間=3600秒)より短くしておくことで、
-// ブラウザ/CDNに失効済みURLへのリダイレクトがキャッシュされたまま残るのを防ぐ。
+// Notionで画像を差し替えたときに、古い画像が残り続けないようにする
 const CACHE_SECONDS = 3000;
 
 // NotionのページID(UUID。ハイフンの有無はどちらも受け付ける)
@@ -83,10 +83,17 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
       return notFound();
     }
 
-    const response = new Response(null, {
-      status: 302,
+    const image = await fetch(url);
+    const contentType = image.headers.get('Content-Type') ?? '';
+    if (!image.ok || !contentType.startsWith('image/')) {
+      console.error(`[api/image] 画像を取得できませんでした: ${image.status} ${contentType}`);
+      return new Response('Bad Gateway', { status: 502 });
+    }
+
+    // 保存時のファイル名にも元の名前が出ないよう、取得元の Content-Disposition などは引き継がない
+    const response = new Response(image.body, {
       headers: {
-        Location: url,
+        'Content-Type': contentType,
         'Cache-Control': `public, max-age=${CACHE_SECONDS}`,
       },
     });
