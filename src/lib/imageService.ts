@@ -7,8 +7,8 @@ import type { LocalImageService } from 'astro';
 // Notionで画像を差し替えるとURLのパス(ファイルごとのID)が変わるため、古い変換結果が使われることはない
 const service: LocalImageService = {
   ...sharp,
-  async validateOptions(options, imageConfig) {
-    const validated = await sharp.validateOptions!(options, imageConfig);
+  async validateOptions(...args) {
+    const validated = await sharp.validateOptions!(...args);
     const { src } = validated;
     return { ...validated, cacheKey: typeof src === 'string' ? src.split('?')[0] : src };
   },
