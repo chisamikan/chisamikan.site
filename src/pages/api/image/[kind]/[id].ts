@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { APIErrorCode, isFullPage, isNotionClientError } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import { createNotionClient, directImageUrl, IMAGE_KINDS, type ImageKind } from '../../../../lib/notionClient';
+import { createNotionClient, imageFile, IMAGE_KINDS, type ImageKind } from '../../../../lib/notionClient';
 import { runtimeEnv } from '../../../../lib/env';
 import { isRateLimited } from '../../../../lib/apiGuard';
 
@@ -11,7 +11,8 @@ import { isRateLimited } from '../../../../lib/apiGuard';
 // 最新URLへリダイレクトしないのは、URLに元のファイル名が入っていて見えてしまうため
 export const prerender = false;
 
-// Notionで画像を差し替えたときに、古い画像が残り続けないようにする
+// Notionで画像を差し替えたときに、1時間以内には新しい画像に切り替わるようにする
+// (リダイレクトしていた頃と同じ長さ。当時はNotionの画像URLの有効期限1時間より短くするため50分にしていた)
 const CACHE_SECONDS = 3000;
 
 // NotionのページID(UUID。ハイフンの有無はどちらも受け付ける)
@@ -78,12 +79,13 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 
   try {
     const page = await notion.pages.retrieve({ page_id: id });
-    const url = isFullPage(page) && isListedPage(page, kind as ImageKind) ? directImageUrl(page) : null;
-    if (!url) {
+    const file = isFullPage(page) && isListedPage(page, kind as ImageKind) ? imageFile(page) : undefined;
+    // 外部URLの画像はサイトでそのURLを直接使っている。ここで任意の外部サイトの中身を中継しないよう対象外にする
+    if (file?.type !== 'file') {
       return notFound();
     }
 
-    const image = await fetch(url);
+    const image = await fetch(file.file.url);
     const contentType = image.headers.get('Content-Type') ?? '';
     if (!image.ok || !contentType.startsWith('image/')) {
       console.error(`[api/image] 画像を取得できませんでした: ${image.status} ${contentType}`);
@@ -97,7 +99,9 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
         'Cache-Control': `public, max-age=${CACHE_SECONDS}`,
       },
     });
-    locals.cfContext.waitUntil(cache.put(cacheKey, response.clone()));
+    locals.cfContext.waitUntil(
+      cache.put(cacheKey, response.clone()).catch((err) => console.error('[api/image] キャッシュへの保存に失敗しました:', err)),
+    );
     return response;
   } catch (err) {
     // 存在しない・インテグレーションに共有されていないページは404にする

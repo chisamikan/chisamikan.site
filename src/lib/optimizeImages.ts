@@ -28,7 +28,11 @@ async function optimize(
     // 元画像の大きさを取得する。ここで取得できない画像は、ビルドの最後にまとめて行われる変換でも
     // 失敗してビルド全体が止まるため、この時点で変換の対象から外す
     const { width, height } = await inferRemoteSize(sourceUrl);
-    return await convert(width, height);
+    const result = await convert(width, height);
+    // 変換後のファイル名を img_<ハッシュ> にする仕組み(imageService.ts)はAstroの内部の処理に頼っている。
+    // Astroの更新で元のファイル名が見えるようになったら、変換せずに表示する
+    if (!result.src.includes('/img_')) throw new Error(`変換後のファイル名が想定と違います: ${result.src}`);
+    return result;
   } catch (err) {
     console.warn(`[optimizeImages] 画像を変換できなかったため、変換せずに表示します: ${fallbackUrl}`, err);
     return { src: fallbackUrl };
