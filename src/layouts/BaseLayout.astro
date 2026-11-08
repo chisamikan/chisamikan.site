@@ -165,6 +165,20 @@ const structuredData = {
       window.addEventListener('load', () =>
         document.head.appendChild(Object.assign(document.createElement('script'), { src: 'https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE' })),
       );
+
+      // 開発者ツールを開いた人向けの遊び。色はコンソールのライト・ダーク両方で読める --color-accent(ライト)
+      console.log(
+        `%c${String.raw` ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____
+||c |||h |||i |||s |||a |||m |||i |||k |||a |||n |||. |||s |||i |||t |||e ||
+||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__||
+|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|`}%c
+
+「今、開発者ツールのコンソールを見ているな？　これでお前とも縁ができた！」
+GitHubでリポジトリを公開しているので、気になる方はそちらもどうぞ。
+https://github.com/chisamikan/chisamikan.site`,
+        'color: rgb(8 145 178); font-family: monospace',
+        '',
+      );
     </script>
 	
   </head>
