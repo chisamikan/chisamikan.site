@@ -1,5 +1,5 @@
 // お知らせ(/rss.xml)の新着をDiscordのチャンネルへ通知する。
-// Cron Trigger(src/worker.ts)から呼ばれ、前回までに見た記事をKVに覚えておき、増えた分だけを送る。
+// 再ビルドの5分後のCron Trigger(src/worker.ts)から呼ばれ、前回までに見た記事をKVに覚えておき、増えた分だけを送る。
 import { decodeEntities } from './decodeEntities';
 import { notifyDiscord } from './notify';
 
