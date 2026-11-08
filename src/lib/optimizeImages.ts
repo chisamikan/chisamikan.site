@@ -8,6 +8,9 @@ export interface OptimizedImage {
   src: string;
   srcset?: string;
   sizes?: string;
+  // 元画像の大きさ(optimizePreviewImage だけが返す)
+  width?: number;
+  height?: number;
 }
 
 /**
@@ -96,6 +99,33 @@ const CARD_SIZES = '(min-width: 640px) 24rem, 85vw';
 
 export function optimizeCardImage(sourceUrl: string, fallbackUrl: string, sizes = CARD_SIZES): Promise<OptimizedImage> {
   return optimizeSquareImage(sourceUrl, fallbackUrl, CARD_WIDTHS, sizes);
+}
+
+// ギャラリーのカードのサムネイル。正方形に切り抜かず元の縦横比のまま変換し、表示時にCSS(object-cover)で切り抜く。
+// 拡大表示(Lightbox)で元画像が届くまでの間、読み込み済みのこの画像を代わりに表示するため。
+// 拡大表示の大きさを元画像の届く前に決められるよう、元画像の大きさも返す
+export function optimizePreviewImage(sourceUrl: string, fallbackUrl: string, sizes: string): Promise<OptimizedImage> {
+  return optimize(sourceUrl, fallbackUrl, async (width, height) => {
+    const maxWidth = Math.min(width, CARD_WIDTHS.at(-1)!);
+    const avif = await getImage({
+      src: sourceUrl,
+      width: maxWidth,
+      height: Math.round((maxWidth * height) / width),
+      widths: widthsUpTo(CARD_WIDTHS, maxWidth),
+      format: 'avif',
+      quality: 50,
+    });
+    // 横長の画像は正方形の枠に高さを合わせて拡大されるため、枠の幅 × 縦横比を表示幅として画像を選ばせる
+    const ratio = width / height;
+    const scaledSizes =
+      ratio > 1
+        ? sizes
+            .split(/,\s*(?![^()]*\))/)
+            .map((entry) => entry.replace(/^(\([^)]*\)\s+)?(.+)$/, (_, media = '', len) => `${media}calc(${len} * ${ratio.toFixed(3)})`))
+            .join(', ')
+        : sizes;
+    return { src: avif.src, srcset: avif.srcSet.attribute, sizes: scaledSizes, width, height };
+  });
 }
 
 // 一覧(List.astro)のサムネイル。表示幅はスマホで5rem(80px)、sm以上で9rem(144px)。画素密度3倍までを賄う

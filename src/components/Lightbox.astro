@@ -205,14 +205,57 @@
     dialog?.classList.toggle('is-open', isOpen);
   }
 
+  // 元画像の読み込み。触れた時点から始め(先読み)、拡大表示で使い回す
+  const originals = new Map<string, HTMLImageElement>();
+  function loadOriginal(url: string): HTMLImageElement {
+    let original = originals.get(url);
+    if (!original) {
+      original = new Image();
+      original.src = url;
+      originals.set(url, original);
+    }
+    return original;
+  }
+
   function prepareContent(trigger: HTMLElement): boolean {
     if (!dialog || !img) return false;
     const full = trigger.dataset.full;
     if (!full) return false;
-    img.src = full;
+    const description = trigger.dataset.description ?? '';
+    const original = loadOriginal(full);
+    const width = Number(trigger.dataset.width);
+    const height = Number(trigger.dataset.height);
+    // ギャラリーのサムネイルは元画像と同じ縦横比なので、元画像が届くまで読み込み済みのそれを拡大して見せ、
+    // 届いたら差し替える(タップから拡大までに元画像の取得を待たせない)。
+    // 読み込みに失敗して代わりの画像になったサムネイル(onerrorでsrcsetが外れる)は使わない
+    const thumb = trigger.querySelector('img');
+    const preview =
+      width && height && thumb?.complete && thumb.naturalWidth > 0 && thumb.hasAttribute('srcset')
+        ? thumb.currentSrc
+        : undefined;
+    const ready = original.complete && original.naturalWidth > 0;
+    img.src = ready || !preview ? full : preview;
+    img.dataset.full = full;
+    if (!ready && preview) {
+      original
+        .decode()
+        .then(() => {
+          if (img.dataset.full === full) img.src = full;
+        })
+        .catch(() => {});
+    }
+    // 小さいサムネイルを表示している間も、元画像と同じ大きさで表示する(差し替えで大きさが変わらないように)。
+    // 枠(最大幅・最大高さ)に収め、元画像より大きくは引き伸ばさない。最大高さはCSSの max-h と揃える
+    if (width && height) {
+      const maxHeight = description ? '78dvh' : '85dvh';
+      img.style.aspectRatio = `${width} / ${height}`;
+      img.style.width = `min(90vw, 900px, calc(${maxHeight} * ${width / height}), ${width}px)`;
+    } else {
+      img.style.removeProperty('aspect-ratio');
+      img.style.removeProperty('width');
+    }
     img.alt = trigger.dataset.alt ?? '';
 
-    const description = trigger.dataset.description ?? '';
     if (caption && captionDescription) {
       captionDescription.textContent = description;
       caption.hidden = !description;
@@ -315,6 +358,13 @@
   }
 
   document.querySelectorAll<HTMLElement>('.lightbox-trigger').forEach((trigger) => {
+    // マウスを乗せた・指が触れた・キーボードで選んだ時点で元画像を読み始め、開くまでの待ちを縮める
+    const prefetch = () => {
+      if (trigger.dataset.full) loadOriginal(trigger.dataset.full);
+    };
+    for (const type of ['pointerenter', 'pointerdown', 'focus']) {
+      trigger.addEventListener(type, prefetch, { passive: true });
+    }
     trigger.addEventListener('click', () => {
       if (trigger.dataset.nsfw === 'true' && !hasAcknowledgedNsfw()) {
         pendingTrigger = trigger;

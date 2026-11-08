@@ -2,7 +2,7 @@
 import type { ArtworkItem, NovelItem, ToolboxItem } from '../lib/notion';
 import type { BoothItem } from '../lib/booth';
 import { isNewItem } from '../lib/isNew';
-import { optimizeCardImage } from '../lib/optimizeImages';
+import { optimizeCardImage, optimizePreviewImage } from '../lib/optimizeImages';
 
 type Props = (
   | { type: 'artwork'; item: ArtworkItem; headingLevel?: 2 | 3 }
@@ -15,6 +15,8 @@ type Props = (
   imageSizes?: string;
   // ファーストビューに入るカード。遅延読み込みをやめ、画像を優先して取得させる
   priority?: boolean;
+  // サムネイルを元の縦横比のまま変換し、拡大表示で元画像が届くまでの代わりに使う(ギャラリー)
+  lightboxPreview?: boolean;
 };
 
 const props = Astro.props;
@@ -24,10 +26,11 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 // (srcsetがあるとsrcの差し替えが効かないため、srcsetも外す)
 const onImageError = `this.onerror=null;this.removeAttribute('srcset');this.src='${PLACEHOLDER}'`;
 // optimizeImage(トップページ・ギャラリー)では、ビルド時に変換したサムネイルを表示する。拡大表示(Lightbox)には元の画像を使う
-const thumbnail =
-  props.optimizeImage && props.item.sourceImageUrl
-    ? await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!, props.imageSizes)
-    : undefined;
+const thumbnail = !props.optimizeImage || !props.item.sourceImageUrl
+  ? undefined
+  : props.lightboxPreview && props.imageSizes
+    ? await optimizePreviewImage(props.item.sourceImageUrl, props.item.imageUrl!, props.imageSizes)
+    : await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!, props.imageSizes);
 const loadingAttrs = props.priority ? { fetchpriority: 'high' as const } : { loading: 'lazy' as const };
 const thumbSrc = thumbnail?.src ?? props.item.imageUrl;
 const thumbAttrs = { srcset: thumbnail?.srcset, sizes: thumbnail?.sizes };
@@ -48,6 +51,8 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
           data-alt={props.item.title}
           data-description={props.item.description || undefined}
           data-nsfw={props.item.nsfw ? 'true' : undefined}
+          data-width={thumbnail?.width}
+          data-height={thumbnail?.height}
           aria-label={props.item.nsfw ? `${props.item.title}(NSFW)を拡大表示` : `${props.item.title}を拡大表示`}
         >
           <img
