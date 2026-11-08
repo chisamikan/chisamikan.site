@@ -43,12 +43,12 @@ const breadcrumbStructuredData = {
 <BaseLayout title={item.title} description={item.body.slice(0, 120) || 'お知らせ'}>
   <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbStructuredData).replaceAll('<', '\\u003c')} />
   <article class="page-section">
-    <nav aria-label="パンくずリスト" class="mb-6">
+    <nav aria-label="パンくずリスト" class="mb-5">
       <ol class="flex flex-wrap items-center gap-x-2 text-[13px] text-ink-soft">
         {breadcrumbs.map((crumb, i) => (
           <li class="flex items-center gap-x-2">
             {i > 0 && <span aria-hidden="true">›</span>}
-            <a href={crumb.href} class="transition-colors duration-150 hover:text-ink">{crumb.name}</a>
+            <a href={crumb.href} class="py-1 transition-colors duration-150 hover:text-ink">{crumb.name}</a>
           </li>
         ))}
       </ol>
