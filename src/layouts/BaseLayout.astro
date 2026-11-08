@@ -161,25 +161,15 @@ const structuredData = {
 
       // gtag.js(約170KB)は、最初の表示に必要な読み込みと回線・CPUを取り合わないよう、ページの読み込み後に読み込む。
       // それまでの gtag() の呼び出しは dataLayer に溜まり、読み込まれた時点でまとめて送信される。
+      // console-art.js は開発者ツールを開いた人向けの遊び。HTMLに埋め込むと「ページのソースを表示」に出てしまうため、
+      // public/ の別ファイルにしている(src/ に置くと小さいスクリプトはAstroがHTMLへ埋め込む)。文字色は、コンソールは
+      // テーマの判定ができず、白・黒の背景どちらでもコントラスト4.5:1を満たす色は無いため、両方で3:1以上になる --color-accent(ライト)の値
       // append ではなく appendChild を使う(tsconfigのCloudflare Workersの型がElement.appendをHTMLRewriter用の型で上書きしており、型エラーになるため)
-      window.addEventListener('load', () =>
-        document.head.appendChild(Object.assign(document.createElement('script'), { src: 'https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE' })),
-      );
-
-      // 開発者ツールを開いた人向けの遊び。コンソールはテーマの判定ができず、白・黒の背景どちらでもコントラスト4.5:1を
-      // 満たす色は無いため、両方で3:1以上になる --color-accent(ライト)の値を使う
-      console.log(
-        `%c${String.raw` ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____
-||c |||h |||i |||s |||a |||m |||i |||k |||a |||n |||. |||s |||i |||t |||e ||
-||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__||
-|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|`}%c
-
-「今、開発者ツールのコンソールを見ているな？　これでお前とも縁ができた！」
-GitHubでリポジトリを公開しているので、気になる方はそちらもどうぞ。
-https://github.com/chisamikan/chisamikan.site`,
-        'color: rgb(8 145 178); font-family: monospace',
-        '',
-      );
+      window.addEventListener('load', () => {
+        for (const src of ['https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE', '/console-art.js']) {
+          document.head.appendChild(Object.assign(document.createElement('script'), { src }));
+        }
+      });
     </script>
 	
   </head>
