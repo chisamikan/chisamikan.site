@@ -30,10 +30,11 @@
   --color-glass-border-subtle: rgba(15, 23, 42, 0.09);
 
   /* 本文の欧文は字幅の詰まったOswaldだと和文と並べたときにガタつくため、和文に馴染むInter Tightにする */
-  --font-body: 'Inter Tight', 'Zen Kaku Gothic New', sans-serif;
+  /* Zen Kaku Gothic New Subset はビルド時に作る(scripts/subset-fonts.mjs)。開発サーバーでは無いため、Google Fontsで表示される */
+  --font-body: 'Inter Tight', 'Zen Kaku Gothic New Subset', 'Zen Kaku Gothic New', sans-serif;
   --font-display: var(--font-body);
   /* 日付・数値だけは等幅にして、桁が揃った落ち着いた見た目にする */
-  --font-num: 'IBM Plex Mono', 'Zen Kaku Gothic New', monospace;
+  --font-num: 'IBM Plex Mono', 'Zen Kaku Gothic New Subset', 'Zen Kaku Gothic New', monospace;
 
   /* Tailwind標準の ease-out は立ち上がりが弱く、もたついて見えるため、より鋭いカーブで上書きする */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);

@@ -266,7 +266,7 @@ const omikujiFields = [
       const avatarSize = 148;
       const bubbleGap = 28;
       const bubbleTextWidth = contentWidth - avatarSize - bubbleGap - 56;
-      mctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
+      mctx.font = '400 27px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
       const messageLines = capLines(wrapCanvasText(mctx, item.overall, bubbleTextWidth), 6);
 
       const detailRowHeight = 68;
@@ -307,11 +307,11 @@ const omikujiFields = [
       ctx.textBaseline = 'alphabetic';
 
       ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
-      ctx.font = '600 26px "Zen Kaku Gothic New", sans-serif';
+      ctx.font = '600 26px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
       ctx.fillText('蛇川神社 おみくじ', width / 2, headerY);
 
       ctx.fillStyle = '#5ee7df';
-      ctx.font = '700 150px "Zen Kaku Gothic New", sans-serif';
+      ctx.font = '700 150px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
       ctx.fillText(item.fortune, width / 2, fortuneY);
 
       const avatarX = contentX;
@@ -337,7 +337,7 @@ const omikujiFields = [
       ctx.fill();
 
       ctx.fillStyle = '#111111';
-      ctx.font = '400 27px "Zen Kaku Gothic New", sans-serif';
+      ctx.font = '400 27px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
       ctx.textAlign = 'left';
       const bubbleTextX = bubbleX + 28;
       const bubbleTextStartY = bubbleY + bubblePaddingY + 24;
@@ -360,17 +360,17 @@ const omikujiFields = [
         }
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.font = '700 28px "Zen Kaku Gothic New", sans-serif';
+        ctx.font = '700 28px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
         ctx.fillText(label, contentX, rowY);
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-        ctx.font = '400 28px "Zen Kaku Gothic New", sans-serif';
+        ctx.font = '400 28px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
         ctx.fillText(value, contentX + labelWidth, rowY);
       });
 
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.font = '400 22px "Zen Kaku Gothic New", sans-serif';
+      ctx.font = '400 22px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif';
       ctx.fillText('chisamikan.site', width / 2, footerY);
 
       return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
