@@ -64,24 +64,43 @@ export function optimizeHeroImage(sourceUrl: string, fallbackUrl: string): Promi
   });
 }
 
-// トップページのカードのサムネイル。カードは正方形に上端揃えで切り抜いて表示する(object-cover object-top)ため、
-// 同じ切り抜き方の正方形にして無駄な部分を送らない。表示幅はスマホで画面幅の85%、PCで約19〜24rem。
-// スマホ(表示約350px×画素密度1.75〜2)では600〜700px必要になり、400の次が800だと大きすぎるものを送るため640を挟む
-const CARD_WIDTHS = [400, 640, 800, 1200];
-
-export function optimizeCardImage(sourceUrl: string, fallbackUrl: string): Promise<OptimizedImage> {
+// カード・一覧のサムネイルは正方形に上端揃えで切り抜いて表示する(object-cover object-top)ため、
+// 同じ切り抜き方の正方形にして無駄な部分を送らない
+function optimizeSquareImage(
+  sourceUrl: string,
+  fallbackUrl: string,
+  widths: number[],
+  sizes: string,
+): Promise<OptimizedImage> {
   return optimize(sourceUrl, fallbackUrl, async (width, height) => {
-    const side = Math.min(width, height, CARD_WIDTHS.at(-1)!);
+    const side = Math.min(width, height, widths.at(-1)!);
     const avif = await getImage({
       src: sourceUrl,
       width: side,
       height: side,
-      widths: widthsUpTo(CARD_WIDTHS, side),
+      widths: widthsUpTo(widths, side),
       fit: 'cover',
       position: 'top',
       format: 'avif',
       quality: 50,
     });
-    return { src: avif.src, srcset: avif.srcSet.attribute, sizes: '(min-width: 640px) 24rem, 85vw' };
+    return { src: avif.src, srcset: avif.srcSet.attribute, sizes };
   });
+}
+
+// カード(トップページ・ギャラリー)のサムネイル。
+// スマホ(表示約350〜400px×画素密度1.75〜2)では600〜800px必要になり、400の次が800だと大きすぎるものを送るため640を挟む
+const CARD_WIDTHS = [400, 640, 800, 1200];
+// トップページのカードの表示幅は、スマホで画面幅の85%、PCで約19〜24rem
+const CARD_SIZES = '(min-width: 640px) 24rem, 85vw';
+
+export function optimizeCardImage(sourceUrl: string, fallbackUrl: string, sizes = CARD_SIZES): Promise<OptimizedImage> {
+  return optimizeSquareImage(sourceUrl, fallbackUrl, CARD_WIDTHS, sizes);
+}
+
+// 一覧(List.astro)のサムネイル。表示幅はスマホで5rem(80px)、sm以上で9rem(144px)。画素密度3倍までを賄う
+const THUMBNAIL_WIDTHS = [160, 288, 432];
+
+export function optimizeThumbnailImage(sourceUrl: string, fallbackUrl: string): Promise<OptimizedImage> {
+  return optimizeSquareImage(sourceUrl, fallbackUrl, THUMBNAIL_WIDTHS, '(min-width: 640px) 9rem, 5rem');
 }

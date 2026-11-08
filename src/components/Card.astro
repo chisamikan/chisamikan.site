@@ -9,7 +9,13 @@ type Props = (
   | { type: 'novel'; item: NovelItem; headingLevel?: 2 | 3 }
   | { type: 'toolbox'; item: ToolboxItem; headingLevel?: 2 | 3 }
   | { type: 'shop'; item: BoothItem; headingLevel?: 2 | 3 }
-) & { optimizeImage?: boolean };
+) & {
+  optimizeImage?: boolean;
+  // 変換したサムネイルの表示幅(img の sizes)。省略時はトップページのカードの幅
+  imageSizes?: string;
+  // ファーストビューに入るカード。遅延読み込みをやめ、画像を優先して取得させる
+  priority?: boolean;
+};
 
 const props = Astro.props;
 const Tag = `h${props.headingLevel ?? 3}` as 'h2' | 'h3';
@@ -17,11 +23,12 @@ const PLACEHOLDER = '/images/work-placeholder.svg';
 // 画像の配信元が404等を返した時に、壊れた画像アイコンではなく代わりの画像を出す
 // (srcsetがあるとsrcの差し替えが効かないため、srcsetも外す)
 const onImageError = `this.onerror=null;this.removeAttribute('srcset');this.src='${PLACEHOLDER}'`;
-// optimizeImage(トップページ)では、ビルド時に変換したサムネイルを表示する。拡大表示(Lightbox)には元の画像を使う
+// optimizeImage(トップページ・ギャラリー)では、ビルド時に変換したサムネイルを表示する。拡大表示(Lightbox)には元の画像を使う
 const thumbnail =
   props.optimizeImage && props.item.sourceImageUrl
-    ? await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!)
+    ? await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!, props.imageSizes)
     : undefined;
+const loadingAttrs = props.priority ? { fetchpriority: 'high' as const } : { loading: 'lazy' as const };
 const thumbSrc = thumbnail?.src ?? props.item.imageUrl;
 const thumbAttrs = { srcset: thumbnail?.srcset, sizes: thumbnail?.sizes };
 // サムネイル上に重ねるタグの上限。多いと重ね表示が膨らんでイラストを覆うため、残りは「+N」にまとめる
@@ -47,7 +54,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             src={thumbSrc}
             {...thumbAttrs}
             alt={props.item.title}
-            loading="lazy"
+            {...loadingAttrs}
             onerror={onImageError}
             class:list={[
               'absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 ease-out',

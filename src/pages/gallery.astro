@@ -49,10 +49,19 @@ const galleryStructuredData = {
     <TagFilter tags={tags} class="mb-10 flex flex-wrap gap-2" />
 
     <CardGrid id="gallery-grid" managed class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
+      {items.map((item, index) => (
         <div id={`gallery-${item.id}`} class="h-full scroll-mt-24" data-tags={item.tags.join('|')}>
           <div class="card-reveal h-full">
-            <Card type="artwork" item={item} headingLevel={2} />
+            {/* 表示幅は max-w-5xl(64rem)・左右の余白 px-6・カードの間隔 gap-8 から求めた値。
+                先頭のカードはスマホのファーストビューに入るため優先して読み込む */}
+            <Card
+              type="artwork"
+              item={item}
+              headingLevel={2}
+              optimizeImage
+              imageSizes="(min-width: 1024px) 19rem, (min-width: 640px) calc(50vw - 2.5rem), calc(100vw - 3rem)"
+              priority={index === 0}
+            />
           </div>
         </div>
       ))}
