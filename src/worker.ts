@@ -3,9 +3,6 @@ import { notifyNewNews } from './lib/newsNotify';
 
 type ScheduledEnv = Env & { CF_DEPLOY_HOOK_URL?: string; DISCORD_NEWS_WEBHOOK_URL?: string };
 
-// wrangler.toml の [triggers] crons のうち、再ビルド用のもの。それ以外はお知らせの通知用
-const REBUILD_CRON = '*/30 * * * *';
-
 /**
  * Workerのエントリポイント(wrangler.toml の main)。
  * 通常のリクエストはAstroに任せ、Cron Trigger(wrangler.toml の [triggers])の時だけ
@@ -19,11 +16,10 @@ export default {
   async scheduled(controller, env, ctx) {
     const { CF_DEPLOY_HOOK_URL: hookUrl, DISCORD_NEWS_WEBHOOK_URL: newsWebhookUrl } = env as ScheduledEnv;
 
-    if (controller.cron !== REBUILD_CRON) {
+    // wrangler.toml の [triggers] crons のうち、再ビルド用以外のものはお知らせの通知用
+    if (controller.cron !== '*/30 * * * *') {
       // お知らせ用のWebhookは、お問い合わせ通知(DISCORD_WEBHOOK_URL)とは別のチャンネルに送るため分けている
-      if (newsWebhookUrl) {
-        ctx.waitUntil(notifyNewNews(env.ASSETS, env.COUNTER_KV, newsWebhookUrl));
-      }
+      if (newsWebhookUrl) ctx.waitUntil(notifyNewNews(env.ASSETS, env.COUNTER_KV, newsWebhookUrl));
       return;
     }
 
