@@ -1,3 +1,4 @@
+import { setTimeout } from 'node:timers/promises';
 import { getImage, inferRemoteSize } from 'astro:assets';
 
 // Notionの画像をビルド中に取得してサイズ違いのAVIFへ変換し、自サイトの静的ファイルとして配信する
@@ -29,8 +30,12 @@ async function optimize(
   if (import.meta.env.DEV) return { src: fallbackUrl };
   try {
     // 元画像の大きさを取得する。ここで取得できない画像は、ビルドの最後にまとめて行われる変換でも
-    // 失敗してビルド全体が止まるため、この時点で変換の対象から外す
-    const { width, height } = await inferRemoteSize(sourceUrl);
+    // 失敗してビルド全体が止まるため、この時点で変換の対象から外す。
+    // 取得元への接続が、毎回別の画像で1枚ほど一時的に失敗する。すぐやり直しても失敗したため、1秒おいて1回だけやり直す
+    const { width, height } = await inferRemoteSize(sourceUrl).catch(async () => {
+      await setTimeout(1000);
+      return inferRemoteSize(sourceUrl);
+    });
     const result = await convert(width, height);
     // 変換後のファイル名を img_<ハッシュ> にする仕組み(imageService.ts)はAstroの内部の処理に頼っている。
     // Astroの更新で元のファイル名が見えるようになったら、変換せずに表示する
