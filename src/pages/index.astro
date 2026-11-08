@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
+import RssLink from '../components/RssLink.astro';
 import Card from '../components/Card.astro';
 import CardSlider from '../components/CardSlider.astro';
 import NewsList from '../components/NewsList.astro';
@@ -80,6 +81,11 @@ const heroImages: OptimizedImage[] =
   <section id="news" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
     <SectionHeading eyebrow="News" title="お知らせ" href="/news" />
     <NewsList items={news.slice(0, 3)} />
+    {news.length > 0 && (
+      <div class="mt-6 text-right">
+        <RssLink />
+      </div>
+    )}
   </section>
 
   <!-- プロフィール -->
