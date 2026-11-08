@@ -161,18 +161,16 @@ const structuredData = {
 
       // gtag.js(約170KB)は、最初の表示に必要な読み込みと回線・CPUを取り合わないよう、ページの読み込み後に読み込む。
       // それまでの gtag() の呼び出しは dataLayer に溜まり、読み込まれた時点でまとめて送信される。
+      // console-art.js は開発者ツールを開いた人向けの遊び。HTMLに埋め込むと「ページのソースを表示」に出てしまうため、
+      // public/ の別ファイルにしている(src/ に置くと小さいスクリプトはAstroがHTMLへ埋め込む)。文字色は、コンソールは
+      // テーマの判定ができず、白・黒の背景どちらでもコントラスト4.5:1を満たす色は無いため、両方で3:1以上になる --color-accent(ライト)の値
       // append ではなく appendChild を使う(tsconfigのCloudflare Workersの型がElement.appendをHTMLRewriter用の型で上書きしており、型エラーになるため)
-      window.addEventListener('load', () =>
-        document.head.appendChild(Object.assign(document.createElement('script'), { src: 'https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE' })),
-      );
+      window.addEventListener('load', () => {
+        for (const src of ['https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE', '/console-art.js']) {
+          document.head.appendChild(Object.assign(document.createElement('script'), { src }));
+        }
+      });
     </script>
-    {/*
-      開発者ツールを開いた人向けの遊び。HTMLに埋め込むと「ページのソースを表示」に出てしまうため、
-      public/ の別ファイルにする(src/ に置くと小さいスクリプトはAstroがHTMLへ埋め込む)。
-      文字色: コンソールはテーマの判定ができず、白・黒の背景どちらでもコントラスト4.5:1を満たす色は無いため、
-      両方で3:1以上になる --color-accent(ライト)の値を使う
-    */}
-    <script is:inline src="/console-art.js" defer></script>
 	
   </head>
   <body>
