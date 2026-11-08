@@ -11,12 +11,11 @@ type Props = (
   | { type: 'shop'; item: BoothItem; headingLevel?: 2 | 3 }
 ) & {
   optimizeImage?: boolean;
-  // 変換したサムネイルの表示幅(img の sizes)。省略時はトップページのカードの幅
-  imageSizes?: string;
   // ファーストビューに入るカード。遅延読み込みをやめ、画像を優先して取得させる
   priority?: boolean;
-  // サムネイルを元の縦横比のまま変換し、拡大表示で元画像が届くまでの代わりに使う(ギャラリー)
-  lightboxPreview?: boolean;
+  // 指定すると、サムネイルを元の縦横比のまま変換し、拡大表示で元画像が届くまでの代わりに使う(ギャラリー)。
+  // 値はサムネイルの表示幅(img の sizes)
+  previewSizes?: string;
 };
 
 const props = Astro.props;
@@ -28,9 +27,9 @@ const onImageError = `this.onerror=null;this.removeAttribute('srcset');this.src=
 // optimizeImage(トップページ・ギャラリー)では、ビルド時に変換したサムネイルを表示する。拡大表示(Lightbox)には元の画像を使う
 const thumbnail = !props.optimizeImage || !props.item.sourceImageUrl
   ? undefined
-  : props.lightboxPreview && props.imageSizes
-    ? await optimizePreviewImage(props.item.sourceImageUrl, props.item.imageUrl!, props.imageSizes)
-    : await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!, props.imageSizes);
+  : props.previewSizes
+    ? await optimizePreviewImage(props.item.sourceImageUrl, props.item.imageUrl!, props.previewSizes)
+    : await optimizeCardImage(props.item.sourceImageUrl, props.item.imageUrl!);
 const loadingAttrs = props.priority ? { fetchpriority: 'high' as const } : { loading: 'lazy' as const };
 const thumbSrc = thumbnail?.src ?? props.item.imageUrl;
 const thumbAttrs = { srcset: thumbnail?.srcset, sizes: thumbnail?.sizes };

@@ -94,11 +94,10 @@ function optimizeSquareImage(
 // カード(トップページ・ギャラリー)のサムネイル。
 // スマホ(表示約350〜400px×画素密度1.75〜2)では600〜800px必要になり、400の次が800だと大きすぎるものを送るため640を挟む
 const CARD_WIDTHS = [400, 640, 800, 1200];
-// トップページのカードの表示幅は、スマホで画面幅の85%、PCで約19〜24rem
-const CARD_SIZES = '(min-width: 640px) 24rem, 85vw';
 
-export function optimizeCardImage(sourceUrl: string, fallbackUrl: string, sizes = CARD_SIZES): Promise<OptimizedImage> {
-  return optimizeSquareImage(sourceUrl, fallbackUrl, CARD_WIDTHS, sizes);
+// トップページのカードの表示幅は、スマホで画面幅の85%、PCで約19〜24rem
+export function optimizeCardImage(sourceUrl: string, fallbackUrl: string): Promise<OptimizedImage> {
+  return optimizeSquareImage(sourceUrl, fallbackUrl, CARD_WIDTHS, '(min-width: 640px) 24rem, 85vw');
 }
 
 // ギャラリーのカードのサムネイル。正方形に切り抜かず元の縦横比のまま変換し、表示時にCSS(object-cover)で切り抜く。
