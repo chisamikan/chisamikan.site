@@ -64,23 +64,17 @@ export default {
       // サイト名の表示より先に最優先で取得され、Lighthouse(スマホ)のLCPの推定が数秒悪くなった。
       // Google FontsのCSSが先に効くと、その分割ファイル(60個以上)を読み始めてしまう(保存済みのGoogle FontsのCSSと、
       // 文字が増えて名前の変わったこのCSSとで起きる)。Google Fontsはこちらが効いてから(失敗しても)有効にする
-      const googleFonts = '<link rel="preconnect" href="https://fonts.googleapis.com"';
       const enableGoogleFonts = "document.getElementById('google-fonts').media='all'";
       const link =
         `<link href="/${cssFile}" rel="stylesheet" media="print" onload="this.media='all';${enableGoogleFonts}" onerror="${enableGoogleFonts}">` +
-        `<noscript><link href="/${cssFile}" rel="stylesheet"></noscript>${googleFonts}`;
-      await Promise.all(
-        files.map((f, i) =>
-          f.endsWith('.html')
-            ? writeFile(
-                join(root, f),
-                contents[i]
-                  .replace(/(<link href="https:\/\/fonts\.googleapis\.com\/css2[^"]*" rel="stylesheet" media="print") onload="this\.media='all'"/, '$1 id="google-fonts"')
-                  .replace(googleFonts, link),
-              )
-            : null,
-        ),
-      );
+        `<noscript><link href="/${cssFile}" rel="stylesheet"></noscript></head>`;
+      for (const [i, f] of files.entries()) {
+        if (!f.endsWith('.html')) continue;
+        const html = contents[i]
+          .replace(/(<link href="https:\/\/fonts\.googleapis\.com\/css2[^"]*" rel="stylesheet" media="print") onload="this\.media='all'"/, '$1 id="google-fonts"')
+          .replace('</head>', link);
+        await writeFile(join(root, f), html);
+      }
     },
   },
 };
