@@ -23,7 +23,7 @@ const stripComments = {
           /(<script\b([^>]*)>)([\s\S]*?)(<\/script>)|<!--[\s\S]*?-->/g,
           (_, open, attrs, code, close) => {
             if (open === undefined) return '';
-            if (!code.trim() || /type="(?!module")/.test(attrs)) return open + code + close;
+            if (!code.trim() || /\stype="(?!module")/.test(attrs)) return open + code + close;
             const { code: min, errors } = minifySync('inline.js', code, { compress: false, mangle: false });
             if (errors.length) throw new Error(`${file}: ${errors[0].message}`);
             return open + min + close;
