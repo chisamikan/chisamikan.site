@@ -2,6 +2,38 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { minifySync } from 'vite';
+
+// ソースのコメントは開発用なので、公開するHTMLからは取り除く。バンドルされるJS・CSSはビルド時に消えるため、
+// 残るのはHTMLのコメントと、HTMLに直接埋め込まれたスクリプト(is:inlineや小さいため埋め込まれたもの)だけ。
+// スクリプトは圧縮(minify)でコメントを消す。compress・mangleを切り、空白とコメント以外は変えない
+const stripComments = {
+  name: 'strip-comments',
+  hooks: {
+    'astro:build:done': async ({ dir }) => {
+      const root = fileURLToPath(dir);
+      const files = (await readdir(root, { recursive: true })).filter((f) => f.endsWith('.html'));
+      for (const file of files) {
+        const path = join(root, file);
+        const html = await readFile(path, 'utf8');
+        const out = html.replace(
+          /(<script\b([^>]*)>)([\s\S]*?)(<\/script>)|<!--[\s\S]*?-->/g,
+          (_, open, attrs, code, close) => {
+            if (open === undefined) return '';
+            if (!code.trim() || /\stype="(?!module")/.test(attrs)) return open + code + close;
+            const { code: min, errors } = minifySync('inline.js', code, { compress: false, mangle: false });
+            if (errors.length) throw new Error(`${file}: ${errors[0].message}`);
+            return open + min + close;
+          },
+        );
+        await writeFile(path, out);
+      }
+    },
+  },
+};
 
 // サイト全体は静的生成(SSG)し、/api/* のみ各ページ側で `export const prerender = false` を
 // 指定することで Cloudflare Workers 上のサーバー処理として動かします。
@@ -26,6 +58,7 @@ export default defineConfig({
     ],
   },
   integrations: [
+    stripComments,
     sitemap({
       // /secret は隠しページ、/404 はエラーページのためサイトマップから除外する
       filter: (page) => !page.includes('/secret') && !page.includes('/404'),
