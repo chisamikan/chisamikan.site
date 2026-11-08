@@ -17,7 +17,7 @@ const pageTitle = title ? `${title} | ${site.title}` : site.title;
 const ogImageURL = new URL('/og-image.webp', Astro.site ?? Astro.url).toString();
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 const siteURL = new URL('/', Astro.site ?? Astro.url).toString();
-const profileURL = new URL('/profile', Astro.site ?? Astro.url).toString();
+const profileURL = new URL('/profile/', Astro.site ?? Astro.url).toString();
 const personImageURL = new URL(person.image, Astro.site ?? Astro.url).toString();
 
 // サイト運営者(千紗みかん)とサイト自体を表す構造化データ。全ページ共通で埋め込む

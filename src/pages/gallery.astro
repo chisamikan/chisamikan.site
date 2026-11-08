@@ -17,7 +17,7 @@ const galleryStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'ギャラリー',
-  url: new URL('/gallery', Astro.site ?? Astro.url).toString(),
+  url: new URL('/gallery/', Astro.site ?? Astro.url).toString(),
   about: { '@type': 'Person', name: person.name },
   mainEntity: {
     '@type': 'ItemList',
@@ -87,7 +87,7 @@ const galleryStructuredData = {
     </nav>
 
 	<div class="mt-16 text-center">
-      <a href="/contact" class="btn-glass btn-glass-accent btn-wide">
+      <a href="/contact/" class="btn-glass btn-glass-accent btn-wide">
         <i class="fa-solid fa-envelope"></i>ご依頼はこちら
       </a>
     </div>

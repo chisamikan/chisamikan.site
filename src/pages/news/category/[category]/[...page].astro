@@ -31,7 +31,7 @@ const { category } = Astro.params as { category: NewsCategory };
 const { page } = Astro.props;
 const meta = getCategoryMeta(category);
 
-const categoryPath = (c: NewsCategory) => `/news/category/${c}`;
+const categoryPath = (c: NewsCategory) => `/news/category/${c}/`;
 ---
 
 <BaseLayout title={`News - ${meta.label}`} description={`${meta.label}に関するお知らせ・更新履歴の一覧です。`}>
@@ -40,7 +40,7 @@ const categoryPath = (c: NewsCategory) => `/news/category/${c}`;
       <RssLink slot="action" />
     </SectionHeading>
 
-    <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} current={category} />
+    <NewsCategoryFilter allPath="/news/" categoryPath={categoryPath} current={category} />
 
     <NewsList items={page.data} emptyText="このカテゴリのお知らせはまだありません。" />
 

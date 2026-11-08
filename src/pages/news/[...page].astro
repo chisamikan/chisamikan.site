@@ -15,7 +15,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 const { page } = Astro.props;
 
-const categoryPath = (category: NewsCategory) => `/news/category/${category}`;
+const categoryPath = (category: NewsCategory) => `/news/category/${category}/`;
 ---
 
 <BaseLayout title="News" description="サイトの更新履歴・お知らせ一覧です。">
@@ -24,7 +24,7 @@ const categoryPath = (category: NewsCategory) => `/news/category/${category}`;
       <RssLink slot="action" />
     </SectionHeading>
 
-    <NewsCategoryFilter allPath="/news" categoryPath={categoryPath} />
+    <NewsCategoryFilter allPath="/news/" categoryPath={categoryPath} />
 
     <NewsList items={page.data} />
 

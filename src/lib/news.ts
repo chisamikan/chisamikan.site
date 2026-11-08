@@ -150,19 +150,19 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
   const items: RawNewsItem[] = [
     ...buildSiteNewsItems(
       gallery.map((item) => ({ id: item.id, name: item.title, createdTime: item.createdTime })),
-      { idPrefix: 'gallery', label: 'ギャラリー', unit: '点', basePath: '/gallery' },
+      { idPrefix: 'gallery', label: 'ギャラリー', unit: '点', basePath: '/gallery/' },
     ),
     ...buildSiteNewsItems(
       novels.map((item) => ({ id: item.id, name: item.title, createdTime: item.createdTime })),
-      { idPrefix: 'novel', label: '小説', unit: '作', basePath: '/novels' },
+      { idPrefix: 'novel', label: '小説', unit: '作', basePath: '/novels/' },
     ),
     ...buildSiteNewsItems(
       toolbox.map((item) => ({ id: item.id, name: item.title, createdTime: item.createdTime })),
-      { idPrefix: 'toolbox', label: 'ツールボックス', unit: '点', basePath: '/toolbox' },
+      { idPrefix: 'toolbox', label: 'ツールボックス', unit: '点', basePath: '/toolbox/' },
     ),
     ...buildSiteNewsItems(
       works.map((item) => ({ id: item.id, name: item.client, createdTime: item.createdTime })),
-      { idPrefix: 'work', label: '仕事履歴', unit: '件', basePath: '/profile' },
+      { idPrefix: 'work', label: '仕事履歴', unit: '件', basePath: '/profile/' },
     ),
     ...manual.map((item) => ({
       id: `manual-${item.id}`,
@@ -171,7 +171,7 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
       body: item.body || null,
       date: item.date ?? item.createdTime,
       // 本文・URLは個別ページ(/news/[id])に載せる
-      link: `/news/${item.id}`,
+      link: `/news/${item.id}/`,
       external: false,
     })),
     ...noteItems,

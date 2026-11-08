@@ -18,7 +18,7 @@ export async function GET(context: APIContext) {
       description: item.body ?? undefined,
       pubDate: new Date(item.date),
       // リンク先の無いお知らせ(手動投稿など)は/newsへのリンクにフォールバックする
-      link: item.link ?? '/news',
+      link: item.link ?? '/news/',
       categories: [getCategoryMeta(item.category).label],
     })),
     customData: '<language>ja</language>',
