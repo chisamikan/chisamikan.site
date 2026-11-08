@@ -6,9 +6,11 @@ main = "./src/worker.ts"
 
 # Notion/RSSの更新を反映するため、30分おきにDeploy Hookを叩いて再ビルドする(src/worker.ts)
 # Deploy Hook URLはシークレット CF_DEPLOY_HOOK_URL で指定する
-# あわせて/rss.xmlの新着をDiscordへ通知する(Webhook URLはシークレット DISCORD_NEWS_WEBHOOK_URL。未設定なら通知しない)
+# 再ビルドの5分後に、/rss.xmlの新着をDiscordへ通知する(Webhook URLはシークレット DISCORD_NEWS_WEBHOOK_URL。未設定なら通知しない)
+# ビルドは1分半ほどで終わるため、5分あればサイトの更新を反映した後に通知できる
+# 再ビルド用の文字列を変える時は src/worker.ts の scheduled も合わせること
 [triggers]
-crons = ["*/30 * * * *"]
+crons = ["*/30 * * * *", "5,35 * * * *"]
 
 [assets]
 directory = "./dist"
