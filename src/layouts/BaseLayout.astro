@@ -166,7 +166,8 @@ const structuredData = {
         document.head.appendChild(Object.assign(document.createElement('script'), { src: 'https://www.googletagmanager.com/gtag/js?id=G-XZSD8BQ5DE' })),
       );
 
-      // 開発者ツールを開いた人向けの遊び。色はコンソールのライト・ダーク両方で読める --color-accent(ライト)
+      // 開発者ツールを開いた人向けの遊び。コンソールはテーマの判定ができず、白・黒の背景どちらでもコントラスト4.5:1を
+      // 満たす色は無いため、両方で3:1以上になる --color-accent(ライト)の値を使う
       console.log(
         `%c${String.raw` ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____
 ||c |||h |||i |||s |||a |||m |||i |||k |||a |||n |||. |||s |||i |||t |||e ||
