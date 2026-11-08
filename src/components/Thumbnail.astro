@@ -1,15 +1,21 @@
 ---
+import { optimizeThumbnailImage } from '../lib/optimizeImages';
+
 interface Props {
   imageUrl: string | null;
+  /** ビルド中の画像変換の取得元(ArtworkItem.sourceImageUrl と同じ) */
+  sourceImageUrl: string | null;
   /** ライトボックスのdata-alt、及び「〜を拡大表示」のaria-labelに使う見出し(例: `${item.title}の表紙`) */
   label: string;
   class?: string;
 }
-const { imageUrl, label, class: className = '' } = Astro.props;
+const { imageUrl, sourceImageUrl, label, class: className = '' } = Astro.props;
 
 const PLACEHOLDER = '/images/work-placeholder.svg';
 const hasImage = Boolean(imageUrl);
 const src = imageUrl ?? PLACEHOLDER;
+// 一覧には変換した小さいサムネイルを表示し、拡大表示(Lightbox)には元の画像を使う
+const thumbnail = imageUrl && sourceImageUrl ? await optimizeThumbnailImage(sourceImageUrl, imageUrl) : undefined;
 
 // List.astro専用の枠スタイル(.thumbnail-frame/.thumbnail-frame-static)を使う。
 // Card UI(.glass-panel)とは角丸の値が異なるため、CSSを共有しない
@@ -24,10 +30,12 @@ const src = imageUrl ?? PLACEHOLDER;
     aria-label={`${label}を拡大表示`}
   >
     <img
-      src={src}
+      src={thumbnail?.src ?? src}
+      srcset={thumbnail?.srcset}
+      sizes={thumbnail?.sizes}
       alt={label}
       loading="lazy"
-      onerror="this.onerror=null;this.src='/images/work-placeholder.svg'"
+      onerror="this.onerror=null;this.removeAttribute('srcset');this.src='/images/work-placeholder.svg'"
       class="h-full w-full object-cover object-top transition-transform duration-300 scale-[1.02] group-hover:scale-105 motion-reduce:group-hover:scale-[1.02]"
     />
   </button>

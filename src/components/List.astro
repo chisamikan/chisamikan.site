@@ -33,7 +33,7 @@ function formatPeriod(start: string | null, end: string | null) {
 
 <article id={id} class:list={['border-t border-ink/10 py-6', entryClass]}>
   <div class="flex items-start gap-5">
-    <Thumbnail imageUrl={props.item.imageUrl} label={thumbnailLabel} class="w-20 shrink-0 sm:w-36" />
+    <Thumbnail imageUrl={props.item.imageUrl} sourceImageUrl={props.item.sourceImageUrl} label={thumbnailLabel} class="w-20 shrink-0 sm:w-36" />
 
     <div class="min-w-0 flex-1">
       {props.type === 'work' && (

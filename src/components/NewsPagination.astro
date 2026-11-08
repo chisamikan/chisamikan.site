@@ -8,7 +8,7 @@ interface Props {
   basePath: string;
 }
 const { page, basePath } = Astro.props;
-const pathFor = (n: number) => (n === 1 ? basePath : `${basePath}/${n}`);
+const pathFor = (n: number) => (n === 1 ? `${basePath}/` : `${basePath}/${n}/`);
 
 // gallery.astro のページネーションUIと揃える: current を中心とした3ページ分の窓を作り、
 // 先頭/末尾に接していなければその側に 1 (または total) と省略記号を追加する。

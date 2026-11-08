@@ -15,14 +15,14 @@ export const person = {
 // ナビゲーションでは英語名(label)を主に表示し、日本語名(labelJa)を小さく併記する
 export const nav = [
   { href: '/', label: 'Top', labelJa: 'トップ' },
-  { href: '/news', label: 'News', labelJa: 'お知らせ' },
-  { href: '/about', label: 'About', labelJa: 'サイトについて' },
-  { href: '/profile', label: 'Profile', labelJa: 'プロフィール' },
-  { href: '/gallery', label: 'Gallery', labelJa: 'ギャラリー' },
-  { href: '/novels', label: 'Novels', labelJa: '小説' },
-  { href: '/toolbox', label: 'ToolBox', labelJa: 'ツールボックス' },
+  { href: '/news/', label: 'News', labelJa: 'お知らせ' },
+  { href: '/about/', label: 'About', labelJa: 'サイトについて' },
+  { href: '/profile/', label: 'Profile', labelJa: 'プロフィール' },
+  { href: '/gallery/', label: 'Gallery', labelJa: 'ギャラリー' },
+  { href: '/novels/', label: 'Novels', labelJa: '小説' },
+  { href: '/toolbox/', label: 'ToolBox', labelJa: 'ツールボックス' },
   { href: '/#shop', label: 'Shop', labelJa: 'ショップ' },
-  { href: '/contact', label: 'Contact', labelJa: 'お問い合わせ' },
+  { href: '/contact/', label: 'Contact', labelJa: 'お問い合わせ' },
 ];
 
 export const snsLinks = [

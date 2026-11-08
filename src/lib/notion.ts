@@ -65,6 +65,8 @@ export interface WorkItem {
   periodEnd: string | null;
   url: string | null;
   imageUrl: string | null;
+  // ArtworkItem.sourceImageUrl と同じ(ビルド中の画像変換の取得元にだけ使う)
+  sourceImageUrl: string | null;
   tags: string[];
   createdTime: string;
 }
@@ -256,6 +258,7 @@ export async function getWorkHistory(): Promise<WorkItem[]> {
       periodEnd: period?.end ?? null,
       url: urlProp(props, 'URL'),
       imageUrl: imageProp(page, 'works'),
+      sourceImageUrl: directImageUrl(page),
       tags: tagsProp(props),
       createdTime: page.created_time,
     };

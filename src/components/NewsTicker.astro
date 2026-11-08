@@ -15,7 +15,7 @@ const formattedDate = item.date
 const duration = Math.max(10, (item.title.length + (formattedDate?.length ?? 0)) * 0.35);
 
 // リンクが無い(URL未設定の手動投稿)場合は、お知らせ一覧へ案内する
-const href = item.link ?? '/news';
+const href = item.link ?? '/news/';
 const isExternal = Boolean(item.link && item.external);
 ---
 

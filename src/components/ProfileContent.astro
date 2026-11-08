@@ -15,6 +15,8 @@ interface Props {
 }
 const { showSkills = true, layout = 'center' } = Astro.props;
 const split = layout === 'split';
+// トップページではセクション見出し(h2)の下、プロフィールページではページ見出し(h1)の直下に置かれる
+const NameTag = split ? 'h3' : 'h2';
 
 const bioLines = [
   'インターネット絵とデザインと文マン。要するに器用貧乏。',
@@ -69,7 +71,7 @@ const skills = [
   />
   <div class={split ? 'space-y-4' : 'space-y-6'}>
     <div class:list={[split ? 'flex' : 'md:flex', 'items-baseline gap-3']}>
-      <h3 class:list={['text-3xl text-ink sm:text-4xl', split ? 'font-bold' : 'font-semibold leading-snug md:font-bold']}>千紗みかん</h3>
+      <NameTag class:list={['text-3xl text-ink sm:text-4xl', split ? 'font-bold' : 'font-semibold leading-snug md:font-bold']}>千紗みかん</NameTag>
       <p class:list={['text-sm text-graphite', !split && 'mt-1 md:mt-0']}>Chisa Mikan</p>
     </div>
     <p class="leading-relaxed text-ink/80">

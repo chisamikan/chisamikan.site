@@ -79,7 +79,7 @@ const heroImages: OptimizedImage[] =
 
   <!-- お知らせ(統合フィードの最新3件) -->
   <section id="news" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 py-24">
-    <SectionHeading eyebrow="News" title="お知らせ" href="/news" />
+    <SectionHeading eyebrow="News" title="お知らせ" href="/news/" />
     <NewsList items={news.slice(0, 3)} />
     {news.length > 0 && (
       <div class="mt-6 text-right">
@@ -90,13 +90,13 @@ const heroImages: OptimizedImage[] =
 
   <!-- プロフィール -->
   <section id="profile" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Profile" title="プロフィール" href="/profile" linkLabel="もっと見る" />
+    <SectionHeading eyebrow="Profile" title="プロフィール" href="/profile/" linkLabel="もっと見る" />
     <ProfileContent showSkills={false} layout="split" />
   </section>
 
   <!-- ギャラリー抜粋 -->
   <section id="gallery" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Gallery" title="ギャラリー" href="/gallery" />
+    <SectionHeading eyebrow="Gallery" title="ギャラリー" href="/gallery/" />
     {featuredGallery.length > 0 ? (
       <CardSlider id="home-gallery-slider" count={featuredGallery.length}>
         {featuredGallery.map((item) => (
@@ -112,7 +112,7 @@ const heroImages: OptimizedImage[] =
 
   <!-- 小説抜粋 -->
   <section id="novels" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Novels" title="小説" href="/novels" />
+    <SectionHeading eyebrow="Novels" title="小説" href="/novels/" />
     {featuredNovels.length > 0 ? (
       <CardSlider id="home-novels-slider" count={featuredNovels.length}>
         {featuredNovels.map((item) => (
@@ -128,7 +128,7 @@ const heroImages: OptimizedImage[] =
 
   <!-- ツールボックス(最新3件) -->
   <section id="toolbox" class="reveal mx-auto max-w-5xl scroll-mt-20 px-6 pb-24">
-    <SectionHeading eyebrow="Tool Box" title="ツールボックス" href="/toolbox" />
+    <SectionHeading eyebrow="Tool Box" title="ツールボックス" href="/toolbox/" />
     {featuredToolbox.length > 0 ? (
       <CardSlider id="home-toolbox-slider" count={featuredToolbox.length}>
         {featuredToolbox.map((item) => (
@@ -163,7 +163,7 @@ const heroImages: OptimizedImage[] =
     <div class="mx-auto text-center">
       <p class="page-lead">イラスト / グラフィックデザイン / Webデザイン / ライティング等、幅広いコンテンツの制作を承ります。</p>
       <div class="mt-10 text-center">
-        <a href="/contact" class="btn-glass btn-glass-accent btn-wide">
+        <a href="/contact/" class="btn-glass btn-glass-accent btn-wide">
           <i class="fa-solid fa-envelope"></i>ご依頼はこちら
         </a>
       </div>
