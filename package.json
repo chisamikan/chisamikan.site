@@ -17,12 +17,12 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^14.4.3",
+    "@astrojs/cloudflare": "^14.4.6",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "@notionhq/client": "^5.30.0",
-    "@tailwindcss/vite": "^4.0.0",
-    "astro": "^7.4.4",
+    "@notionhq/client": "^5.31.0",
+    "@tailwindcss/vite": "^4.3.4",
+    "astro": "^7.4.7",
     "rss-parser": "^3.13.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^6.0.3"
@@ -33,8 +33,8 @@
     "@fortawesome/free-regular-svg-icons": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "subset-font": "^2.9.0",
-    "vite": "^8.3.5",
-    "wrangler": "^4.156.0"
+    "vite": "^8.3.6",
+    "wrangler": "^4.158.0"
   },
   "overrides": {
     "miniflare": {
