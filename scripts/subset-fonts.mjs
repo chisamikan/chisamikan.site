@@ -16,6 +16,10 @@ const SOURCE = `https://raw.githubusercontent.com/google/fonts/${COMMIT}/ofl/zen
 const WEIGHTS = { 400: 'Regular', 500: 'Medium', 700: 'Bold' };
 // 元のフォント(1つ約2.3MB)を毎回取得しないよう、ビルドキャッシュに残す。コミットを変えたら取り直す
 const CACHE_DIR = `node_modules/.cache/zen-kaku-gothic-new/${COMMIT}`;
+// 作り直さない部分のフォントに入れる文字の一覧
+const BASE_CHARS = new URL('./font-base-chars.txt', import.meta.url);
+// 追加分がこれを超えたら、一覧を作り直すよう知らせる(1文字あたり3つの太さで計約0.4KB。200文字で約80KB)
+const EXTRA_LIMIT = 200;
 
 async function sourceFont(name) {
   const path = join(CACHE_DIR, `${name}.ttf`);
@@ -41,16 +45,40 @@ export default {
       const files = (await readdir(root, { recursive: true })).filter((f) => /\.(html|js|css)$/.test(f));
       const contents = await Promise.all(files.map((f) => readFile(join(root, f), 'utf8')));
       // 画面に出る文字は、HTML・JSが書き出す文字列・CSSの content のどれかに含まれる
-      const text = [...new Set(contents.join(''))].join('');
+      const used = new Set(contents.join(''));
+      // 使う文字をそのまま1つのフォントにすると、Notionの更新(2〜3日に1回)で文字が1つ増えるたびに作り直され、
+      // 再訪問した人も約530KBを読み直すことになる。固定した文字の一覧で作るフォント(作り直されない)と、
+      // 一覧に無い文字だけの小さな追加分に分ける。一覧が無ければ今の文字で作る(作り直すときは消してビルドしてコミット)
+      let base;
+      try {
+        base = await readFile(BASE_CHARS, 'utf8');
+      } catch {
+        base = [...used].join('');
+        await writeFile(BASE_CHARS, base);
+      }
+      const baseSet = new Set(base);
+      const extra = [...used].filter((c) => !baseSet.has(c));
+      if (extra.length > EXTRA_LIMIT) {
+        logger.warn(`日本語フォントの追加分が${extra.length}文字になりました。${fileURLToPath(BASE_CHARS)} を消してビルドし、コミットしてください`);
+      }
 
       const hashed = (name, ext, data) => `_astro/${name}.${createHash('sha256').update(data).digest('hex').slice(0, 8)}.${ext}`;
+      const fontFace = async (name, weight, source, chars, unicodeRange = '') => {
+        const font = await subsetFont(source, chars, { targetFormat: 'woff2' });
+        const file = hashed(name, 'woff2', font);
+        await writeFile(join(root, file), font);
+        return `@font-face{font-family:'${FAMILY}';src:url(/${file}) format('woff2');font-weight:${weight};font-display:swap${unicodeRange}}`;
+      };
       let css = '';
       try {
         for (const [weight, name] of Object.entries(WEIGHTS)) {
-          const font = await subsetFont(await sourceFont(name), text, { targetFormat: 'woff2' });
-          const file = hashed(`zen-kaku-${weight}`, 'woff2', font);
-          await writeFile(join(root, file), font);
-          css += `@font-face{font-family:'${FAMILY}';src:url(/${file}) format('woff2');font-weight:${weight};font-display:swap}`;
+          const source = await sourceFont(name);
+          css += await fontFace(`zen-kaku-${weight}`, weight, source, base);
+          // 追加分は、その文字を使うページでだけ読み込まれるよう unicode-range で範囲を絞る
+          if (extra.length) {
+            const range = `;unicode-range:${extra.map((c) => `U+${c.codePointAt(0).toString(16)}`).join(',')}`;
+            css += await fontFace(`zen-kaku-extra-${weight}`, weight, source, extra.join(''), range);
+          }
         }
       } catch (err) {
         // 作れなくても、Google Fontsだけで今までどおり表示される
