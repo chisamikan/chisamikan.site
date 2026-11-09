@@ -6,6 +6,7 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { minifySync } from 'vite';
+import subsetFonts from './scripts/subset-fonts.mjs';
 
 // ソースのコメントは開発用なので、公開するHTMLからは取り除く。バンドルされるJS・CSSはビルド時に消えるため、
 // 残るのはHTMLのコメントと、HTMLに直接埋め込まれたスクリプト(is:inlineや小さいため埋め込まれたもの)だけ。
@@ -59,6 +60,7 @@ export default defineConfig({
   },
   integrations: [
     stripComments,
+    subsetFonts,
     sitemap({
       // /secret は隠しページ、/404 はエラーページのためサイトマップから除外する
       filter: (page) => !page.includes('/secret') && !page.includes('/404'),
