@@ -1,0 +1,51 @@
+name: 日本語フォントの文字の一覧の確認
+
+# 日本語フォントの追加分(scripts/subset-fonts.mjs)が増えすぎていないかを本番のCSSで確かめ、
+# 一覧を作り直す時期ならissueを立てる。忘れても困らないよう、ビルドのログの警告とは別に知らせる
+on:
+  schedule:
+    # 毎月1日 00:00 UTC(09:00 JST)
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          # scripts/subset-fonts.mjs の EXTRA_LIMIT と同じ値
+          LIMIT: 200
+          TITLE: 日本語フォントの文字の一覧を作り直す
+        run: |
+          css=$(curl -fsS https://chisamikan.site/ | grep -o '/_astro/zen-kaku\.[0-9a-f]*\.css' | head -1 || true)
+          if [ -z "$css" ]; then echo "自前の日本語フォントは使われていません"; exit 0; fi
+          # 追加分は3つの太さで同じ文字の範囲を持つため、1つ目だけ数える
+          range=$(curl -fsS "https://chisamikan.site$css" | grep -o 'unicode-range:[^}]*' | head -1 || true)
+          count=0
+          if [ -n "$range" ]; then count=$(echo "$range" | tr ',' '\n' | wc -l); fi
+          echo "追加分: ${count}文字(上限 ${LIMIT}文字)"
+          if [ "$count" -le "$LIMIT" ]; then exit 0; fi
+          if [ "$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq length)" != "0" ]; then
+            echo "同じissueが開いています"; exit 0
+          fi
+          gh issue create --title "$TITLE" --body "$(cat <<EOF
+          日本語フォントの追加分が ${count}文字 になりました(上限 ${LIMIT}文字)。
+
+          Notionの更新で増えた文字は、小さな「追加分」のフォントで配信しています。追加分が大きくなってきたので、文字の一覧を作り直してください。作り直すと、追加分の文字も固定の部分に入ります。
+
+          ## 頼み方
+          Claude Codeに「日本語フォントの文字の一覧を作り直して」と頼んでください。
+
+          ## 作業の中身
+          1. \`scripts/font-base-chars.txt\` を消す
+          2. \`npm run build\` を実行する(今の文字で一覧が作り直される)
+          3. 作り直した一覧をコミットしてPRを出す
+
+          作り直した直後だけ、再訪問した人もフォント(約530KB)を1回読み直します。
+          EOF
+          )"
