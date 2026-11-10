@@ -441,22 +441,24 @@ html.theme-transition::view-transition-new(root) {
     @apply py-2;
   }
 
-  /* タイピング中に吹き出しの縦幅が伸び縮みしても、アバターと三角(::before)の
-     位置が動かないよう上詰めで固定する */
+  /* アバターと吹き出しの三角(::before)を吹き出しの中央に揃える。
+     タイピング中は404.astroの typeText が吹き出しの高さを全文の高さに固定するため、位置は動かない */
   .line-mock-row {
-    @apply flex items-start gap-3;
+    @apply flex items-center gap-3;
   }
 
   .line-mock-avatar {
     @apply flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white bg-cover bg-center text-4xl;
   }
 
+  /* ライトモードは囲みの箱(bg-surface)が白のため、吹き出しを白にすると箱に溶けて三角も見えなくなる。
+     ライトでは淡い色、ダークでは白にする */
   .line-mock-bubble {
-    @apply relative max-w-full rounded-2xl bg-white px-3.5 py-2.5 text-sm leading-relaxed text-black shadow-sm text-left w-full break-normal;
+    @apply relative max-w-full rounded-2xl bg-paper-dim px-3.5 py-2.5 text-sm leading-relaxed text-black shadow-sm text-left w-full break-normal dark:bg-white;
   }
 
   .line-mock-bubble::before {
-    @apply content-[''] absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
+    @apply content-[''] absolute top-1/2 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-inherit;
   }
 
   /* ファーストビュー(index.astro)のイラスト上に重ねる、浮かぶガラスの部品(ナビ・お知らせの札)。
