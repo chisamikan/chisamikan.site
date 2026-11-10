@@ -14,7 +14,8 @@
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "refresh-font-chars": "node -e \"require('node:fs').rmSync('scripts/font-base-chars.txt', { force: true })\" && npm run build",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "postinstall": "npm run cf-typegen"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.6",
@@ -24,11 +25,9 @@
     "@tailwindcss/vite": "^4.3.4",
     "astro": "^7.4.7",
     "rss-parser": "^3.13.0",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^6.0.3"
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261030.1",
     "@fortawesome/free-brands-svg-icons": "^7.3.1",
     "@fortawesome/free-regular-svg-icons": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
