@@ -90,16 +90,21 @@ export default {
 
       // Google Fontsと同じく、表示を止めないよう後から読み込む。HTMLに直接書くと、フォント(計約530KB)が
       // サイト名の表示より先に最優先で取得され、Lighthouse(スマホ)のLCPの推定が数秒悪くなった。
-      // Google FontsのCSSが先に効くと、その分割ファイル(60個以上)を読み始めてしまう(保存済みのGoogle FontsのCSSと、
-      // 文字が増えて名前の変わったこのCSSとで起きる)。Google Fontsはこちらが効いてから(失敗しても)有効にする
-      const enableGoogleFonts = "document.getElementById('google-fonts').media='all'";
+      // Google Fontsの日本語フォントは、こちらのフォントが届いてから(失敗したらすぐ)有効にし、英字用とは分けて読み込む。
+      // 先に効くと、その分割ファイル(60個以上)を読み始めてしまう(保存済みのGoogle FontsのCSSと、文字が増えて名前の変わった
+      // このCSSとで起きる)。また、こちらのフォントが届く前に効いていると、代わりの文字を探すたびに分割ファイルの指定
+      // (太さ3種類で数百件)をたどるため、最初のレイアウトが重くなる(スマホ想定のCPU 4倍遅延で約0.8秒→約0.15秒)。
+      // フォントの読み込みはレイアウトで始まるため、次の描画を待ってから document.fonts.ready を見る(PageLoaderと同じ)
+      const googleFontsJa = `https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@${Object.keys(WEIGHTS).join(';')}&display=swap`;
+      const enableJa = "document.getElementById('google-fonts-ja').media='all'";
       const link =
-        `<link href="/${cssFile}" rel="stylesheet" media="print" onload="this.media='all';${enableGoogleFonts}" onerror="${enableGoogleFonts}">` +
+        `<link id="google-fonts-ja" href="${googleFontsJa}" rel="stylesheet" media="print">` +
+        `<link href="/${cssFile}" rel="stylesheet" media="print" onload="this.media='all';requestAnimationFrame(()=>setTimeout(()=>document.fonts.ready.then(()=>${enableJa})))" onerror="${enableJa}">` +
         `<noscript><link href="/${cssFile}" rel="stylesheet"></noscript></head>`;
       for (const [i, f] of files.entries()) {
         if (!f.endsWith('.html')) continue;
         const html = contents[i]
-          .replace(/(<link href="https:\/\/fonts\.googleapis\.com\/css2[^"]*" rel="stylesheet" media="print") onload="this\.media='all'"/, '$1 id="google-fonts"')
+          .replace(/(<link href="https:\/\/fonts\.googleapis\.com\/css2[^"]*?)&family=Zen\+Kaku\+Gothic\+New[^&"]*([^"]*" rel="stylesheet" media="print" onload)/, '$1$2')
           .replace('</head>', link);
         await writeFile(join(root, f), html);
       }
