@@ -1,0 +1,24 @@
+---
+interface Props {
+  tags: string[];
+}
+const { tags } = Astro.props;
+// サムネイル上に重ねるタグの上限。多いと重ね表示が膨らんでイラストを覆うため、残りは「+N」にまとめる
+const MAX_TAGS = 3;
+const rest = tags.slice(MAX_TAGS);
+---
+
+{tags.length > 0 && (
+  <ul class="flex flex-wrap gap-1.5">
+    {tags.slice(0, MAX_TAGS).map((tag) => (
+      <li class="glass-tag glass-tag-inverse" title={tag}>
+        {tag}
+      </li>
+    ))}
+    {rest.length > 0 && (
+      <li class="glass-tag glass-tag-inverse" title={rest.join(' / ')}>
+        +{rest.length}
+      </li>
+    )}
+  </ul>
+)}

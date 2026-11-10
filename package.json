@@ -9,7 +9,6 @@
   "scripts": {
     "predev": "node scripts/build-icons.mjs",
     "dev": "astro dev",
-    "start": "npm run dev",
     "prebuild": "node scripts/build-icons.mjs",
     "build": "astro build",
     "preview": "wrangler dev",

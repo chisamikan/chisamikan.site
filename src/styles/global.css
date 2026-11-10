@@ -271,6 +271,11 @@ html.theme-transition::view-transition-new(root) {
     @apply cursor-pointer rounded-full border border-ink/15 px-4 py-1.5 font-body text-xs font-medium text-ink-soft transition-[transform,background-color,border-color,color] duration-150 ease-out hover:border-accent/50 hover:text-accent-text active:scale-[0.97];
   }
 
+  /* 絞り込みの選択中(TagFilter・NewsCategoryFilter)。.btn-glass-ghost のホバー時の色に勝つよう、その後ろに置く */
+  .filter-btn.is-active {
+    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90 hover:text-on-accent;
+  }
+
   /* 以下、CodePen "Liquid Glass UI kit" 由来の追加コンポーネント */
 
   /* タグ: カード・実績・スキル・お知らせのカテゴリに共通で使う。ガラスの面は持たせず、細い枠線だけで示す。

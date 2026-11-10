@@ -7,6 +7,7 @@
 // カードが3枚以下の場合はデスクトップで元々全件が1行に収まり、スライドさせる意味が
 // 無い(むしろモバイルで1枚ずつしか見えなくなり不便)ため、CardGridでの通常グリッド表示にフォールバックする。
 import CardGrid from './CardGrid.astro';
+import LoadingOverlay from './LoadingOverlay.astro';
 
 interface Props {
   id: string;
@@ -55,16 +56,7 @@ const isSlider = count > 3;
     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
   </button>
 
-  <div
-    data-card-slider-loading={id}
-    class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300"
-    role="status"
-    aria-live="polite"
-    aria-hidden="true"
-  >
-    <i class="fa-solid fa-spinner fa-spin text-4xl text-accent" aria-hidden="true"></i>
-    <span class="sr-only">読み込み中</span>
-  </div>
+  <LoadingOverlay data-card-slider-loading={id} />
 
   {/* カルーセルであることを示すためのページネーションドット。本物のカード1枚につき1つ表示し、
       現在左端(見出しの左端の位置)に表示されているカードに合わせてJSからis-activeを切り替える */}
