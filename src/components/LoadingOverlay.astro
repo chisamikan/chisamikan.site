@@ -1,0 +1,16 @@
+---
+// 一覧の画像が読み込まれるまで重ねるスピナー。表示の切り替えは lib/imageLoading.ts が行い、
+// 対象の一覧を見分ける data-* 属性は呼び出し側から渡す
+const attrs = Astro.props;
+---
+
+<div
+  {...attrs}
+  class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300"
+  role="status"
+  aria-live="polite"
+  aria-hidden="true"
+>
+  <i class="fa-solid fa-spinner fa-spin text-4xl text-accent" aria-hidden="true"></i>
+  <span class="sr-only">読み込み中</span>
+</div>

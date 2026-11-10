@@ -35,14 +35,6 @@ const { tags, containerSelector, emptySelector, class: wrapperClass = 'mb-4 flex
   </div>
 )}
 
-<style>
-  @reference '../styles/global.css';
-
-  .filter-btn.is-active {
-    @apply border-transparent bg-accent-strong text-on-accent hover:border-transparent hover:bg-accent-strong/90 hover:text-on-accent;
-  }
-</style>
-
 <script>
   import { matchesTag, revealItems } from '../lib/tagFilter';
 
@@ -62,18 +54,10 @@ const { tags, containerSelector, emptySelector, class: wrapperClass = 'mb-4 flex
 
         if (container) {
           const items = Array.from(container.querySelectorAll<HTMLElement>(':scope > [data-tags]'));
-          let visibleCount = 0;
-          const itemsToReveal: HTMLElement[] = [];
-          items.forEach((item) => {
-            const match = matchesTag(item, filter);
-            item.style.display = match ? '' : 'none';
-            if (match) {
-              visibleCount += 1;
-              itemsToReveal.push(item);
-            }
-          });
-          if (emptyMessage) emptyMessage.classList.toggle('hidden', visibleCount > 0);
-          revealItems(itemsToReveal);
+          items.forEach((item) => (item.style.display = matchesTag(item, filter) ? '' : 'none'));
+          const shown = items.filter((item) => item.style.display === '');
+          emptyMessage?.classList.toggle('hidden', shown.length > 0);
+          revealItems(shown);
         }
 
         group.dispatchEvent(new CustomEvent('tagfilter:change', { detail: { filter }, bubbles: true }));

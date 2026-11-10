@@ -47,21 +47,26 @@ async function optimize(
 // 元画像より大きい幅は作らず、元画像の幅を上限にする
 const widthsUpTo = (widths: number[], max: number) => [...widths.filter((w) => w < max), max];
 
+// 元の縦横比のまま、widths の最大か元画像の幅の小さい方を上限に変換する
+function convertKeepingRatio(sourceUrl: string, width: number, height: number, widths: number[]) {
+  const maxWidth = Math.min(width, widths.at(-1)!);
+  return getImage({
+    src: sourceUrl,
+    width: maxWidth,
+    height: Math.round((maxWidth * height) / width),
+    widths: widthsUpTo(widths, maxWidth),
+    format: 'avif',
+    quality: 50,
+  });
+}
+
 // ファーストビューの全画面イラスト。PCの画面幅(1920px前後)で等倍になる大きさを上限にする。
 // スマホの高画素密度の画面では少し拡大表示になるが、文字を重ねる背景でありズームもしているため目立たない
 const HERO_WIDTHS = [640, 960, 1280, 1920];
 
 export function optimizeHeroImage(sourceUrl: string, fallbackUrl: string): Promise<OptimizedImage> {
   return optimize(sourceUrl, fallbackUrl, async (width, height) => {
-    const maxWidth = Math.min(width, HERO_WIDTHS.at(-1)!);
-    const avif = await getImage({
-      src: sourceUrl,
-      width: maxWidth,
-      height: Math.round((maxWidth * height) / width),
-      widths: widthsUpTo(HERO_WIDTHS, maxWidth),
-      format: 'avif',
-      quality: 50,
-    });
+    const avif = await convertKeepingRatio(sourceUrl, width, height, HERO_WIDTHS);
     // 画面全体に object-cover で敷くため、画面が画像より縦長なら画面の高さに合わせて拡大される。
     // そのときは横幅ではなく「画面の高さ × 画像の縦横比」を表示幅として画像を選ばせる
     const sizes = `(min-aspect-ratio: ${width}/${height}) 100vw, calc(100vh * ${(width / height).toFixed(3)})`;
@@ -107,15 +112,7 @@ export function optimizeCardImage(sourceUrl: string, fallbackUrl: string): Promi
 // 拡大表示の大きさを元画像の届く前に決められるよう、元画像の大きさも返す
 export function optimizePreviewImage(sourceUrl: string, fallbackUrl: string, sizes: string): Promise<OptimizedImage> {
   return optimize(sourceUrl, fallbackUrl, async (width, height) => {
-    const maxWidth = Math.min(width, CARD_WIDTHS.at(-1)!);
-    const avif = await getImage({
-      src: sourceUrl,
-      width: maxWidth,
-      height: Math.round((maxWidth * height) / width),
-      widths: widthsUpTo(CARD_WIDTHS, maxWidth),
-      format: 'avif',
-      quality: 50,
-    });
+    const avif = await convertKeepingRatio(sourceUrl, width, height, CARD_WIDTHS);
     // 横長の画像は正方形の枠に高さを合わせて拡大されるため、枠の幅 × 縦横比を表示幅として画像を選ばせる
     const ratio = width / height;
     const scaledSizes =

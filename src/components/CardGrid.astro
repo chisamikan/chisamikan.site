@@ -9,6 +9,8 @@
 // タグ絞り込み等でページ側が表示更新を担う場合は managed を付け、
 // このコンポーネントの自動初期化をスキップしてページ側スクリプトに委ねる
 // (対象は data-card-grid-loading={id} のオーバーレイ要素)。
+import LoadingOverlay from './LoadingOverlay.astro';
+
 interface Props {
   id: string;
   class?: string;
@@ -22,17 +24,7 @@ const { id, class: gridClass = '', managed = false } = Astro.props;
   <div id={id} class={gridClass}>
     <slot />
   </div>
-  <div
-    data-card-grid-loading={id}
-    data-managed={managed ? 'true' : undefined}
-    class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300"
-    role="status"
-    aria-live="polite"
-    aria-hidden="true"
-  >
-    <i class="fa-solid fa-spinner fa-spin text-4xl text-accent" aria-hidden="true"></i>
-    <span class="sr-only">読み込み中</span>
-  </div>
+  <LoadingOverlay data-card-grid-loading={id} data-managed={managed ? 'true' : undefined} />
 </div>
 
 <script>

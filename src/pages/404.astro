@@ -239,16 +239,6 @@ const omikujiFields = [
       ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
     }
 
-    function drawRoundedRect(ctx, x, y, w, h, radius) {
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.arcTo(x + w, y, x + w, y + h, radius);
-      ctx.arcTo(x + w, y + h, x, y + h, radius);
-      ctx.arcTo(x, y + h, x, y, radius);
-      ctx.arcTo(x, y, x + w, y, radius);
-      ctx.closePath();
-    }
-
     // ページの文字と同じ順でフォントを探す(Subsetはビルド時に作る。scripts/subset-fonts.mjs)
     const canvasFont = (weight, size) =>
       `${weight} ${size}px "Zen Kaku Gothic New Subset", "Zen Kaku Gothic New", sans-serif`;
@@ -337,7 +327,8 @@ const omikujiFields = [
       ctx.restore();
 
       ctx.fillStyle = '#ffffff';
-      drawRoundedRect(ctx, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 24);
+      ctx.beginPath();
+      ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 24);
       ctx.fill();
 
       ctx.fillStyle = '#111111';

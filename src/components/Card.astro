@@ -3,6 +3,7 @@ import type { ArtworkItem, NovelItem, ToolboxItem } from '../lib/notion';
 import type { BoothItem } from '../lib/booth';
 import { isNewItem } from '../lib/isNew';
 import { optimizeCardImage, optimizePreviewImage } from '../lib/optimizeImages';
+import CardTags from './CardTags.astro';
 
 type Props = (
   | { type: 'artwork'; item: ArtworkItem; headingLevel?: 2 | 3 }
@@ -37,8 +38,6 @@ const thumbAttrs = { srcset: thumbnail?.srcset, sizes: thumbnail?.sizes };
 // 音声で操作する人が「NSFW」と言っても押せず、Lighthouseでも見た目と名前の不一致と判定される
 const artworkLabel =
   props.type === 'artwork' && props.item.nsfw ? `NSFW ${props.item.title}を拡大表示` : `${props.item.title}を拡大表示`;
-// サムネイル上に重ねるタグの上限。多いと重ね表示が膨らんでイラストを覆うため、残りは「+N」にまとめる
-const MAX_TAGS = 3;
 // BOOTH商品(shop)は追加日時を取得できないため対象外
 const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
 ---
@@ -91,20 +90,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         大きな空白ができるため、ここに置いてカード下部は日付・リンクの1行だけにし、全カードの高さを揃える
         (小説・ツールボックスのカードも同じ理由で説明文をここに置き、カード下部を持たせない) */}
       <div class="card-overlay">
-        {props.item.tags.length > 0 && (
-          <ul class="flex flex-wrap gap-1.5">
-            {props.item.tags.slice(0, MAX_TAGS).map((tag) => (
-              <li class="glass-tag glass-tag-inverse" title={tag}>
-                {tag}
-              </li>
-            ))}
-            {props.item.tags.length > MAX_TAGS && (
-              <li class="glass-tag glass-tag-inverse" title={props.item.tags.slice(MAX_TAGS).join(' / ')}>
-                +{props.item.tags.length - MAX_TAGS}
-              </li>
-            )}
-          </ul>
-        )}
+        <CardTags tags={props.item.tags} />
         <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white break-normal wrap-anywhere">
           {props.item.title}
         </Tag>
@@ -161,20 +147,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         <span class="glass-badge glass-badge-accent pointer-events-none absolute right-3 top-3 z-10">NEW</span>
       )}
       <div class="card-overlay">
-        {props.item.tags.length > 0 && (
-          <ul class="flex flex-wrap gap-1.5">
-            {props.item.tags.slice(0, MAX_TAGS).map((tag) => (
-              <li class="glass-tag glass-tag-inverse" title={tag}>
-                {tag}
-              </li>
-            ))}
-            {props.item.tags.length > MAX_TAGS && (
-              <li class="glass-tag glass-tag-inverse" title={props.item.tags.slice(MAX_TAGS).join(' / ')}>
-                +{props.item.tags.length - MAX_TAGS}
-              </li>
-            )}
-          </ul>
-        )}
+        <CardTags tags={props.item.tags} />
         <Tag class="line-clamp-2 font-display text-lg font-medium leading-snug text-white">
           {props.item.title}
         </Tag>
@@ -264,11 +237,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
         )}
       </a>
       <div class="card-overlay">
-        {props.item.category && (
-          <ul class="flex flex-wrap gap-1.5">
-            <li class="glass-tag glass-tag-inverse" title={props.item.category}>{props.item.category}</li>
-          </ul>
-        )}
+        <CardTags tags={props.item.category ? [props.item.category] : []} />
         <Tag class="line-clamp-2 font-display text-base font-medium leading-snug text-white">
           <a
             href={props.item.url}

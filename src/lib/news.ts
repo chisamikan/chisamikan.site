@@ -50,7 +50,7 @@ type RawNewsItem = Omit<NewsFeedItem, 'date'> & { date: string | null };
 
 interface GroupableSiteItem {
   id: string;
-  name: string;
+  title: string;
   createdTime: string;
 }
 
@@ -82,7 +82,7 @@ function buildSiteNewsItems(items: GroupableSiteItem[], config: SiteNewsGroupCon
       return {
         id: `${config.idPrefix}-${item.id}`,
         category: 'site' as const,
-        title: `${config.label}に『${item.name}』を追加しました`,
+        title: `${config.label}に『${item.title}』を追加しました`,
         body: null,
         date: item.createdTime,
         link: `${config.basePath}#${config.idPrefix}-${item.id}`,
@@ -93,7 +93,7 @@ function buildSiteNewsItems(items: GroupableSiteItem[], config: SiteNewsGroupCon
     return {
       id: `${config.idPrefix}-group-${toJstDateKey(latest.createdTime)}`,
       category: 'site' as const,
-      title: buildGroupedTitle(group.map((item) => item.name), config.label, config.unit),
+      title: buildGroupedTitle(group.map((item) => item.title), config.label, config.unit),
       body: null,
       date: latest.createdTime,
       link: config.basePath,
@@ -148,20 +148,11 @@ export async function getAllNewsItems(): Promise<NewsFeedItem[]> {
   ]);
 
   const items: RawNewsItem[] = [
+    ...buildSiteNewsItems(gallery, { idPrefix: 'gallery', label: 'ギャラリー', unit: '点', basePath: '/gallery/' }),
+    ...buildSiteNewsItems(novels, { idPrefix: 'novel', label: '小説', unit: '作', basePath: '/novels/' }),
+    ...buildSiteNewsItems(toolbox, { idPrefix: 'toolbox', label: 'ツールボックス', unit: '点', basePath: '/toolbox/' }),
     ...buildSiteNewsItems(
-      gallery.map((item) => ({ id: item.id, name: item.title, createdTime: item.createdTime })),
-      { idPrefix: 'gallery', label: 'ギャラリー', unit: '点', basePath: '/gallery/' },
-    ),
-    ...buildSiteNewsItems(
-      novels.map((item) => ({ id: item.id, name: item.title, createdTime: item.createdTime })),
-      { idPrefix: 'novel', label: '小説', unit: '作', basePath: '/novels/' },
-    ),
-    ...buildSiteNewsItems(
-      toolbox.map((item) => ({ id: item.id, name: item.title, createdTime: item.createdTime })),
-      { idPrefix: 'toolbox', label: 'ツールボックス', unit: '点', basePath: '/toolbox/' },
-    ),
-    ...buildSiteNewsItems(
-      works.map((item) => ({ id: item.id, name: item.client, createdTime: item.createdTime })),
+      works.map((item) => ({ ...item, title: item.client })),
       { idPrefix: 'work', label: '仕事履歴', unit: '件', basePath: '/profile/' },
     ),
     ...manual.map((item) => ({
