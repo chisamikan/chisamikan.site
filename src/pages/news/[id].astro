@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getManualNewsItems } from '../../lib/notion';
 import { getCategoryMeta } from '../../lib/news';
+import { person } from '../../lib/config';
 
 // Notionの手動投稿DBの記事ごとの個別ページ。一覧(/news/[...page])のページ番号とはIDの形式が異なるため衝突しない
 export const getStaticPaths = (async () => {
@@ -25,23 +26,38 @@ const breadcrumbs = [
 ];
 // 画面では記事名を出さない(すぐ下のh1と重なるため)が、検索向けのデータには今のページとして含める。
 // 記事名はNotionの入力のままなので、埋め込み時に < を逃がして </script> でタグが閉じないようにする
-const breadcrumbStructuredData = {
+const siteURL = new URL('/', Astro.site ?? Astro.url).toString();
+const structuredData = {
   '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    ...breadcrumbs.map((crumb, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: crumb.name,
-      item: new URL(crumb.href, Astro.site ?? Astro.url).toString(),
-    })),
-    { '@type': 'ListItem', position: breadcrumbs.length + 1, name: item.title },
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        ...breadcrumbs.map((crumb, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: crumb.name,
+          item: new URL(crumb.href, siteURL).toString(),
+        })),
+        { '@type': 'ListItem', position: breadcrumbs.length + 1, name: item.title },
+      ],
+    },
+    // 書いた人はBaseLayoutの構造化データのPersonと@idで結ぶ。別のscriptにあるため名前とURLも書いておく
+    {
+      '@type': 'Article',
+      headline: item.title,
+      datePublished: date,
+      inLanguage: 'ja',
+      mainEntityOfPage: new URL(Astro.url.pathname, siteURL).toString(),
+      author: { '@id': `${siteURL}#person`, '@type': 'Person', name: person.name, url: new URL('/profile/', siteURL).toString() },
+      publisher: { '@id': `${siteURL}#person` },
+    },
   ],
 };
 ---
 
-<BaseLayout title={item.title} description={item.body.slice(0, 120) || 'お知らせ'}>
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbStructuredData).replaceAll('<', '\\u003c')} />
+<BaseLayout title={item.title} description={item.body.slice(0, 120) || 'お知らせ'} ogType="article">
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData).replaceAll('<', '\\u003c')} />
   <article class="page-section">
     <nav aria-label="パンくずリスト" class="mb-5">
       <ol class="flex flex-wrap items-center gap-x-2 text-[13px] text-ink-soft">
