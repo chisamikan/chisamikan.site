@@ -48,7 +48,7 @@ export default {
       const used = new Set(contents.join(''));
       // 使う文字をそのまま1つのフォントにすると、Notionの更新(2〜3日に1回)で文字が1つ増えるたびに作り直され、
       // 再訪問した人も約530KBを読み直すことになる。固定した文字の一覧で作るフォント(作り直されない)と、
-      // 一覧に無い文字だけの小さな追加分に分ける。一覧が無ければ今の文字で作る(作り直すときは消してビルドしてコミット)
+      // 一覧に無い文字だけの小さな追加分に分ける。一覧が無ければ今の文字で作る(作り直すときは npm run refresh-font-chars のあとコミット)
       let base;
       try {
         base = await readFile(BASE_CHARS, 'utf8');
@@ -59,7 +59,7 @@ export default {
       const baseSet = new Set(base);
       const extra = [...used].filter((c) => !baseSet.has(c));
       if (extra.length > EXTRA_LIMIT) {
-        logger.warn(`日本語フォントの追加分が${extra.length}文字になりました。${fileURLToPath(BASE_CHARS)} を消してビルドし、コミットしてください`);
+        logger.warn(`日本語フォントの追加分が${extra.length}文字になりました。npm run refresh-font-chars を実行し、${fileURLToPath(BASE_CHARS)} をコミットしてください`);
       }
 
       const hashed = (name, ext, data) => `_astro/${name}.${createHash('sha256').update(data).digest('hex').slice(0, 8)}.${ext}`;
