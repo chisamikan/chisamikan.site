@@ -6,6 +6,7 @@
   "author": "Chisamikan",
   "license": "UNLICENSED",
   "private": true,
+  "packageManager": "npm@11.19.1",
   "scripts": {
     "predev": "node scripts/build-icons.mjs",
     "dev": "astro dev",
