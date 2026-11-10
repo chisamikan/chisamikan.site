@@ -15,7 +15,8 @@
     "preview": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "refresh-font-chars": "node -e \"require('node:fs').rmSync('scripts/font-base-chars.txt', { force: true })\" && npm run build",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "postinstall": "npm run cf-typegen"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.6",
