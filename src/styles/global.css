@@ -451,12 +451,16 @@ html.theme-transition::view-transition-new(root) {
     @apply flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white bg-cover bg-center text-4xl;
   }
 
+  /* ライトモードは囲みの箱(bg-surface)が白のため、吹き出しを白にすると箱に溶けて三角も見えなくなる。
+     ライトでは淡い色、ダークでは白にする。
+     三角はアバターの中心(上から40px)に置く。吹き出しの高さをアバターと同じ80px以上にして文字を上下中央に置き、
+     2行以下では三角が吹き出しの中央に来るようにする */
   .line-mock-bubble {
-    @apply relative max-w-full rounded-2xl bg-white px-3.5 py-2.5 text-sm leading-relaxed text-black shadow-sm text-left w-full break-normal;
+    @apply relative flex min-h-20 max-w-full items-center rounded-2xl bg-paper-dim px-3.5 py-2.5 text-sm leading-relaxed text-black shadow-sm text-left w-full break-normal dark:bg-white;
   }
 
   .line-mock-bubble::before {
-    @apply content-[''] absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-white;
+    @apply content-[''] absolute top-10 -left-1 h-3 w-3 -translate-y-1/2 rotate-45 bg-inherit;
   }
 
   /* ファーストビュー(index.astro)のイラスト上に重ねる、浮かぶガラスの部品(ナビ・お知らせの札)。

@@ -149,6 +149,7 @@ const omikujiFields = [
 
       const bubble = el.closest('.line-mock-bubble');
 
+      el.style.minHeight = '';
       if (prefersReducedMotion || !text) {
         el.textContent = text || '';
         if (bubble) bubble.style.minHeight = '';
@@ -157,10 +158,12 @@ const omikujiFields = [
 
       // 先に全文を描画して吹き出しの最終的な高さをmin-heightに固定してから空にする。
       // これによりタイピング中に縦幅が変化しても、アバターや三角の位置が動かなくなる。
+      // 吹き出しは文字を上下中央に置くため、文字の要素も全文の高さに固定し、打ち始めから上詰めで表示する
       if (bubble) {
         bubble.style.minHeight = '';
         el.textContent = text;
         bubble.style.minHeight = `${bubble.offsetHeight}px`;
+        el.style.minHeight = `${el.offsetHeight}px`;
       }
 
       el.textContent = '';
