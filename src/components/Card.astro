@@ -33,6 +33,10 @@ const thumbnail = !props.optimizeImage || !props.item.sourceImageUrl
 const loadingAttrs = props.priority ? { fetchpriority: 'high' as const } : { loading: 'lazy' as const };
 const thumbSrc = thumbnail?.src ?? props.item.imageUrl;
 const thumbAttrs = { srcset: thumbnail?.srcset, sizes: thumbnail?.sizes };
+// 画面に見える「NSFW」の札を、読み上げ名でも独立した語として先頭に置く。前後の文字と続けると
+// 音声で操作する人が「NSFW」と言っても押せず、Lighthouseでも見た目と名前の不一致と判定される
+const artworkLabel =
+  props.type === 'artwork' && props.item.nsfw ? `NSFW ${props.item.title}を拡大表示` : `${props.item.title}を拡大表示`;
 // サムネイル上に重ねるタグの上限。多いと重ね表示が膨らんでイラストを覆うため、残りは「+N」にまとめる
 const MAX_TAGS = 3;
 // BOOTH商品(shop)は追加日時を取得できないため対象外
@@ -52,7 +56,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
           data-nsfw={props.item.nsfw ? 'true' : undefined}
           data-width={thumbnail?.width}
           data-height={thumbnail?.height}
-          aria-label={props.item.nsfw ? `${props.item.title}(NSFW)を拡大表示` : `${props.item.title}を拡大表示`}
+          aria-label={artworkLabel}
         >
           <img
             src={thumbSrc}
