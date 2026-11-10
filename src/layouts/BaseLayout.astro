@@ -11,8 +11,9 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  ogType?: 'website' | 'article';
 }
-const { title, description = site.description, noindex = false } = Astro.props;
+const { title, description = site.description, noindex = false, ogType = 'website' } = Astro.props;
 const pageTitle = title ? `${title} | ${site.title}` : site.title;
 const ogImageURL = new URL('/og-image.webp', Astro.site ?? Astro.url).toString();
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
@@ -104,13 +105,14 @@ const structuredData = {
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
-    <link rel="canonical" href={canonicalURL} />
+    <!-- 検索に載せないページ(404など)では出さない。404ページは存在しない /404/ を指してしまうため -->
+    {!noindex && <link rel="canonical" href={canonicalURL} />}
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
 
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:site_name" content={site.title} />
     <meta property="og:image" content={ogImageURL} />

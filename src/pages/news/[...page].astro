@@ -16,9 +16,11 @@ export const getStaticPaths = (async ({ paginate }) => {
 const { page } = Astro.props;
 
 const categoryPath = (category: NewsCategory) => `/news/category/${category}/`;
+// 2ページ目以降が1ページ目と同じタイトル・説明文だと、検索エンジンに重複したページと見なされるため
+const pageLabel = page.currentPage > 1 ? `(${page.currentPage}ページ目)` : '';
 ---
 
-<BaseLayout title="News" description="サイトの更新履歴・お知らせ一覧です。">
+<BaseLayout title={`News${pageLabel}`} description={`サイトの更新履歴・お知らせ一覧${pageLabel}です。`}>
   <section class="page-section">
     <SectionHeading eyebrow="News" title="お知らせ" level={1}>
       <RssLink slot="action" />

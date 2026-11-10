@@ -32,9 +32,11 @@ const { page } = Astro.props;
 const meta = getCategoryMeta(category);
 
 const categoryPath = (c: NewsCategory) => `/news/category/${c}/`;
+// 2ページ目以降が1ページ目と同じタイトル・説明文だと、検索エンジンに重複したページと見なされるため
+const pageLabel = page.currentPage > 1 ? `(${page.currentPage}ページ目)` : '';
 ---
 
-<BaseLayout title={`News - ${meta.label}`} description={`${meta.label}に関するお知らせ・更新履歴の一覧です。`}>
+<BaseLayout title={`News - ${meta.label}${pageLabel}`} description={`${meta.label}に関するお知らせ・更新履歴の一覧${pageLabel}です。`}>
   <section class="page-section">
     <SectionHeading eyebrow="News" title="お知らせ" level={1}>
       <RssLink slot="action" />
