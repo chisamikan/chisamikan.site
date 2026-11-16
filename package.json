@@ -33,8 +33,8 @@
     "@fortawesome/free-regular-svg-icons": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "subset-font": "^2.9.0",
-    "vite": "^8.3.6",
-    "wrangler": "^4.158.0"
+    "vite": "^8.3.8",
+    "wrangler": "^4.161.0"
   },
   "overrides": {
     "miniflare": {
