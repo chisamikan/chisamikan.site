@@ -66,7 +66,9 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             class:list={[
               'absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 ease-out',
               // 15px: 8pxでは見えすぎ、18pxでは何の絵か分かりにくかったため、間を取った
-              props.item.nsfw ? 'scale-110 blur-[15px]' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
+              // transform-gpu: iOS 27のSafariでは、ぼかしを画像の区画ごとにかけて継ぎ目が縦線になるため、
+              // GPUの層に載せて画像全体へ一度にかけさせる
+              props.item.nsfw ? 'scale-110 blur-[15px] transform-gpu' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
             ]}
           />
           {props.item.nsfw && (
