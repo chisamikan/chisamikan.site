@@ -66,7 +66,7 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             onerror={onImageError}
             class:list={[
               'absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 ease-out',
-              props.item.nsfw ? 'scale-110 blur-md' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
+              props.item.nsfw ? 'scale-110 blur-sm' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
             ]}
           />
           {props.item.nsfw && (
