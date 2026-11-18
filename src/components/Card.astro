@@ -65,12 +65,13 @@ const isNew = props.type !== 'shop' && isNewItem(props.item.createdTime);
             onerror={onImageError}
             class:list={[
               'absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 ease-out',
-              props.item.nsfw ? 'scale-110 blur-xl' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
+              // 15px: 8pxでは見えすぎ、18pxでは何の絵か分かりにくかったため、間を取った
+              props.item.nsfw ? 'scale-110 blur-[15px]' : 'group-hover:scale-105 motion-reduce:group-hover:scale-100',
             ]}
           />
           {props.item.nsfw && (
-            // 画像の上に重ねる固定の暗幕バッジなので、ページのテーマに関わらず black/white で統一する
-            <span class="absolute inset-0 flex items-center justify-center bg-black/35">
+            // 画像の上に重ねる固定のバッジなので、ページのテーマに関わらず black/white で統一する
+            <span class="absolute inset-0 flex items-center justify-center">
               <span class="rounded-full bg-black/85 px-3 py-1 text-xs uppercase tracking-widest text-white">
                 NSFW
               </span>
