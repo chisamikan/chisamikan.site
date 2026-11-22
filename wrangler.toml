@@ -4,6 +4,11 @@ compatibility_flags = ["nodejs_compat"]
 # Astroの処理に加えて定期再ビルド(Cron Trigger)を扱うため、自前のエントリを使う
 main = "./src/worker.ts"
 
+# console.error などの記録を残す(無効だとAPIのエラーの原因を後から確かめられないため)
+# ダッシュボードで有効にしてもデプロイ時にこの設定で上書きされるので、ここで指定する
+[observability]
+enabled = true
+
 # Notion/RSSの更新を反映するため、30分おきにDeploy Hookを叩いて再ビルドする(src/worker.ts)
 # Deploy Hook URLはシークレット CF_DEPLOY_HOOK_URL で指定する
 # 再ビルドの5分後に、/rss.xmlの新着をDiscordへ通知する(Webhook URLはシークレット DISCORD_NEWS_WEBHOOK_URL。未設定なら通知しない)
