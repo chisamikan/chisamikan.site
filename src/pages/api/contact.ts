@@ -197,7 +197,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: 'server_error', fallbackEmail }, 500);
   }
   try {
-    await sendAdminEmail({ name, email, message }, env.CONTACT_EMAIL, adminAddress);
+    await sendAdminEmail({ name, email, message, remoteIp }, env.CONTACT_EMAIL, adminAddress);
   } catch (err) {
     // 詳細はサーバーログにのみ記録し、クライアントやDiscordへは個人情報・内部情報を含めない
     const code = (err as { code?: string }).code ?? 'unknown';

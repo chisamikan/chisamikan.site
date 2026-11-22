@@ -6,6 +6,8 @@ interface ContactNotifyPayload {
   name: string;
   email: string;
   message: string;
+  // 迷惑な送信元をCloudflareのセキュリティルールでブロックできるよう、メールにだけ載せる
+  remoteIp: string | null;
 }
 
 const SENDER_ADDRESS = 'no-reply@chisamikan.site';
@@ -33,6 +35,7 @@ export async function sendAdminEmail(
       `受信日時: ${receivedAt}`,
       `お名前: ${payload.name}`,
       `メールアドレス: ${payload.email}`,
+      `送信元IP: ${payload.remoteIp ?? '不明'}`,
       '',
       '--- お問い合わせ内容 ---',
       payload.message,
